@@ -13,9 +13,9 @@ Godot; the CLI surface in ADR-010 is a thin wrapper on top of their functions.
 | [phase1.json](phase1.json) | phase1 (project: game) | demo -> build -> capture | build/ProjectGypsy.exe, artifacts/game/demo.mp4, artifacts/game/frame.png |
 | [quality.json](quality.json) | quality (project: repository root) | check -> tests -> records | none |
 
-The two slices are independent: phase1 proves the game vertical slice again from a clean state, quality proves the
-harness (gypsy check, the workstream unit tests, the records guard). A task runs them in file-name order and stops at
-the first failing slice.
+The two slices are independent manifests: phase1 proves the game vertical slice again from a clean state; quality
+proves the pack check list, the workstream unit tests and the records guard. A task runs them in manifest order and
+stops at the first failing slice; quality does not require Godot, only Python and git.
 
 ## Schema: gypsy.slice/v1
 
@@ -62,7 +62,7 @@ recorded as a failed step instead of crashing the run.
 | Kind | Default handler |
 | --- | --- |
 | game.demo / game.build / game.capture | lazily imports workstream/game.py; phase1 args set the Windows Desktop preset and build/ProjectGypsy.exe output; capture produces the mp4/frame the artifacts list declares |
-| check_all | lazily imports gypsy.py and calls gypsy.check_all(project_dir) |
+| check_all | subprocess: python scripts/check_all.py, cwd = project root (pack checks only; no engine dependency) |
 | tests | subprocess: python -m unittest discover -s workstream/tests -v, cwd = project root |
 | records | subprocess: python scripts/records_check.py --root <project root> |
 | command | subprocess with an explicit argv list and cwd, shell=False; a string argv is refused |
@@ -93,8 +93,10 @@ SHA-256; a changed manifest ignores the old state. --force (run_slice(force=True
     # run a task with the default handlers
     python -c "import sys; sys.path.insert(0, 'workstream'); import slices, orchestrator, json; print(json.dumps(orchestrator.run_task(slices.load_all('slices'), project_root='.', state_dir='workstream/state'), indent=2))"
 
-The `phase1` slice needs Godot 4.7.2, export templates and ffmpeg; the `quality` slice needs neither but runs the
-full unit suite. Neither needs the network.
+The `phase1` slice needs Godot 4.7.2, export templates and ffmpeg. The `quality` slice needs Python and git only:
+its check step runs scripts/check_all.py (environment-dependent unit tests skip on a clean runner). Neither needs the
+network. The two slices are independent manifests, but a clean-runner task can still run phase1 only after Godot is
+installed.
 
 ## Tests
 

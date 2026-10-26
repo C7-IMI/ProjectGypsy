@@ -168,5 +168,15 @@ Each entry has:
 
 ---
 
-Next prompt number: 17. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 17 - 2026-10-25
+
+- Request: Fix the Phase-2 audit findings and re-verify the orchestrator.
+- Status: Completed.
+- Version: 2026.10.25.012
+- Commit/evidence: portable quality check (clean-runner simulation PASS 3/3), task --force (resumed=false, all steps
+  attempted), stale status corrections; 54 tests; scripts/check_all.py 6/6; 37 capabilities.
+
+---
+
+Next prompt number: 18. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

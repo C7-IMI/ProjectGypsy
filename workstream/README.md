@@ -1,7 +1,8 @@
-# Workstream (Phase 0)
+# Workstream (Phase 0-2)
 
-The studio-harness skeleton described in [docs/ADR-003-workstream-architecture.md](../docs/ADR-003-workstream-architecture.md).
-It is deliberately small: detection, manifests and checks first; adapters and the orchestrator come later.
+The studio harness described in [docs/ADR-003-workstream-architecture.md](../docs/ADR-003-workstream-architecture.md):
+engine/tool detection, manifests and checks (Phase 0), a playable Godot slice (Phase 1), and a manifest-driven slice
+orchestrator with state and artifact hashes (Phase 2).
 
 ## Commands
 
@@ -23,7 +24,7 @@ Run the tests:
 python -m unittest discover -s workstream/tests -v
 ```
 
-## What is real in Phase 0
+## What is real
 
 - Engine registry by binary probe, not registry metadata; hardware gate; Unity licence presence; Godot export-template
   detection; UE5 stale-registry reporting.
@@ -32,9 +33,11 @@ python -m unittest discover -s workstream/tests -v
 - Tool manifest verification.
 - Godot headless smoke test (the reference adapter).
 - Phase-1 game adapter: headless demo, Windows export, exported-binary demo, windowed movie capture.
+- Phase-2 orchestrator: gypsy.slice/v1 manifests (`slices/`), ordered/dependent steps, resumable state, artifact
+  SHA-256 ledger, multi-slice task report and the `slices` CLI.
 
 ## What is not built yet
 
-Engine adapters beyond detection/smoke, build/export automation, capture harness, artifact store, orchestrator state
-machine, console. Those are registered as deferred work (DEFERRED.md) rather than claimed. See
+Engine adapters beyond Godot, console/TUI, live editing and self-extension. Those are registered as deferred work
+(DEFERRED.md) rather than claimed. See
 [docs/ADR-003-workstream-architecture.md](../docs/ADR-003-workstream-architecture.md) for the phase plan.

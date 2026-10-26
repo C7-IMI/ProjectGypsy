@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.25.011
+Current version: 2026.10.25.012
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,20 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.25.012
+
+**Phase-2 audit fixes: portable quality slice, task --force, status corrections.**
+
+- Date: 2026-10-25
+- Commit: this change.
+- Change: the orchestrator's check_all handler now runs scripts/check_all.py (pack checks) instead of gypsy.check_all, so
+  the quality slice is portable to a clean runner; run_task accepts force and the CLI passes --all --force through;
+  stale Phase-0/15-test/orchestrator-not-built status text and the Phase-2 evidence Python version were corrected;
+  slices/README documents the real dependencies.
+- Verification: 54 tests OK; slices run quality in a simulated clean environment (no Godot/GameTools) PASS 3/3;
+  slices run --all --force PASS 6/6 with resumed=false and all 3 phase1 steps attempted; scripts/check_all.py 6/6 PASS,
+  37 capabilities.
 
 ## 2026.10.25.011
 

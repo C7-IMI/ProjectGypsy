@@ -111,12 +111,14 @@ python workstream/gypsy.py game demo      # headless: GYPSY_DEMO_OK collected=3 
 python workstream/gypsy.py game build     # exports build/ProjectGypsy.exe (109,127,680 bytes)
 python workstream/gypsy.py game capture   # windowed movie -> artifacts/game/demo.mp4 + frame.png
 python workstream/gypsy.py game verify    # demo + build + exported-binary demo + capture
-python workstream/gypsy.py slices run --all   # Phase-2: phase1 + quality, one report
+python workstream/gypsy.py slices list|plan   # Phase-2 manifests and dependency order
+python workstream/gypsy.py slices run --all   # phase1 + quality, one report
 python workstream/gypsy.py slices status      # latest task state
 ~~~
 
 - Engine: Godot 4.7.2, PC; export templates installed under `%APPDATA%\\Godot\\export_templates\\4.7.2.stable`.
-- Evidence: [docs/PHASE-1-EVIDENCE.md](docs/PHASE-1-EVIDENCE.md); state under `workstream/state/game-*.json` (gitignored).
+- Evidence: [docs/PHASE-1-EVIDENCE.md](docs/PHASE-1-EVIDENCE.md) and [docs/PHASE-2-EVIDENCE.md](docs/PHASE-2-EVIDENCE.md);
+  state under `workstream/state/game-*.json` and `workstream/state/{slices,artifacts}/` (gitignored).
 - `build/` and `artifacts/` are gitignored; the slice source is `game/`.
 
 ## Workstream commands

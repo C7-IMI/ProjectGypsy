@@ -10,8 +10,8 @@ A game. Phase 1 is a playable **Godot 4.7.2 PC** slice; the interface standard a
 - [`docs/README.md`](docs/README.md) — all ten ADRs (engines, art pipeline, workstream architecture, generative
   media, character/animation automation, Blender import matrix, language boundaries, MCP/local tools, vertical slice,
   slice orchestrator) and the generated evidence.
-- [`workstream/README.md`](workstream/README.md) — the Phase-0 CLI: engine registry, hardware gates, capability and
-  project manifests, checks, Godot smoke test.
+- [`workstream/README.md`](workstream/README.md) — the Phase-0-2 CLI: engine registry, hardware gates, manifests,
+  checks, Godot smoke/slice commands, and the phase-2 slices orchestrator.
 
 ## Rules and decisions
 

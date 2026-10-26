@@ -833,7 +833,7 @@ def main(argv=None) -> int:
                     # run_slice supports force; a task does not need it (default is a clean rerun).
                     result = run_slice(manifests[ids[0]], project_root=REPO_ROOT, state_dir=state_dir, resume=args.resume, force=args.force if len(ids) == 1 else False)
                 else:
-                    result = run_task([manifests[slice_id] for slice_id in ids], project_root=REPO_ROOT, state_dir=state_dir, resume=args.resume)
+                    result = run_task([manifests[slice_id] for slice_id in ids], project_root=REPO_ROOT, state_dir=state_dir, resume=args.resume, force=args.force)
                 if args.json:
                     print(json.dumps(result, indent=2))
                 else:

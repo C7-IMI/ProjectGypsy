@@ -5,7 +5,8 @@ workstream/state/slices/ and workstream/state/artifacts/ (gitignored); this file
 
 ## Environment
 
-- Python 3.13 (C:/Python), Windows, Godot 4.7.2 for phase1; no network needed.
+- Python 3.14.2 (C:/Python), Windows, Godot 4.7.2 for phase1; no network needed. The quality slice's check_all step
+  runs scripts/check_all.py and is portable to a clean runner (environment tests skip); phase1 still needs Godot.
 - Manifests: slices/phase1.json and slices/quality.json.
 - Orchestrator: workstream/orchestrator.py; schema/loader: workstream/slices.py.
 
@@ -20,6 +21,8 @@ workstream/state/slices/ and workstream/state/artifacts/ (gitignored); this file
 | Artifact ledger | PASS — SHA-256 + bytes written for build/ProjectGypsy.exe, artifacts/game/demo.mp4, artifacts/game/frame.png |
 | Reproducibility | PASS — a second task run produced identical SHA-256 for all three artifacts |
 | Resume | PASS — slices run phase1 --resume reuses passed state (tested; manifest hash must match) |
+| Force | PASS — slices run phase1 --force reruns all three steps; --all --force also reruns every slice (resumed:false, 3 attempted) |
+| Clean-runner quality | PASS — slices run quality with no Godot/GameTools on PATH: 3/3 steps, because check_all runs scripts/check_all.py and environment tests skip |
 | Task console | PASS — slices list, plan, run --all and status all execute |
 | Full checks | scripts/check_all.py 6/6 PASS; 54 workstream tests; 37 capabilities |
 
@@ -41,7 +44,7 @@ status, timings, errors, the manifest SHA-256 and the aggregate report.
 | artifacts/game/frame.png | 33,187 | 89d0d32945894c2b280ca98be9daadd822e692dc6ab78699471efd7b4435864d |
 
 The second run (task-20261026T042118Z) produced the same three hashes. Artifact ledgers:
-workstream/state/artifacts/phase1-<runId>.json.
+workstream/state/artifacts/phase1-<runId>.json. A forced rerun also produced the same hashes.
 
 ## Commands
 

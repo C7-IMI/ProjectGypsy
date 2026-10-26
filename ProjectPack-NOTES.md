@@ -52,7 +52,7 @@ rules remain.
 | 11.5 explanation is a deliverable | **parked** (addendum) |
 | 11.6 subagents on every prompt, cap 10 | declined — the portable §10.1 cap applies (this project: twelve) |
 | 11.7 feature and integration checks across applications | declined — one application, no interop map |
-| 11.8 records move with the work | carried, adapted → **11.4** (records not built yet, PG-D1) |
+| 11.8 records move with the work | carried, adapted → **11.4** (records built and guarded; PG-D1 closed) |
 | 11.9 probe and discovery safety | declined — no customer infrastructure, no probes |
 | 11.10 one interface, three arrangements | **parked** (addendum) |
 | 11.11 help stays current | **parked** (addendum) |
@@ -114,9 +114,9 @@ The "declined" entries are in Part 11.13 of the pack and in `DEFERRED.md` only w
 
 ## §2.31 — which rules are in force today (applied 2026-10-25, pack PG-1)
 
-This repository is **a game with rules, a Phase-0 workstream, a Phase-1 playable slice, a pack-wide check list and
-records**. The engine is chosen for this slice (Godot 4.7.2, PC), the build and capture are proven, and the records/check
-machinery is in place; remaining work is asset authorship, adapters and phases 2+.
+This repository is **a game with rules, a Phase-0/1/2 workstream, a playable slice, a pack-wide check list and
+records**. The engine is chosen for this slice (Godot 4.7.2, PC), the build/capture and the multi-slice orchestrator are
+proven; remaining work is asset authorship, console/live editing, adapters and later phases.
 
 - **In force as conduct, not mechanised:** Part 1's laws; §2.1–§2.4 records and prose (records now guarded); §2.5
   one source; §2.6 brand packet (when assets exist); §2.7 configuration declared; §2.13 reversibility; §2.14–§2.16
@@ -164,8 +164,9 @@ python workstream/gypsy.py check
 python workstream/gypsy.py game verify
 ```
 
-`check_all.py` covers records, encoding, links, capability JSON, the 15 workstream tests and hook/CI caller coverage;
-`gypsy check` covers engine/project manifests and the hardware gate; `game verify` covers the playable slice.
+`check_all.py` covers records, encoding, links, capability JSON, the 54 workstream tests and hook/CI caller coverage;
+`gypsy check` covers engine/project manifests and the hardware gate; `game verify` covers the playable slice; `slices run
+--all` covers the Phase-2 multi-slice task and artifact hashes.
 
 
 ## How this application of the pack was verified

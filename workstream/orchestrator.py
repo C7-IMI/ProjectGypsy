@@ -421,7 +421,7 @@ def _report_lines(task_name: str, passed: bool, slices: list, counts: dict, arti
     return lines
 
 
-def run_task(manifests, *, project_root, state_dir, resume=False, handlers=None) -> dict:
+def run_task(manifests, *, project_root, state_dir, resume=False, force=False, handlers=None) -> dict:
     """Run several slice manifests in order, writing one aggregate task report.
 
     *manifests* may be a mapping (as returned by slices.load_all) or any iterable of
@@ -490,6 +490,7 @@ def run_task(manifests, *, project_root, state_dir, resume=False, handlers=None)
             project_root=project_root,
             state_dir=state_dir,
             resume=resume,
+            force=force,
             handlers=handlers,
         )
         step_counts = _count_statuses(result["steps"])
@@ -636,30 +637,10 @@ def _game_handler(function_name: str):
 
 
 def handle_check_all(step, context) -> dict:
-    gypsy = _workstream_module("gypsy")
-    args = step.get("args") or {}
-    if args.get("project"):
-        target = Path(args["project"])
-        if not target.is_absolute():
-            target = Path(context["project_root"]) / target
-    else:
-        target = Path(context["project_dir"])
-    result = gypsy.check_all(str(target))
-    lines = []
-    for error in result.get("errors", []):
-        lines.append("FAIL " + str(error))
-    for warning in result.get("warnings", []):
-        lines.append("WARN " + str(warning))
-    tools = result.get("tools") or {}
-    lines.append(
-        f"checks: {'PASS' if result.get('passed') else 'FAIL'} | "
-        f"capabilities {result.get('capabilities')} | tools {tools.get('count')}"
-    )
-    return {
-        "passed": bool(result.get("passed")),
-        "output": "\n".join(lines),
-        "error": "; ".join(str(error) for error in result.get("errors", [])) or None,
-    }
+    """Run the pack check list (scripts/check_all.py); no engine/GameTools dependency."""
+    root = Path(context["project_root"])
+    script = root / "scripts" / "check_all.py"
+    return _run_command([sys.executable, str(script)], root, context["timeout"], label="check_all")
 
 
 def handle_tests(step, context) -> dict:
