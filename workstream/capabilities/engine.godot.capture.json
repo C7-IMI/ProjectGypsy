@@ -4,7 +4,7 @@
   "layer": "engine",
   "engine": "godot",
   "kind": "capture",
-  "maturity": "partial",
+  "maturity": "planned",
   "description": "Capture rendered evidence from a windowed run or Godot movie-maker mode. Headless mode cannot render, so this is not a headless capability.",
   "requires": [
     "godot.installed",
@@ -42,5 +42,8 @@
       "frameCount",
       "artefactHash"
     ]
-  }
+  },
+  "notes": [
+    "Planned: declared but not implemented; no run is claimed."
+  ]
 }

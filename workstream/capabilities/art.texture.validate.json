@@ -4,7 +4,7 @@
   "layer": "art",
   "tool": "imagemagick",
   "kind": "validate",
-  "maturity": "stable",
+  "maturity": "planned",
   "description": "Validate texture sets with ImageMagick and DirectXTex: channels, dimensions, colour space, alpha, tiling seam check, compression.",
   "requires": [
     "imagemagick.installed",
@@ -40,5 +40,8 @@
       "inputHashes",
       "reportHash"
     ]
-  }
+  },
+  "notes": [
+    "Planned: declared but not implemented; no run is claimed."
+  ]
 }

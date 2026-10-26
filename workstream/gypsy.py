@@ -56,7 +56,7 @@ REQUIREMENTS = {
     "ue5": {"min_vram_gb": 8, "min_free_gb": 60, "disk": "D"},
     "flax": {"min_vram_gb": 2, "min_free_gb": 5, "disk": "C"},
 }
-CAP_MATURITY = {"stable", "partial", "experimental", "blocked"}
+CAP_MATURITY = {"stable", "partial", "experimental", "planned", "blocked"}
 CAP_REQUIRED = {
     "id", "layer", "kind", "maturity", "description",
     "requires", "inputs", "outputs", "checks", "provenance",
@@ -537,6 +537,8 @@ def smoke_godot(keep: bool = False) -> dict:
             "tempDir": str(temp) if keep else None,
             "passed": passed,
         }
+        STATE_DIR.mkdir(parents=True, exist_ok=True)
+        (STATE_DIR / "smoke-godot.json").write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
         if not passed:
             raise GypsyError("Godot smoke failed: " + json.dumps(evidence, indent=2)[:2000])
         return evidence
@@ -668,8 +670,9 @@ def main(argv=None) -> int:
         if args.command == "engines":
             if args.engines_command == "probe":
                 probe = probe_engines()
-                STATE_DIR.mkdir(parents=True, exist_ok=True)
-                (STATE_DIR / "engines.json").write_text(json.dumps(probe, indent=2) + "\n", encoding="utf-8")
+                if args.save:
+                    STATE_DIR.mkdir(parents=True, exist_ok=True)
+                    (STATE_DIR / "engines.json").write_text(json.dumps(probe, indent=2) + "\n", encoding="utf-8")
                 if args.json:
                     print(json.dumps(probe, indent=2))
                 else:

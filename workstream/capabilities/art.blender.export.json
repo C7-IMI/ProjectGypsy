@@ -4,7 +4,7 @@
   "layer": "art",
   "tool": "blender",
   "kind": "export",
-  "maturity": "stable",
+  "maturity": "planned",
   "description": "Headless Blender export: .blend source to glTF/GLB or FBX plus a JSON descriptor; no hand-editing of derived files.",
   "requires": [
     "blender.installed"
@@ -43,5 +43,8 @@
       "exportSettings",
       "artefactHash"
     ]
-  }
+  },
+  "notes": [
+    "Planned: declared but not implemented; no run is claimed."
+  ]
 }

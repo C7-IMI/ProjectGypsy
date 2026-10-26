@@ -34,8 +34,7 @@ Pointers and stubs were removed from the pack as well (they were not rules): the
 §9.2 token-lint row; the two Part 4 definition-of-done lines (the "every surface" line and the design-language line);
 the Part 6 "a reimagine starts with a mockup" step and its frame wording; the §2.31 naming-rule reference; the P1
 design-language item and its agent-file wording; the P2 interface-change bullet and the "screen captured in every
-arrangement" evidence line; the Part 7 example 1 reference to §2.9; the §8.2 sentence that says what is parked; and
-the §10.2/§10.6 browser references. Each is replaced by a statement that says what is parked, so nothing silently
+arrangement" evidence line; the Part 7 example 1 reference to §2.9; and the §10.2/§10.6 browser references. Each is replaced by a statement that says what is parked, so nothing silently
 loses its rule, and each is listed here so a restore can put it back.
 
 **Nothing else was parked.** The pack's subject is verifying claims — records, evidence, generated artefacts, gates,
@@ -80,10 +79,10 @@ The "declined" entries are in Part 11.13 of the pack and in `DEFERRED.md` only w
 | `<PROMPT_LOG>` | not created yet — **PG-D1** |
 | `<CHANGELOG>` | not created yet — **PG-D1** |
 | version script | none yet — **PG-D1** |
-| `<GUARD_LIST>` | none yet — **PG-D2** (there is no build or test to list) |
+| `<GUARD_LIST>` | none yet — **PG-D2**; Phase 0 has workstream unit tests and `gypsy check`, which are not the pack-wide list |
 | `<CONTRACT_ARTEFACT>` | none yet — no published API (**PG-D7** if one appears) |
 | `<CONTRACT_GUIDE>` | the same |
-| `<PRODUCT_DOCS>` | [`README.md`](./README.md), this file, `ProjectPack.md` and `DEFERRED.md`; no docs tree yet (**PG-D5**) |
+| `<PRODUCT_DOCS>` | [`README.md`](./README.md), [`docs/README.md`](./docs/README.md), this file, `ProjectPack.md`, `TOOLCHAIN.md` and `DEFERRED.md`; the links guard is still owed (**PG-D5**) |
 | `<DEFERRED_REGISTER>` | [`DEFERRED.md`](./DEFERRED.md) |
 | `<HEALTH_COMMAND>` | none — nothing runs yet (engine decision **PG-D3**) |
 | `<SWEEP_COMMAND>` | none — no test rig writes state yet |
@@ -96,13 +95,13 @@ The "declined" entries are in Part 11.13 of the pack and in `DEFERRED.md` only w
 | --- | --- |
 | Where the prompt log and changelog live, and how the version is computed | Not built yet (**PG-D1**). The intended home is the C7NTRY pattern: a prompt log, a changelog and a script-computed version, guard-checked; the first build bootstraps it |
 | Which generated copies exist, and who regenerates them | None — nothing generated yet |
-| The single check list, and how the hook and CI are kept in step | None yet (**PG-D2**); there is nothing to run. The first code creates the list, the tracked hook and the CI caller together |
+| The single check list, and how the hook and CI are kept in step | None yet (**PG-D2**). Phase 0 runs `python -m unittest discover -s workstream/tests` and `python workstream/gypsy.py check`; the pack-wide list, tracked hook and CI caller are created together by the first game build |
 | The published contract artefact and what checks it | Not applicable yet; if the game exposes an API this becomes **PG-D7** |
-| Where the product's own documentation lives, and what keeps it reachable | README and these pack files today. A docs tree and a links guard arrive with the first docs (**PG-D5**) |
+| Where the product's own documentation lives, and what keeps it reachable | README, `docs/README.md` and the ADRs/`ENGINE-SMOKE.md` today; the links guard is still owed (**PG-D5**) |
 | The design language, and what guards it | **Parked** — the web design rules are in the addendum and not in force (**PG-D4**). No game-side standard has been chosen; inventing one is an operator decision |
 | How many interfaces and themes exist, and what they are called | Not decided; parked with the interface material. Do not claim interface facts until the game's interface standard exists |
 | Whether the product runs as more than one instance, and what makes scheduled work safe | Nothing runs yet; when a server exists it answers the four questions (§2.20, Part 11.7) |
-| Which bug classes this codebase actually produces | None recorded — no code exists |
+| Which bug classes this codebase actually produces | None recorded — no game code exists; the Phase-0 workstream has only its own tests and checks |
 | Where the scratch rigs live, and how they are reaped | None started by this repository's work |
 | Whether anything commits on somebody's behalf | No. Commits are made by a person or a session; no auto-publisher exists |
 | Which layers need a rollback document | None yet (**PG-D8**); `ProjectPack.md` §2.13 and Part 11.9 state what each will need |
@@ -115,8 +114,9 @@ The "declined" entries are in Part 11.13 of the pack and in `DEFERRED.md` only w
 
 ## §2.31 — which rules are in force today (applied 2026-10-25, pack PG-1)
 
-This repository is **a game with rules and no product code yet**: no engine, no build, no test, no check list, no
-records infrastructure. That state is why most of the pack is conduct rather than mechanism here.
+This repository is **a game with rules and a Phase-0 workstream, but no game code yet**: no chosen engine, no game
+build, no pack-wide check list and no records infrastructure. That state is why most of the pack is conduct rather than
+mechanism here; the workstream tests/CLI are not the pack's checks.
 
 - **In force as conduct, not mechanised:** Part 1's laws; §2.1–§2.4 records and prose (the mechanism is PG-D1); §2.5
   one source; §2.6 brand packet (when assets exist); §2.7 configuration declared; §2.13 reversibility; §2.14–§2.16
@@ -145,11 +145,11 @@ checks the first game build should produce, and the pack's §9 list is the full 
 | records | not yet | **PG-D1**: the prompt log, changelog and generated copies need the first records files |
 | newest-first / version computation | not yet | same (**PG-D1**) |
 | encoding | not yet | the first build adds the guard; the pack files are UTF-8 without BOM (checked) |
-| documentation links | not yet | **PG-D5**: README and the pack files are the only docs; a links guard comes with the docs tree |
+| documentation links | not yet | **PG-D5**: the docs tree now exists (`docs/README.md`); the links guard is still owed. |
 | secret scan | not yet | no code or config yet; the first build adds the scanner before any credential exists |
 | project boundary | not yet | **PG-D6**: the peer guard is a discipline until the guard exists (Part 11.5) |
 | typecheck / build | not yet | no engine or code (**PG-D3**) |
-| generated artefacts | not yet | no generator |
+| generated artefacts | not yet | no game-art generator; MusicGen prototype outputs exist under the ADR-004 record, not a game pipeline |
 | contract / curated prose | not yet | no API (**PG-D7** if one appears) |
 | deploy templates, auto-publish gate, leak sweep, audit sweep, artefact stamp, health, token lint, browser check | n/a | each has no subject in this repository yet; the token-lint and browser rows are **parked** with the interface material |
 

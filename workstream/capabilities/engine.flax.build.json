@@ -4,7 +4,7 @@
   "layer": "engine",
   "engine": "flax",
   "kind": "build",
-  "maturity": "experimental",
+  "maturity": "planned",
   "description": "Flax build via Flax.Build.exe; automation path not yet demonstrated.",
   "requires": [
     "flax.installed"
@@ -31,5 +31,8 @@
       "command",
       "exitCode"
     ]
-  }
+  },
+  "notes": [
+    "Planned: declared but not implemented; no run is claimed."
+  ]
 }

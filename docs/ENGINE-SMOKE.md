@@ -27,8 +27,8 @@ export templates: none installed
 
 What the smoke does: creates a temporary Godot project (`project.godot`, `main.tscn`, a GDScript that prints
 `GYPSY_SMOKE_OK engine=godot version=...`), runs `godot --headless --path <tmp>` with a 90 s timeout, asserts exit 0
-and the marker, deletes the temp directory. The test also writes a JSON sidecar with exit code, duration, stdout and
-stderr.
+and the marker, deletes the temp directory, and writes the evidence (exit code, duration, stdout, stderr,
+export-template list) to `workstream/state/smoke-godot.json` (gitignored).
 
 **Not proven yet:** rendering. Godot headless uses a dummy renderer, so no frame can be captured in this mode. The
 visual-evidence path (windowed run + OBS, or Godot movie-maker mode) is a separate capability

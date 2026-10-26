@@ -4,7 +4,7 @@
   "layer": "engine",
   "engine": "unity",
   "kind": "build",
-  "maturity": "partial",
+  "maturity": "blocked",
   "description": "Unity batchmode build. Gated on a proven licence; activation is not automated.",
   "requires": [
     "unity.installed",

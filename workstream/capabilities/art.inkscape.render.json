@@ -4,7 +4,7 @@
   "layer": "art",
   "tool": "inkscape",
   "kind": "render",
-  "maturity": "stable",
+  "maturity": "planned",
   "description": "Deterministic SVG rendering and size variants via Inkscape CLI.",
   "requires": [
     "inkscape.installed"
@@ -37,5 +37,8 @@
       "sizes",
       "artefactHash"
     ]
-  }
+  },
+  "notes": [
+    "Planned: declared but not implemented; no run is claimed."
+  ]
 }

@@ -4,7 +4,7 @@
   "layer": "engine",
   "engine": "godot",
   "kind": "build",
-  "maturity": "stable",
+  "maturity": "planned",
   "description": "Headless Godot export/build for a pinned target; requires the matching export templates to be installed.",
   "requires": [
     "godot.installed",
@@ -38,5 +38,8 @@
       "command",
       "artefactHash"
     ]
-  }
+  },
+  "notes": [
+    "Planned: declared but not implemented; no run is claimed."
+  ]
 }

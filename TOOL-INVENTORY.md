@@ -52,6 +52,8 @@ Python libraries installed into `C:\Python\python.exe`: `scipy`, `trimesh`, `pyg
 | Krita | 5.3.4.1 | painting, concept art, texture layers (limited headless scripting) |
 | Inkscape | 1.4.4 | vector art, icons, patterns; strong CLI export |
 | GIMP | 3.2.6 | raster fallback and format bridge |
+| Upscayl | 2.15.0 | AI upscaling of concepts/textures (AGPL; provenance required) |
+| Topaz Gigapixel / Photo / Video AI | 7.1.4 / 3.2.0 / 7.1.1 | paid upscalers; source/concept only, never to fake resolution |
 | Godot | 4.7.2 | engine — headless build/run (best agent loop) |
 | Unity | 6000.6.7f1 | engine — mobile strength; batchmode needs licence check |
 | Unreal Engine | 5.8.4 (5.4 registry entry is stale) | engine — limited by 4 GB VRAM and free disk |

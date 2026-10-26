@@ -4,7 +4,7 @@
   "layer": "audio",
   "tool": "audacity",
   "kind": "edit",
-  "maturity": "partial",
+  "maturity": "planned",
   "description": "Human-in-the-loop audio editing in Audacity; batch processing via FFmpeg where deterministic.",
   "requires": [
     "audacity.installed"
@@ -37,5 +37,8 @@
       "parameters",
       "artefactHash"
     ]
-  }
+  },
+  "notes": [
+    "Planned: declared but not implemented; no run is claimed."
+  ]
 }

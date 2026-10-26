@@ -27,9 +27,11 @@ def _stats(wav):
     import numpy as np
 
     finite = bool(np.isfinite(wav).all())
+    if not finite:
+        return {"finite": False, "peak": None, "rms": None}
     peak = float(np.max(np.abs(wav))) if wav.size else 0.0
     rms = float(np.sqrt(np.mean(np.square(wav.astype(np.float64))))) if wav.size else 0.0
-    return {"finite": finite, "peak": round(peak, 6), "rms": round(rms, 6)}
+    return {"finite": True, "peak": round(peak, 6), "rms": round(rms, 6)}
 
 
 def main() -> int:

@@ -5,7 +5,7 @@ It is deliberately small: detection, manifests and checks first; adapters and th
 
 ## Commands
 
-\`\`\`text
+```text
 python workstream/gypsy.py engines probe [--json]          # detect engines, hardware gates, stale registry entries
 python workstream/gypsy.py engines smoke godot [--json]    # headless Godot project boots and exits 0
 python workstream/gypsy.py tools probe [--json]            # verify the installed GameTools manifest
@@ -13,13 +13,13 @@ python workstream/gypsy.py capabilities list|check [--json]
 python workstream/gypsy.py project init --path game --engine godot --version 4.7.2 --targets pc
 python workstream/gypsy.py project show [--path game]
 python workstream/gypsy.py check [--project .] [--json]
-\`\`\`
+```
 
 Run the tests:
 
-\`\`\`text
+```text
 python -m unittest discover -s workstream/tests -v
-\`\`\`
+```
 
 ## What is real in Phase 0
 

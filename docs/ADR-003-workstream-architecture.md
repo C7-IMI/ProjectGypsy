@@ -43,7 +43,8 @@ the primary path.
 ## Contracts
 
 - **Project manifest** (`project.gypsy.json`): engine id/version/adapter, targets, paths, decisions.
-- **Capability manifest** (`workstream/capabilities/*.json`): `id`, `layer`, `kind`, `maturity`, `requires`,
+- **Capability manifest** (`workstream/capabilities/*.json`): `id`, `layer`, `kind`, `maturity` (`stable`, `partial`,
+  `experimental`, `planned` for declared-but-not-implemented, `blocked`), `requires`,
   `inputs`, `outputs`, `checks`, `provenance`. Validated by `gypsy capabilities check`.
 - **Artifact record**: hash, path, source inputs + hashes, tool id/version, command, seed/parameters, licence,
   producing run and timestamp. Stored as JSONL under `artifacts/` (not committed; the record is).

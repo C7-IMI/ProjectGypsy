@@ -46,7 +46,7 @@ row; the two Part 4 definition-of-done lines (the "every surface" line and the d
 "a reimagine starts with a mockup" step and the "interface change (which arrangements)" frame wording; the §2.31
 naming-rule reference; the P1 design-language item and its agent-file wording about reading the design language; the
 P2 interface-change bullet and its "screen captured in every arrangement" evidence line; the Part 7 example 1
-reference to §2.9; the §8.2 sentence that says what is parked; and the §10.2 and §10.6 browser references. Each one
+reference to §2.9; and the §10.2 and §10.6 browser references. Each one
 is named in `ProjectPack-NOTES.md`, and each is recreatable from the restored sections and their rules.
 
 ## Restoring it

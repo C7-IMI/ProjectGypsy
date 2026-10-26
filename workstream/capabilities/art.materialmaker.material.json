@@ -4,7 +4,7 @@
   "layer": "art",
   "tool": "material_maker",
   "kind": "material",
-  "maturity": "partial",
+  "maturity": "planned",
   "description": "Procedural PBR material authoring in Material Maker; export maps and record the parameter set. GUI-first tool, so automation is partial.",
   "requires": [
     "material_maker.installed"
@@ -41,5 +41,8 @@
       "parameters",
       "artefactHash"
     ]
-  }
+  },
+  "notes": [
+    "Planned: declared but not implemented; no run is claimed."
+  ]
 }

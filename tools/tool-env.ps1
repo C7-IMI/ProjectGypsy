@@ -6,7 +6,7 @@ if (-not (Test-Path $manifest)) {
     return
 }
 $tools = Get-Content $manifest -Raw | ConvertFrom-Json
-$dirs = @($tools | ForEach-Object { $_.path } | Where-Object { $_ -and (Test-Path $_) })
+$dirs = @($tools | ForEach-Object { $_.path } | Where-Object { $_ -and (Test-Path -LiteralPath $_) })
 $env:GYPSY_TOOLS_MANIFEST = $manifest
 $env:Path = ($dirs -join ";") + ";" + $env:Path
 Write-Host ("GameTools loaded: " + $dirs.Count + " directories")

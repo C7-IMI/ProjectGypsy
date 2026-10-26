@@ -70,7 +70,7 @@ transformers 5.20.2), model cache under `...\MusicGen\hf-cache`, outputs under `
 ## Workstream commands
 
 ```text
-python workstream/gypsy.py engines probe [--json] [--save]
+python workstream/gypsy.py engines probe [--json] [--save]   # --save writes workstream/state/engines.json
 python workstream/gypsy.py engines smoke godot [--json]
 python workstream/gypsy.py tools probe [--json]
 python workstream/gypsy.py capabilities list|check [--json]

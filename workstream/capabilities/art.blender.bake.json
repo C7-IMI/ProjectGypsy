@@ -4,7 +4,7 @@
   "layer": "art",
   "tool": "blender",
   "kind": "bake",
-  "maturity": "partial",
+  "maturity": "planned",
   "description": "Bake procedural/height material into normal, AO, roughness and position maps; 4 GB VRAM caps resolution.",
   "requires": [
     "blender.installed",
@@ -44,5 +44,8 @@
       "bakeSettings",
       "artefactHash"
     ]
-  }
+  },
+  "notes": [
+    "Planned: declared but not implemented; no run is claimed."
+  ]
 }
