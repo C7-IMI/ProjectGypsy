@@ -1,0 +1,64 @@
+# AGENTS.md — read this first
+
+Entry point for any model working in this repository. Read this file, then the documents it names, before acting.
+
+## What this repository is
+
+**ProjectGypsy** — a game. The repository is the working home for it. The engine, target platforms, input methods
+and the game's own interface standard are **not chosen yet**; they are recorded as open decisions in
+[`DEFERRED.md`](./DEFERRED.md) (PG-D3, PG-D4). Do not describe ProjectGypsy as a website, a web application or a
+console, and do not apply web interface rules to it.
+
+## What governs your work
+
+In this order:
+
+1. **[`ProjectPack.md`](./ProjectPack.md)** — the standing rules, this copy's revision **PG-1** (base: C7NTRY's
+   pack 2.5). Parts 1–10 are the portable pack and the operator's standing rules; **Part 11 is this repository's own
+   overlay** — 13 rules adapted from C7NTRY's 24.
+2. **[`ProjectPack-NOTES.md`](./ProjectPack-NOTES.md)** — how the pack resolves *here*: the placeholders, the §8.1
+   answers, the §8.2 inventory, which rules are actually in force, the §11 mapping, and the parked interface list.
+   When the pack and this repository differ, this file says how, and it is the file to correct if it is wrong.
+3. **[`ProjectPack-ADDENDUM-Interface.md`](./ProjectPack-ADDENDUM-Interface.md)** — the interface design and
+   redesign material, **parked and not in force**. Read its first page so you know what is parked. Do not apply it,
+   quote it as a requirement, or restore any of it without the recorded operator decision it asks for.
+4. **[`DEFERRED.md`](./DEFERRED.md)** — the work deliberately not done. Read the entry covering an area before you
+   change that area, and do not quietly close a deferred item by implementing it halfway.
+5. **[`README.md`](./README.md)** — the repository entry point and index.
+
+## The rules that bind every turn
+
+- **Never claim a check you did not run.** Report exactly what was verified, by what command, and what was not
+  (§1.10, P1, Part 11.2).
+- **This is a game, not a web app.** No design-language, mockup-first, visual-bar, viewport, token-lint,
+  accessibility-pass or browser-gate rule applies until the addendum is restored or replaced by a recorded decision
+  (PG-1, Part 11.1). If a request needs interface design, say the standard is parked and treat the choice as the
+  operator's — do not invent one.
+- **Verify by running** the build or the test that proves the change, and read back what you captured (§2.18). If no
+  build exists yet, say so rather than implying a verification.
+- **Record the work.** A change is not finished until its prompt-log and changelog entries exist, with a computed
+  version (§2.1). Those files and the version script are not built yet — see `DEFERRED.md` PG-D1 — so record what
+  was done in the change's own report until the mechanism exists. Do not pretend the mechanism exists.
+- **One list of checks** when checks exist; a tracked hook and CI both read it, and a coverage check compares them
+  (§2.22–§2.23). Never keep a second list.
+- **Records and peer projects are separate** (Part 11.5): C7NTRY, C7NC, C7NTAX, C7TNL, C7NTRL and the other C7-IMI
+  projects are peers. A prompt asked here is logged here; nothing crosses without explicit instruction.
+- **Nothing fake in the build** (Part 11.6): no dead controls, no pretend features; unavailable behaviour says so.
+- **Background agents are evidence only after they are read** (§10.8). A dispatch is not progress; read the status
+  *and* the work before recording it.
+- **Handle text carefully** (§2.32): UTF-8 without a BOM, no round-trip through PowerShell, read back what you wrote.
+
+## First action in a new session
+
+1. Read this file, `ProjectPack-NOTES.md` §2.31, `DEFERRED.md`, and the addendum's first page.
+2. Check `git status` and the newest records entry — if the records do not exist yet, say so rather than pretending.
+3. Ask what the session is for, then run the matching prompt from `ProjectPack.md` Part 3 — **P1** only if the
+   bootstrap is incomplete, otherwise **P2** onward. Prompts P4 and P16 are parked; do not renumber the others.
+4. If the bootstrap is incomplete, say which parts and why rather than inventing them: the honest status is in
+   `ProjectPack-NOTES.md` and `DEFERRED.md`.
+
+## What has not been built (do not pretend otherwise)
+
+No engine, no code, no build, no test, no check list, no records infrastructure and no interface standard exist yet.
+This repository currently holds the rules, their application to this project, and the register of what is deferred.
+The interface design/redesign rules are **parked** in the addendum, not in force. See `DEFERRED.md`.
