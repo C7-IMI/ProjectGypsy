@@ -28,11 +28,12 @@ In this order:
 5. **[`docs/README.md`](./docs/README.md)** — the ADRs: engines (001), art pipeline (002), workstream architecture
    (003), generative media (004), character/animation automation (005), Blender import matrix (006), language
    boundaries (007), MCP/free local tools (008), vertical slice (009), slice orchestrator (010), toolpacks (011),
-   thin console (012), plus [`docs/ENGINE-SMOKE.md`](./docs/ENGINE-SMOKE.md), [`docs/IMPORT-MATRIX.md`](./docs/IMPORT-MATRIX.md),
-   and the PHASE-1..4 evidence files.
+   thin console (012), phase-5 mobile/live/perf (013), plus
+   [`docs/ENGINE-SMOKE.md`](./docs/ENGINE-SMOKE.md), [`docs/IMPORT-MATRIX.md`](./docs/IMPORT-MATRIX.md),
+   the PHASE-1..5 evidence files and [`docs/PHASE-6-GATE.md`](./docs/PHASE-6-GATE.md).
 6. **[`workstream/README.md`](./workstream/README.md)** — the CLI: `engines probe|smoke`, `tools probe`,
    `capabilities`, `project`, `game demo|build|capture|verify`, `slices list|plan|run|status`, `toolpacks list|check|run`,
-   `console board|preview|diff`, `check`.
+   `console board|preview|diff`, `game bench`, `live`, `check`.
 7. **[`DEFERRED.md`](./DEFERRED.md)** — the work deliberately not done. Read the entry covering an area before you
    change that area, and do not quietly close a deferred item by implementing it halfway.
 8. **[`README.md`](./README.md)** — the repository entry point and index.
@@ -47,7 +48,7 @@ In this order:
   operator's — do not invent one.
 - **Verify by running** the build or the test that proves the change, and read back what you captured (§2.18). If no
   build exists yet, say so rather than implying a verification. Evidence lives in `docs/ENGINE-SMOKE.md`,
-  `docs/IMPORT-MATRIX.md`, and the PHASE-1..4 evidence files.
+  `docs/IMPORT-MATRIX.md`, and the PHASE-1..5 evidence files plus PHASE-6-GATE.
 - **Record the work.** A change is not finished until its [Retrace.md](./Retrace.md) and [BuildNotes.md](./BuildNotes.md)
   entries exist, with a version from [`scripts/next-version.py`](./scripts/next-version.py) (§2.1).
   [`scripts/check_all.py`](./scripts/check_all.py) guards the records.
@@ -77,9 +78,9 @@ In this order:
 
 ## What has been built (do not overstate it)
 
-Phase 0, 1, 2, 3 and 4 exist: engine/tool probes, hardware gates, manifests, a Godot headless smoke, a playable Godot
-4.7.2 PC slice with demo/export/capture, a manifest-driven slice orchestrator with state and artifact hashes, toolpacks
-with validators/provenance for Blender->Godot import and MusicGen audio, a read-only terminal console (board/preview/diff),
-records and the one pack check list, the ADRs, a golden Blender import matrix, MCP/ComfyUI/Poly Haven tooling. There is
-still **no hero art/character pipeline, live editing, self-extension, mobile build or performance budget**. See
-`docs/PHASE-4-EVIDENCE.md` and `DEFERRED.md`.
+Phase 0-5 exist: engine/tool probes, hardware gates, manifests, a Godot headless smoke, a playable Godot 4.7.2 PC slice
+with demo/export/capture, a manifest-driven slice orchestrator with state/artifact hashes, toolpacks with
+validators/provenance, a read-only terminal console, a live watcher, a performance baseline and a signed Android debug
+APK; records and the one pack check list; the ADRs; a golden Blender import matrix; MCP/ComfyUI/Poly Haven tooling.
+There is still **no hero art/character pipeline, self-extension, tested device launch or second engine**; Phases 6
+(UE5) is hardware-blocked. See `docs/PHASE-5-EVIDENCE.md`, `docs/PHASE-6-GATE.md` and `DEFERRED.md`.

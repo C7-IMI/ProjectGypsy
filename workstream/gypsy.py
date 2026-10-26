@@ -663,13 +663,15 @@ def main(argv=None) -> int:
 
     game_parser = sub.add_parser("game", help="vertical-slice adapter")
     game_sub = game_parser.add_subparsers(dest="game_command", required=True)
-    for name in ("demo", "build", "capture", "verify"):
+    for name in ("demo", "build", "capture", "verify", "bench"):
         game_cmd = game_sub.add_parser(name)
         game_cmd.add_argument("--path", default=str(REPO_ROOT / "game"))
         game_cmd.add_argument("--json", action="store_true")
         if name == "build":
             game_cmd.add_argument("--preset", default="Windows Desktop")
             game_cmd.add_argument("--out", default=None)
+        if name == "bench":
+            game_cmd.add_argument("--runs", type=int, default=3)
     slices_parser = sub.add_parser("slices", help="manifest-driven Phase-2 orchestrator")
     slices_sub = slices_parser.add_subparsers(dest="slices_command", required=True)
     for name in ("list", "plan", "run", "status"):
@@ -710,6 +712,15 @@ def main(argv=None) -> int:
     console_diff.add_argument("--staged", action="store_true")
     console_diff.add_argument("--commit", default=None)
     console_diff.add_argument("--json", action="store_true")
+
+    live_parser = sub.add_parser("live", help="Phase-5 live-iteration watcher")
+    live_parser.add_argument("--paths", action="append", default=None)
+    live_parser.add_argument("--interval", type=float, default=0.5)
+    live_parser.add_argument("--debounce", type=float, default=0.0)
+    live_parser.add_argument("--iterations", type=int, default=None)
+    live_parser.add_argument("--once", action="store_true")
+    live_parser.add_argument("--command", dest="live_command", choices=["demo", "verify"], default="demo")
+    live_parser.add_argument("--json", action="store_true")
 
     check_parser = sub.add_parser("check", help="run the Phase-0 checks")
     check_parser.add_argument("--project")
@@ -788,7 +799,7 @@ def main(argv=None) -> int:
                     print(f"created: {project.get('created')}")
                 return 0
         if args.command == "game":
-            from game import build as game_build, capture as game_capture, demo as game_demo, verify as game_verify
+            from game import benchmark as game_benchmark, build as game_build, capture as game_capture, demo as game_demo, verify as game_verify
 
             if args.game_command == "demo":
                 evidence = game_demo(Path(args.path))
@@ -806,6 +817,23 @@ def main(argv=None) -> int:
                 evidence = game_verify(Path(args.path))
                 print(json.dumps(evidence, indent=2) if args.json else f"game verify | demo={evidence['demo']['passed']} build={evidence['build']['passed']} capture={evidence['capturePassed']}")
                 return 0 if evidence["passed"] else 1
+            if args.game_command == "bench":
+                evidence = game_benchmark(args.runs, Path(args.path))
+                print(json.dumps(evidence, indent=2) if args.json else f"game bench | median={evidence['medianSeconds']}s p95={evidence['p95Seconds']}s gpu={evidence['captureGpuMsPerFrame']}ms | passed={evidence['passed']}")
+                return 0 if evidence["passed"] else 1
+        if args.command == "live":
+            import live as live_mod
+            from game import demo as game_demo, verify as game_verify
+
+            runner = (lambda: game_verify(Path("game"))) if args.live_command == "verify" else (lambda: game_demo(Path("game")))
+            if args.once:
+                result = runner()
+                print(json.dumps(result, indent=2) if args.json else f"live run once: ok ({result.get('seconds', '?')}s)")
+                return 0 if result.get("passed") else 1
+            summary = live_mod.watch(args.paths or ["game"], runner=runner, iterations=args.iterations, interval=args.interval, debounce=args.debounce)
+            print(json.dumps(summary, indent=2) if args.json else f"live: {summary['iterations']} change(s), {summary['runs']} run(s), {len(summary['errors'])} error(s)")
+            return 0 if not summary["errors"] else 1
+
         if args.command == "console":
             import console as console_mod
             from pathlib import Path as _Path

@@ -51,6 +51,16 @@ Headless Godot uses a dummy renderer (ADR-001): this proves game logic and the c
 output. `python workstream/gypsy.py game capture` records a windowed 1280×720 movie (72 frames) and extracts a frame;
 see `docs/PHASE-1-EVIDENCE.md`.
 
+## Android package
+
+From the repository root:
+
+    powershell -File scripts/build_android.ps1
+
+This produces a signed arm64 debug APK at build/ProjectGypsy.apk and verifies the package id and signature. It needs the
+portable JDK 17/Android SDK listed in TOOLCHAIN.md. The APK has not been launched on a device/emulator; no device
+behaviour is claimed. See docs/PHASE-5-EVIDENCE.md.
+
 ## Layout
 
 | Path | Purpose |

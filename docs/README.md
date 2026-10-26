@@ -14,12 +14,15 @@
 | [ADR-010-slice-orchestrator.md](ADR-010-slice-orchestrator.md) | Phase-2 slice schema, orchestrator, state, artifact ledger, multi-slice task |
 | [ADR-011-toolpacks.md](ADR-011-toolpacks.md) | Phase-3 toolpacks, validators (file/json/text/wav/png/glb) and provenance |
 | [ADR-012-thin-console.md](ADR-012-thin-console.md) | Phase-4 read-only terminal console (board/preview/diff), CLI parity |
+| [ADR-013-phase5-mobile-live-perf.md](ADR-013-phase5-mobile-live-perf.md) | Phase-5 mobile package, live watcher, performance baseline, second-engine gate |
 | [ENGINE-SMOKE.md](ENGINE-SMOKE.md) | Phase-0 evidence: Godot headless pass, Unity licence block, UE5 gate, Flax status |
 | [IMPORT-MATRIX.md](IMPORT-MATRIX.md) | generated evidence: Blender round-trip, glTF validation, Godot import, blocked engines |
 | [PHASE-1-EVIDENCE.md](PHASE-1-EVIDENCE.md) | generated evidence: headless demo, export, exported-binary demo, capture, checks |
 | [PHASE-2-EVIDENCE.md](PHASE-2-EVIDENCE.md) | generated evidence: multi-slice task, hashes, reproducibility, resume, tests |
 | [PHASE-3-EVIDENCE.md](PHASE-3-EVIDENCE.md) | generated evidence: golden import, MusicGen audio, validators, provenance |
 | [PHASE-4-EVIDENCE.md](PHASE-4-EVIDENCE.md) | generated evidence: console board, preview, diff, no-write audit |
+| [PHASE-5-EVIDENCE.md](PHASE-5-EVIDENCE.md) | generated evidence: APK package/signature, live watcher, performance, blocked second engine |
+| [PHASE-6-GATE.md](PHASE-6-GATE.md) | UE5 hardware gate: blocked, no adapter claimed |
 
 Related: [../TOOLCHAIN.md](../TOOLCHAIN.md), [../TOOL-INVENTORY.md](../TOOL-INVENTORY.md),
 [../DEFERRED.md](../DEFERRED.md), [../workstream/README.md](../workstream/README.md),

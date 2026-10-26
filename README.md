@@ -26,9 +26,10 @@ A game. Phase 1 is a playable **Godot 4.7.2 PC** slice; the interface standard a
 
 ## Status
 
-Phase 0 + 1 + 2 + 3 + 4 exist: engine/tool probes, hardware gates, manifests, tests, a playable Godot slice with
+Phase 0 + 1 + 2 + 3 + 4 + 5 exist: engine/tool probes, hardware gates, manifests, tests, a playable Godot slice with
 headless demo/export/capture, a manifest-driven slice orchestrator with state and artifact hashes, toolpacks with
 validators/provenance for golden Blender->Godot import and local MusicGen audio, a read-only terminal console, records
-and the pack check list, the ADRs, MCP/ComfyUI/Poly Haven tooling and the installed toolchain. Not built yet: hero
-art/character pipeline, live editing, self-extension, mobile or performance budgets. See `docs/PHASE-4-EVIDENCE.md` and
-`DEFERRED.md`.
+and the pack check list, the ADRs, MCP/ComfyUI/Poly Haven tooling and the installed toolchain. Also present: a live
+watcher, performance baseline and a signed Android debug APK (not device-tested). Not built yet: hero art/character
+pipeline, self-extension, second engine; UE5 is hardware-blocked. See `docs/PHASE-5-EVIDENCE.md`, `docs/PHASE-6-GATE.md`
+and `DEFERRED.md`.

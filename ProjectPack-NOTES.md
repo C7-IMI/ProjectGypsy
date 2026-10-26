@@ -114,9 +114,10 @@ The "declined" entries are in Part 11.13 of the pack and in `DEFERRED.md` only w
 
 ## §2.31 — which rules are in force today (applied 2026-10-25, pack PG-1)
 
-This repository is **a game with rules, a Phase-0/1/2/3/4 workstream, a playable slice, a pack-wide check list and
-records**. The engine is chosen for this slice (Godot 4.7.2, PC); build/capture, orchestrator, toolpacks and a read-only
-console are proven; remaining work is hero asset authorship, live editing, adapters and later phases.
+This repository is **a game with rules, a Phase-0/1/2/3/4/5 workstream, a playable slice, a pack-wide check list and
+records**. The engine is chosen for this slice (Godot 4.7.2, PC + Android debug package); build/capture, orchestrator,
+toolpacks, console, live watcher, performance baseline and Android debug package are proven; remaining work is hero asset
+  authorship, self-extension, device testing and the blocked second-engine/UE5 gates.
 
 - **In force as conduct, not mechanised:** Part 1's laws; §2.1–§2.4 records and prose (records now guarded); §2.5
   one source; §2.6 brand packet (when assets exist); §2.7 configuration declared; §2.13 reversibility; §2.14–§2.16
@@ -164,7 +165,7 @@ python workstream/gypsy.py check
 python workstream/gypsy.py game verify
 ```
 
-`check_all.py` covers records, encoding, links, capability JSON, the 138 workstream tests and hook/CI caller coverage;
+`check_all.py` covers records, encoding, links, capability JSON, the 172 workstream tests and hook/CI caller coverage;
 `gypsy check` covers engine/project manifests and the hardware gate; `game verify` covers the playable slice; `slices run
 --all` covers the multi-slice task and artifact hashes; `toolpacks run` covers art/audio validation/provenance; `console`
 is a read-only view of the same state.

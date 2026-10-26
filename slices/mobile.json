@@ -1,0 +1,20 @@
+{
+  "schema": "gypsy.slice/v1",
+  "id": "mobile",
+  "project": ".",
+  "description": "Phase-5 mobile gate: headless Godot Android debug APK, signed and package-verified.",
+  "artifacts": [],
+  "steps": [
+    {
+      "id": "android-apk",
+      "kind": "toolpack",
+      "needs": [],
+      "required": true,
+      "timeout": 900,
+      "args": {
+        "toolpack": "mobile.android",
+        "action": "build"
+      }
+    }
+  ]
+}

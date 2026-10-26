@@ -1,0 +1,51 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "engine.godot.mobile",
+  "layer": "engine",
+  "engine": "godot",
+  "kind": "build",
+  "maturity": "partial",
+  "description": "Godot Android debug APK export: headless export, debug keystore, aapt2 package check and apksigner verification.",
+  "requires": [
+    "godot.installed",
+    "godot.android_templates",
+    "jdk17",
+    "android.sdk"
+  ],
+  "inputs": [
+    {
+      "name": "gameDir",
+      "type": "path"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "apk",
+      "type": "file"
+    },
+    {
+      "name": "package",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "export exit 0",
+    "APK > 20 MB",
+    "package com.c7imi.projectgypsy",
+    "native-code arm64-v8a",
+    "apksigner verify exit 0"
+  ],
+  "provenance": {
+    "record": [
+      "apkHash",
+      "bytes",
+      "package",
+      "certSha256",
+      "buildTools",
+      "jdk"
+    ]
+  },
+  "notes": [
+    "Phase 5. On-device launch is NOT verified (no device/emulator)."
+  ]
+}

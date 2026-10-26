@@ -18,6 +18,8 @@ python workstream/gypsy.py game demo|build|capture|verify [--path game]
 python workstream/gypsy.py slices list|plan|run|status [--all] [--resume] [--force]
 python workstream/gypsy.py toolpacks list|check|run [--action]
 python workstream/gypsy.py console board|preview|diff [--json]
+python workstream/gypsy.py game bench [--runs 3]
+python workstream/live.py --paths game --once --command demo
 ```
 
 Run the tests:
@@ -38,7 +40,8 @@ python -m unittest discover -s workstream/tests -v
 - Phase-2 orchestrator: gypsy.slice/v1 manifests (`slices/`), ordered/dependent steps, resumable state, artifact
   SHA-256 ledger, multi-slice task report and the `slices` CLI.
 - Phase-3 toolpacks: gypsy.toolpack/v1 manifests (`toolpacks/`), explicit argv actions, file/json/text/WAV/PNG/GLB
-  validators, artifact hashes and provenance; real packs for golden Blender->Godot import and MusicGen audio.
+  validators, artifact hashes and provenance; real packs for golden Blender->Godot import, MusicGen audio and Android APK.
+- Phase-5 live watcher (mtime/debounce, no hot reload), performance baseline with budgets, and mobile package gate.
 - Phase-4 console: read-only terminal board, artifact preview and git diff; no writes, no server, no new capability.
 
 ## What is not built yet

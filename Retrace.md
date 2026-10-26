@@ -200,5 +200,16 @@ Each entry has:
 
 ---
 
-Next prompt number: 20. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 20 - 2026-10-26
+
+- Request: Do the rest of the phases in succession; Phase 5/6 next.
+- Status: Phase 5 complete for mobile/live/performance; second engine BLOCKED; Phase 6 UE5 BLOCKED.
+- Version: 2026.10.25.015
+- Commit/evidence: Android debug APK 28,305,095 bytes signed/package-verified; live watcher 34 tests + real --once;
+  game bench median 2.605 s/p95 2.605 s/GPU 0.56 ms; Unity exit 198, UE5 4 GB < 8 GB, Flax no headless; 172 tests;
+  42 capabilities.
+
+---
+
+Next prompt number: 21. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

@@ -1,0 +1,42 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "live.iteration",
+  "layer": "workstream",
+  "kind": "watch",
+  "maturity": "partial",
+  "description": "Deterministic live watcher: snapshot, debounce, rerun demo/verify on settled changes; no engine hot reload.",
+  "requires": [
+    "python>=3.10",
+    "godot.installed for default runner"
+  ],
+  "inputs": [
+    {
+      "name": "paths",
+      "type": "list"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "summary",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "change detection",
+    "debounce",
+    "runner exceptions recorded",
+    "iterations bound",
+    "--once works"
+  ],
+  "provenance": {
+    "record": [
+      "paths",
+      "changes",
+      "runs",
+      "errors"
+    ]
+  },
+  "notes": [
+    "Phase 5; mtime+size only, no content hash; .godot churn can retrigger; not hot reload."
+  ]
+}

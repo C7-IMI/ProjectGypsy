@@ -101,7 +101,9 @@ explicit approval. Generated code is evidence only after it is read and run.
 | 3 | Toolpacks (art/audio/import) and engine import profiles | assets generated/imported with validators and provenance |
 | 4 | Thin console (task board, preview, diffs, approvals) | the console adds no capability the CLI lacks |
 | 5 | Live iteration, mobile export, second engine adapter | same slice runs on two engines; mobile gate passes |
-| 6 | Gated UE5 adapter (hardware/remote) | UE5 slice builds on a machine that meets the gate |
+| 6 | Gated UE5 adapter (hardware/remote) | UE5 slice builds on a machine that meets the gate — **BLOCKED here: 4 GB VRAM < 8 GB** ([PHASE-6-GATE.md](PHASE-6-GATE.md)) |
+
+Phase-5 status: mobile APK package gate, live watcher and performance baseline pass; the second-engine part of the gate is **blocked** (Unity licence 198, UE5 VRAM, Flax no headless) — [PHASE-5-EVIDENCE.md](PHASE-5-EVIDENCE.md).
 
 ## What is not built yet
 

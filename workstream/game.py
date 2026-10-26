@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import re
 import shutil
+import statistics
 import subprocess
 import time
 from pathlib import Path
@@ -169,6 +170,58 @@ def capture(game_dir: Path = GAME_DIR, seconds: int = 30, timeout: int = 240) ->
     if not evidence["passed"]:
         raise gypsy.GypsyError("game capture failed: " + (result["stdout"] + result["stderr"])[-2000:])
     return evidence
+
+
+def benchmark(runs: int = 3, game_dir: Path = GAME_DIR) -> dict:
+    """Measure the headless demo and the rendered capture against declared budgets."""
+    runs = max(1, int(runs))
+    demos = []
+    for _ in range(runs):
+        result = demo(game_dir)
+        demos.append({"seconds": result["seconds"], "frames": result["frames"], "passed": result["passed"]})
+    seconds = [item["seconds"] for item in demos]
+    median = round(statistics.median(seconds), 3) if seconds else None
+    p95 = round(sorted(seconds)[max(0, int(len(seconds) * 0.95) - 1)], 3) if seconds else None
+    capture_result = None
+    capture_error = None
+    gpu_ms = None
+    try:
+        capture_result = capture(game_dir)
+        match = re.search(r"GPU render time: [^\n]*?average:\s*([0-9.]+)\s*ms/frame", capture_result.get("stdout", ""))
+        if match:
+            gpu_ms = float(match.group(1))
+    except gypsy.GypsyError as exc:
+        capture_error = str(exc)
+    budgets = {
+        "demoMedianSeconds": 5.0,
+        "demoMaxSeconds": 8.0,
+        "frames": 143,
+        "captureGpuMsPerFrame": 16.67,
+    }
+    logic_passed = all(item["passed"] and item["frames"] == budgets["frames"] for item in demos)
+    logic_passed = logic_passed and (median is not None and median <= budgets["demoMedianSeconds"])
+    logic_passed = logic_passed and (p95 is not None and p95 <= budgets["demoMaxSeconds"])
+    render_passed = gpu_ms is not None and gpu_ms <= budgets["captureGpuMsPerFrame"]
+    result = {
+        "schema": "gypsy.artifact/v1",
+        "kind": "game.benchmark",
+        "engine": "godot",
+        "runs": runs,
+        "demos": demos,
+        "medianSeconds": median,
+        "p95Seconds": p95,
+        "captureGpuMsPerFrame": gpu_ms,
+        "captureError": capture_error,
+        "budgets": budgets,
+        "logicPassed": logic_passed,
+        "renderPassed": render_passed,
+        "passed": logic_passed,
+        "note": "logic budget is headless demo wall time; render budget is movie-maker GPU render time (not gameplay FPS)",
+    }
+    result["evidencePath"] = str(_evidence("game-benchmark.json", result))
+    if not logic_passed:
+        raise gypsy.GypsyError("game benchmark logic budget failed: " + str(result))
+    return result
 
 
 def verify(game_dir: Path = GAME_DIR) -> dict:

@@ -136,6 +136,16 @@ It is not a YuE2 substitute (no vocals, 32 kHz, lower quality) and its weights a
 | Poly Haven downloader | `tools/polyhaven/polyhaven.py` | CC0 assets, no API key, SHA-256 records |
 | TripoSR | **not installed** | MIT but ~6 GB VRAM (PG-D19) |
 
+
+## Mobile toolchain (Phase 5)
+
+| Item | Version | Notes |
+| --- | --- | --- |
+| OpenJDK | 17.0.20.1 (Temurin portable) | `GameTools/Java/jdk17`; Android export only |
+| Android SDK | platform-tools + platforms;android-35 + build-tools 35.0.0 | `GameTools/AndroidSdk`; aapt2/apksigner verified |
+| Debug keystore | local | `%APPDATA%/Godot/keystores/debug.keystore`; debug signing only |
+| Android export | arm64-v8a debug APK | 28,305,095 bytes; signature verified; no device launch |
+
 ## Verification performed
 
 | Claim | Observation |
@@ -148,6 +158,9 @@ It is not a YuE2 substitute (no vocals, 32 kHz, lower quality) and its weights a
 | Unity/licence and UE5 gates | Unity batchmode: "No valid Unity Editor license found" (exit 198); UE5 hardware gate fails (4 GB VRAM, 51.5 GB free) — see `docs/ENGINE-SMOKE.md` |
 | ComfyUI works | 512×512 SD1.5, 20 steps, seed 42 → PNG (304 KB, mean 0.526) in 28.2 s on the T600 with `--lowvram`; provenance sidecar written |
 | MCP bridge works | `tools/mcp/mcp_call.py list --server godot` lists tools; `get_godot_version` returned `4.7.2.stable.official.ed1daf0bf`; Blender server lists tools with the addon installed |
+| Android APK works | `scripts/build_android.ps1` produced a 28,305,095-byte signed arm64 debug APK; aapt2 package com.c7imi.projectgypsy; apksigner cert SHA-256 140c76ff... |
+| Performance baseline | `game bench --runs 3`: median 2.605 s, p95 2.605 s, GPU 0.56 ms/frame, budgets pass |
+| Live watcher | `live.py --once --command demo`: 2.726 s, exit 0; 34 tests |
 | Poly Haven works | downloaded `brick_wall_02` Diffuse 1k (1,032,279 bytes, SHA-256 recorded, CC0) |
 | Python tooling works | imports of scipy, trimesh, pygltflib, imageio, cv2, matplotlib all succeed under `C:\Python\python.exe` |
 | All new commands resolve | `Get-Command magick,ffmpeg,ffprobe,cmake,ninja,gltfpack,gltf-transform,texconv,renderdoccmd,tiled,material_maker,LDtk,libresprite,meshlab,audacity` all found on the refreshed user PATH |

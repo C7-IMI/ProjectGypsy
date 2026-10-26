@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.25.014
+Current version: 2026.10.25.015
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,20 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.25.015
+
+**Phase 5: Android package, live watcher, performance baseline; second-engine/UE5 gates recorded.**
+
+- Date: 2026-10-26
+- Commit: this change.
+- Change: portable JDK 17 + Android SDK 35 + debug keystore; Android preset/icon/ETC2; scripts/build_android.ps1,
+  toolpacks/mobile.android.json, slices/mobile.json; game bench command and budgets; workstream/live.py + 34 tests;
+  CLI live; capabilities engine.godot.mobile, perf.game.benchmark, live.iteration; ADR-013, PHASE-5-EVIDENCE,
+  PHASE-6-GATE; project manifest targets pc+mobile.
+- Verification: signed arm64 APK 28,305,095 bytes, package com.c7imi.projectgypsy, apksigner verified; game bench
+  median 2.605 s/p95 2.605 s/GPU 0.56 ms; live --once 2.726 s; 172 tests; second engine BLOCKED (Unity 198, UE5 VRAM,
+  Flax no headless); UE5 Phase 6 BLOCKED; 42 capabilities.
 
 ## 2026.10.25.014
 

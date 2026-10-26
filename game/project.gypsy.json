@@ -7,7 +7,8 @@
     "adapter": "godot-4"
   },
   "targets": [
-    "pc"
+    "pc",
+    "mobile"
   ],
   "paths": {
     "game": "game",
@@ -19,6 +20,11 @@
       "date": "2026-10-25T22:44:22-05:00",
       "decision": "engine godot 4.7.2 (adapter godot-4) for the autonomous Phase-1 vertical slice",
       "reason": "Phase 1 chooses Godot 4.7.2 PC (ADR-009) because it is the only engine with a verified headless/build/capture path on this machine; a different engine is a new project/port, not a toggle."
+    },
+    {
+      "date": "2026-10-26T02:00:00-05:00",
+      "decision": "add mobile target after Android debug APK export",
+      "reason": "Phase-5 mobile gate: signed arm64 debug APK built and package-verified; on-device launch not yet tested."
     }
   ]
 }

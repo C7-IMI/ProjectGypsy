@@ -1,0 +1,42 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "perf.game.benchmark",
+  "layer": "game",
+  "engine": "godot",
+  "kind": "benchmark",
+  "maturity": "stable",
+  "description": "Headless demo timing + movie-maker GPU render-time baseline with declared budgets.",
+  "requires": [
+    "godot.installed"
+  ],
+  "inputs": [
+    {
+      "name": "runs",
+      "type": "number"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "evidence",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "frames=143 each run",
+    "median <= 5 s",
+    "p95 <= 8 s",
+    "GPU render <= 16.67 ms/frame when capture available"
+  ],
+  "provenance": {
+    "record": [
+      "runs",
+      "medianSeconds",
+      "p95Seconds",
+      "captureGpuMsPerFrame",
+      "budgets"
+    ]
+  },
+  "notes": [
+    "Phase 5; logic wall time and movie-maker GPU time, not gameplay FPS."
+  ]
+}
