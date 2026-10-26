@@ -12,3 +12,8 @@ python tools/comfyui/generate.py --prompt "stylized fantasy sword icon, game ass
 - Server: http://127.0.0.1:8188, `--lowvram` for the 4 GB T600.
 - Outputs: `artifacts/comfyui/` (gitignored) with a provenance sidecar; SD1.5 is OpenRAIL-M and needs
   licence review before commercial use. See ADR-008.
+
+## Ready-to-import workflow
+
+Use [workflows/projectgypsy-sd15-basic.json](workflows/projectgypsy-sd15-basic.json) for the installed SD1.5
+checkpoint; it was verified in the ComfyUI UI and via tools/comfyui/verify_workflow.py. See [workflows/README.md](workflows/README.md).

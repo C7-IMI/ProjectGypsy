@@ -93,6 +93,7 @@ MCP is a protocol, not a subscription. DSH does not speak MCP natively, so this 
 # ComfyUI + SD1.5 (installed; 4 GB T600, --lowvram)
 .\tools\comfyui\start.ps1
 python tools/comfyui/generate.py --prompt "stylized sword icon, game asset" --steps 20
+python tools/comfyui/verify_workflow.py      # validate + run the importable SD1.5 workflow
 .\tools\comfyui\stop.ps1
 
 # Poly Haven CC0 assets (public API, no key)
@@ -100,6 +101,8 @@ python tools/polyhaven/polyhaven.py list --type textures --search brick
 python tools/polyhaven/polyhaven.py download brick_wall_02 --resolution 1k --slot Diffuse --dest artifacts/polyhaven
 ~~~
 
+- Ready-to-import SD1.5 workflow: `tools/comfyui/workflows/projectgypsy-sd15-basic.json` (verified in the UI with no
+  missing models).
 - ComfyUI 0.42.1 portable + `v1-5-pruned-emaonly-fp16.safetensors` (2.03 GB); measured 512×512, 20 steps, 28.2 s.
   Outputs and sidecars under `artifacts/comfyui/`; SD1.5 is OpenRAIL-M (licence review before shipping).
 - Poly Haven downloads write CC0 + SHA-256 provenance records; no API key.

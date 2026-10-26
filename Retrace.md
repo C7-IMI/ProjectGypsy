@@ -250,5 +250,15 @@ Each entry has:
 
 ---
 
-Next prompt number: 25. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 25 - 2026-10-26
+
+- Request: Add a ready-to-import SD1.5 workflow and verify it in ComfyUI.
+- Status: Completed.
+- Version: 2026.10.25.020
+- Commit/evidence: tools/comfyui/workflows/projectgypsy-sd15-basic.json, verify_workflow.py and README; UI load via
+  Chromium/CDP showed 7 nodes and no missing models; API-equivalent run produced a verified PNG; 181 tests.
+
+---
+
+Next prompt number: 26. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

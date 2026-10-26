@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.25.019
+Current version: 2026.10.25.020
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,19 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.25.020
+
+**ComfyUI: ready-to-import SD1.5 workflow verified in the UI.**
+
+- Date: 2026-10-26
+- Commit: this change.
+- Change: tools/comfyui/workflows/projectgypsy-sd15-basic.json (CheckpointLoaderSimple -> CLIP text -> KSampler ->
+  VAEDecode -> SaveImage, installed v1-5 checkpoint, no Qwen/Z-Image nodes); tools/comfyui/verify_workflow.py
+  (structural/link validation, /object_info checkpoint check, UI-graph to API conversion, run + sidecar);
+  workflows/README.md; ComfyUI README/TOOLCHAIN links.
+- Verification: workflow loaded into ComfyUI 0.42.1 UI via Chromium/CDP with 7 nodes, no missing models/errors;
+  verifier passed and produced artifacts/comfyui/20261026T030013-workflow-0.png; 181 tests, 43 capabilities unchanged.
 
 ## 2026.10.25.019
 
