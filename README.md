@@ -22,8 +22,8 @@ Gypsy”: read [the agent guide](docs/GYPSY-AGENT-GUIDE.md) and the target proje
 - [`docs/GYPSY-AGENT-GUIDE.md`](docs/GYPSY-AGENT-GUIDE.md) — how an agent uses Gypsy on a new or existing project.
 - [`templates/AGENTS.gypsy.md`](templates/AGENTS.gypsy.md) — copy-paste instruction block for a target project's `AGENTS.md`.
 - [`TOOLCHAIN.md`](TOOLCHAIN.md) — installed engines, art/audio/build tools, paths and the PATH loader.
-- [`docs/README.md`](docs/README.md) — all ADRs (001-014: engines, art pipeline, workstream architecture, generative media, character/animation,
-  Blender import, language boundaries, MCP/local tools, vertical slice, orchestrator, toolpacks, console, Phase-5) and
+- [`docs/README.md`](docs/README.md) — all ADRs (001-015: engines, art pipeline, workstream architecture, generative media, character/animation,
+  Blender import, language boundaries, MCP/local tools, vertical slice, orchestrator, toolpacks, console, Phase-5, local dashboard, ActionForge toolkit) and
   the generated evidence.
 - [`workstream/README.md`](workstream/README.md) — the Phase-0-5 CLI: engine registry, hardware gates, manifests,
   checks, Godot slice, slices/orchestrator, toolpacks, console, live watcher and performance bench.

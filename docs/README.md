@@ -16,6 +16,7 @@
 | [ADR-012-thin-console.md](ADR-012-thin-console.md) | Phase-4 read-only terminal console (board/preview/diff), CLI parity |
 | [ADR-013-phase5-mobile-live-perf.md](ADR-013-phase5-mobile-live-perf.md) | Phase-5 mobile package, live watcher, performance baseline, second-engine gate |
 | [ADR-014-local-dashboard.md](ADR-014-local-dashboard.md) | local operations console: overview/run detail/mission/commands/review/slices/artifacts; classic four views; token actions, localhost safety |
+| [ADR-015-actionforge-toolkit.md](ADR-015-actionforge-toolkit.md) | reusable toolkit/plugin registry, ActionForge CC0 rig/animation fetch, licence/provenance, network and path safety, what stays manual |
 | [ENGINE-SMOKE.md](ENGINE-SMOKE.md) | Phase-0 evidence: Godot headless pass, Unity licence block, UE5 gate, Flax status |
 | [IMPORT-MATRIX.md](IMPORT-MATRIX.md) | generated evidence: Blender round-trip, glTF validation, Godot import, blocked engines |
 | [PHASE-1-EVIDENCE.md](PHASE-1-EVIDENCE.md) | generated evidence: headless demo, export, exported-binary demo, capture, checks |

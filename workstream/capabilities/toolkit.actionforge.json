@@ -1,0 +1,77 @@
+{
+  "schema": "gypsy.capability/v1",
+  "file": "toolkit.actionforge.json",
+  "id": "toolkit.actionforge",
+  "layer": "art",
+  "tool": "actionforge",
+  "kind": "download",
+  "maturity": "partial",
+  "description": "Fetch selected CC0 ActionForge rig/animation GLBs into a project with atomic files, binary glTF v2 validation and SHA-256 provenance; animation authoring, retargeting and engine import stay manual.",
+  "requires": [
+    "network",
+    "python 3.14 standard library",
+    "write access to the target project"
+  ],
+  "inputs": [
+    {
+      "name": "project",
+      "type": "path"
+    },
+    {
+      "name": "clips",
+      "type": "string[]"
+    },
+    {
+      "name": "rig",
+      "type": "boolean"
+    },
+    {
+      "name": "dest",
+      "type": "string"
+    },
+    {
+      "name": "force",
+      "type": "boolean"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "rig",
+      "type": "glb"
+    },
+    {
+      "name": "animations",
+      "type": "directory"
+    },
+    {
+      "name": "provenance",
+      "type": "json"
+    },
+    {
+      "name": "notice",
+      "type": "file"
+    }
+  ],
+  "checks": [
+    "binary glTF magic is glTF and version is 2",
+    "GLB header length equals the received byte count",
+    "destination resolves inside the project root",
+    "SHA-256 and byte count recorded for every file",
+    "differing existing file is not overwritten without --force",
+    "rerun with identical bytes leaves provenance unchanged",
+    "download failure or invalid GLB fails the fetch honestly"
+  ],
+  "provenance": {
+    "record": [
+      "source",
+      "license",
+      "url",
+      "path",
+      "clip",
+      "catalogued",
+      "sha256",
+      "bytes",
+      "retrievedAt"
+    ]
+  }
+}

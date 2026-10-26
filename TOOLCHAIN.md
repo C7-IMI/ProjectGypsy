@@ -1,6 +1,6 @@
 # TOOLCHAIN.md — how the workstream finds its tools
 
-Last verified 2026-10-25. Full versions and provenance are in [TOOL-INVENTORY.md](TOOL-INVENTORY.md); decisions are in
+Last verified 2026-10-25; the ActionForge toolkit was probe/fetch-verified on 2026-10-26. Full versions and provenance are in [TOOL-INVENTORY.md](TOOL-INVENTORY.md); decisions are in
 [docs/ADR-001-engines.md](docs/ADR-001-engines.md) and [docs/ADR-003-workstream-architecture.md](docs/ADR-003-workstream-architecture.md).
 
 ## Load the tools into a shell
@@ -68,6 +68,34 @@ transformers 5.20.2), model cache under `...\MusicGen\hf-cache`, outputs under `
 - **Licence: model weights CC-BY-NC 4.0 — non-commercial. Prototype only; not for shipping audio.** See
   [docs/ADR-004-generative-media.md](docs/ADR-004-generative-media.md).
 - YuE2 is **not** installed: it requires Linux + Python 3.12 + a 24 GB BF16 GPU (PG-D10).
+
+## ActionForge (hosted CC0 animation library)
+
+[ActionForge](https://actionforge.app/) is a browser-based Mixamo alternative. **Nothing is installed**: its animation
+library is fetched on demand by a reusable Gypsy toolkit. The humanoid rig is
+`https://actionforge.app/assets/animation-library/rig/rig-human.glb`; clips are
+`https://actionforge.app/assets/animation-library/animations/<clip_id>.glb`.
+
+```powershell
+python workstream/gypsy.py toolkit list                       # registry, licence and status
+python workstream/gypsy.py toolkit show actionforge           # details + curated catalog
+python workstream/gypsy.py toolkit actionforge catalog        # known clip ids (offline)
+python workstream/gypsy.py toolkit probe actionforge          # honest reachability check (network)
+python workstream/gypsy.py toolkit actionforge fetch --project <dir> \
+  --clips idle_loop,walk_loop --rig --dest assets/actionforge
+```
+
+- **Licence:** the animation library is **CC0** (no attribution required); the ActionForge application code is
+  **(c) CGstuff** and is not downloaded or redistributed. Provenance is still recorded.
+- **Fetched layout:** `<dest>/rig/rig-human.glb`, `<dest>/animations/<clip_id>.glb`, `<dest>/provenance.json` and
+  `<dest>/NOTICE.md`; SHA-256 is recorded per file.
+- **Safety:** standard-library `urllib` only (no shell), binary glTF v2 header validation, atomic writes, writes stay
+  inside the target project, and a differing existing file is not overwritten without `--force`.
+- **Not automated:** animation authoring, retargeting, loop/foot-slide QA and engine import. The curated catalog is a
+  convenience list; `fetch` also accepts another known clip id. `list`, `show`, `capabilities` and `catalog` work
+  offline; `probe` and `fetch` need network access.
+- See [docs/ADR-015-actionforge-toolkit.md](docs/ADR-015-actionforge-toolkit.md) and the
+  [workstream CLI](workstream/README.md).
 
 ## MCP bridge (ADR-008)
 

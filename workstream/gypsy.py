@@ -10,6 +10,8 @@ Usage:
     python workstream/gypsy.py engines smoke godot|unity [--json] [--keep]
     python workstream/gypsy.py tools probe [--json]
     python workstream/gypsy.py capabilities list|check [--json]
+    python workstream/gypsy.py toolkit list|show|probe|capabilities [--json]
+    python workstream/gypsy.py toolkit actionforge catalog|fetch [--json]
     python workstream/gypsy.py project init --path DIR --engine ID --version VER [--targets pc,mobile] [--force]
     python workstream/gypsy.py project show [--path DIR] [--json]
     python workstream/gypsy.py check [--project DIR] [--json]
@@ -30,6 +32,8 @@ import time
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
+
+import toolkit as toolkit_spec
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 WS_DIR = Path(__file__).resolve().parent
@@ -614,6 +618,7 @@ def check_all(project_path=None) -> dict:
     warnings = []
     capabilities = load_capabilities()
     errors.extend(validate_capabilities(capabilities))
+    errors.extend(toolkit_spec.registry_errors())
     engines = probe_engines()
     if not engines["engines"]["godot"].get("usable"):
         errors.append("Godot is not usable; the reference adapter cannot run")
@@ -658,6 +663,44 @@ def check_all(project_path=None) -> dict:
         "tools": {"manifest": tools.get("manifest"), "count": len(tools.get("tools", [])), "missing": len(tools.get("missing", []))},
         "project": project.get("name") if project else None,
     }
+
+
+def print_human_toolkits(rows):
+    print(f"toolkits: {len(rows)}")
+    for row in rows:
+        print(f"{row['id']:16} {row['status']:12} {row['kind']:16} {row['license']}")
+        print(f"  {row['summary']}")
+        print(f"  capability: {row['capability']} | home: {row['home']} | plugin: {row['plugin']}")
+
+
+def print_human_toolkit(data):
+    print(f"{data.get('id')} - {data.get('name')}")
+    print(f"status: {data.get('status')} | licence: {data.get('license')}")
+    print(f"kind: {data.get('kind')} | capability: {data.get('capability')}")
+    print(f"home: {data.get('home')}")
+    if data.get("docs"):
+        print(f"docs: {data['docs']}")
+    print(f"summary: {data.get('summary')}")
+    if data.get("source"):
+        for name, value in data["source"].items():
+            print(f"source.{name}: {value}")
+    if data.get("commands"):
+        print("commands: " + ", ".join(data["commands"]))
+    clips = data.get("catalog") or []
+    if clips:
+        print(f"catalog: {len(clips)} curated clips")
+        for clip in clips:
+            print(f"  {clip.get('id', '?'):24} {clip.get('category', ''):16} {clip.get('description', '')}")
+    for note in data.get("notes") or []:
+        print(f"note: {note}")
+
+
+def print_human_toolkit_caps(rows):
+    print(f"toolkit capabilities: {len(rows)}")
+    for row in rows:
+        print(f"{row['toolkit']:16} {row['capability']:28} {str(row['maturity'] or '-'):12} {row['manifest']}")
+        if row.get("error"):
+            print(f"  ERROR {row['error']}")
 
 
 def print_human_engines(probe: dict):
@@ -708,6 +751,33 @@ def main(argv=None) -> int:
     cap_list.add_argument("--json", action="store_true")
     cap_check = cap_sub.add_parser("check")
     cap_check.add_argument("--json", action="store_true")
+
+    toolkit_parser = sub.add_parser("toolkit", help="registered reusable toolkit plugins")
+    toolkit_sub = toolkit_parser.add_subparsers(dest="toolkit_command", required=True)
+    toolkit_list = toolkit_sub.add_parser("list", help="list registered toolkits")
+    toolkit_list.add_argument("--json", action="store_true")
+    toolkit_show = toolkit_sub.add_parser("show", help="show one toolkit and its catalog")
+    toolkit_show.add_argument("toolkit_id")
+    toolkit_show.add_argument("--json", action="store_true")
+    toolkit_probe = toolkit_sub.add_parser("probe", help="probe a toolkit's source honestly")
+    toolkit_probe.add_argument("toolkit_id")
+    toolkit_probe.add_argument("--timeout", type=float, default=10.0)
+    toolkit_probe.add_argument("--json", action="store_true")
+    toolkit_caps = toolkit_sub.add_parser("capabilities", help="list toolkit capability manifests")
+    toolkit_caps.add_argument("--json", action="store_true")
+    toolkit_registry_error = None
+    try:
+        registered_toolkits = toolkit_spec.discover()
+    except toolkit_spec.ToolkitError as exc:
+        toolkit_registry_error = str(exc)
+        registered_toolkits = {}
+    for toolkit_id, registered in sorted(registered_toolkits.items()):
+        plugin_parser = toolkit_sub.add_parser(toolkit_id, help=registered.summary)
+        plugin_sub = plugin_parser.add_subparsers(dest="toolkit_action", required=True)
+        for verb, command in sorted(registered.commands.items()):
+            command_parser = plugin_sub.add_parser(verb, help=command["summary"])
+            command["configure"](command_parser)
+            command_parser.add_argument("--json", action="store_true")
 
     project = sub.add_parser("project", help="project manifest")
     project_sub = project.add_subparsers(dest="project_command", required=True)
@@ -850,6 +920,61 @@ def main(argv=None) -> int:
                     print(f"capabilities: {len(capabilities)} | errors: {len(errors)}")
                 return 0 if not errors else 1
             return 0
+        if args.command == "toolkit":
+            if toolkit_registry_error:
+                raise GypsyError("toolkit registry is invalid: " + toolkit_registry_error)
+            if args.toolkit_command == "list":
+                rows = [
+                    registered.info()
+                    for registered in sorted(registered_toolkits.values(), key=lambda item: item.id)
+                ]
+                if args.json:
+                    print(json.dumps(rows, indent=2))
+                else:
+                    print_human_toolkits(rows)
+                return 0
+            if args.toolkit_command == "capabilities":
+                rows = toolkit_spec.capability_rows(registered_toolkits)
+                visible = [{key: value for key, value in row.items() if key != "data"} for row in rows]
+                if args.json:
+                    print(json.dumps(visible, indent=2))
+                else:
+                    print_human_toolkit_caps(visible)
+                return 0
+            if args.toolkit_command in ("show", "probe"):
+                toolkit_id = args.toolkit_id
+                if toolkit_id not in registered_toolkits:
+                    raise GypsyError(
+                        f"unknown toolkit {toolkit_id!r}; have: {', '.join(sorted(registered_toolkits))}"
+                    )
+                registered = registered_toolkits[toolkit_id]
+                if args.toolkit_command == "show":
+                    data = toolkit_spec.describe_toolkit(registered)
+                    if args.json:
+                        print(json.dumps(data, indent=2))
+                    else:
+                        print_human_toolkit(data)
+                    return 0
+                payload = dict(registered.module.probe(timeout=args.timeout))
+                payload.setdefault("toolkit", toolkit_id)
+                if args.json:
+                    print(json.dumps(payload, indent=2))
+                else:
+                    state = "reachable" if payload.get("reachable") else "UNREACHABLE"
+                    print(f"{toolkit_id} probe: {state}")
+                    print(f"url: {payload.get('url')}")
+                    print(f"method: {payload.get('method')} | status: {payload.get('status')}")
+                    print(f"checked: {payload.get('checkedAt')}")
+                    if payload.get("error"):
+                        print(f"error: {payload['error']}")
+                    for note in payload.get("notes") or []:
+                        print(f"note: {note}")
+                return 0 if payload.get("reachable") else 1
+            registered = registered_toolkits[args.toolkit_command]
+            command = registered.commands[args.toolkit_action]
+            exit_code, payload = command["run"](args)
+            print(json.dumps(payload, indent=2) if args.json else command["render"](payload))
+            return exit_code
         if args.command == "project":
             if args.project_command == "init":
                 targets = [t.strip() for t in args.targets.split(",") if t.strip()]
@@ -1085,7 +1210,7 @@ def main(argv=None) -> int:
         if args.command == "version":
             print("Gypsy Studio 0.1.0")
             return 0
-    except GypsyError as exc:
+    except (GypsyError, toolkit_spec.ToolkitError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
     return 1

@@ -70,6 +70,14 @@ Python libraries installed into `C:\Python\python.exe`: `scipy`, `trimesh`, `pyg
 | NVIDIA Nsight Systems/Compute, CUDA 13.x | current | GPU profiling |
 | HWiNFO, GPU-Z, System Informer, WizTree/SpaceSniffer | current | performance and disk telemetry |
 
+## Hosted libraries fetched on demand (not installed)
+
+Recorded 2026-10-26.
+
+| Library | What it provides | Licence | How it is reached |
+| --- | --- | --- | --- |
+| ActionForge animation library | humanoid rig `rig-human.glb` and CC0 animation clips — a browser-based Mixamo alternative | animation library **CC0** (no attribution required); ActionForge application code **(c) CGstuff** | `python workstream/gypsy.py toolkit actionforge fetch --project <dir> --clips <ids> --rig`; nothing is installed, network is used only by `probe`/`fetch`, and each fetch writes SHA-256 provenance + `NOTICE.md` in the project ([ADR-015](docs/ADR-015-actionforge-toolkit.md)) |
+
 ## Open-source replacements for the commercial gaps
 
 | Commercial tool | Open-source replacement | Status |

@@ -1,0 +1,43 @@
+{
+  "schema": "gypsy.capability/v1",
+  "file": "workstream.toolkit.json",
+  "id": "workstream.toolkit",
+  "layer": "workstream",
+  "tool": "gypsy",
+  "kind": "registry",
+  "maturity": "stable",
+  "description": "Discover, validate and expose reusable toolkit plugins through the gypsy toolkit CLI; list/show/capabilities/catalog work offline and each plugin owns its network and licence rules.",
+  "requires": [
+    "python 3.14 standard library"
+  ],
+  "inputs": [
+    {
+      "name": "toolkit",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "registry",
+      "type": "json"
+    },
+    {
+      "name": "capabilityRows",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "every plugin satisfies the documented module contract",
+    "toolkit ids are unique and not reserved command names",
+    "every plugin's capability manifest exists, parses and matches its id",
+    "list/show/capabilities/catalog make no network request"
+  ],
+  "provenance": {
+    "record": [
+      "plugin",
+      "pluginPath",
+      "capability",
+      "status"
+    ]
+  }
+}

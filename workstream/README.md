@@ -11,6 +11,9 @@ python workstream/gypsy.py engines probe [--json]          # detect engines, har
 python workstream/gypsy.py engines smoke godot [--json]    # headless Godot project boots and exits 0
 python workstream/gypsy.py tools probe [--json]            # verify the installed GameTools manifest
 python workstream/gypsy.py capabilities list|check [--json]
+python workstream/gypsy.py toolkit list|show|probe|capabilities [--json]
+python workstream/gypsy.py toolkit actionforge catalog [--json]
+python workstream/gypsy.py toolkit actionforge fetch --project <dir> --clips idle_loop,walk_loop --rig
 python workstream/gypsy.py project init --path game --engine godot --version 4.7.2 --targets pc
 python workstream/gypsy.py project show [--path game]
 python workstream/gypsy.py check [--project .] [--json]
@@ -42,11 +45,15 @@ python -m unittest discover -s workstream/tests -v
   SHA-256 ledger, multi-slice task report and the `slices` CLI.
 - Phase-3 toolpacks: gypsy.toolpack/v1 manifests (`toolpacks/`), explicit argv actions, file/json/text/WAV/PNG/GLB
   validators, artifact hashes and provenance; real packs for golden Blender->Godot import, MusicGen audio and Android APK.
+- Reusable toolkit registry (`toolkit.py`, `toolkits/`): validated plugins, offline list/show/capabilities/catalog, and
+  the ActionForge adapter (`toolkit actionforge fetch`) which fetches CC0 rig/animation GLBs with GLB validation,
+  project-root confinement, atomic writes, SHA-256 provenance and `NOTICE.md` ([ADR-015](../docs/ADR-015-actionforge-toolkit.md)).
 - Phase-5 live watcher (mtime/debounce, no hot reload), performance baseline with budgets, and mobile package gate.
 - Phase-4 console: read-only terminal board, artifact preview and git diff; no writes, no server, no new capability.
 
 ## What is not built yet
 
 Engine adapters beyond Godot (Unity licence/UE5 VRAM/Flax headless are blocked), true hot reload, self-extension
-and a tested Android device launch. Those are registered as deferred work (DEFERRED.md) rather than claimed. See
+and a tested Android device launch. Animation authoring/retargeting/import and toolkits beyond ActionForge are not
+automated. Those are registered as deferred work (DEFERRED.md) rather than claimed. See
 [docs/ADR-003-workstream-architecture.md](../docs/ADR-003-workstream-architecture.md) for the phase plan.

@@ -43,6 +43,22 @@ slices, toolpacks or evidence. The portable instructions and copy-paste template
 Verify the CLI before trusting it: `python workstream/gypsy.py version`. If Gypsy cannot be found, report the block;
 do not substitute ad-hoc shell orchestration and do not claim evidence.
 
+### Toolkit requests: "add XXX to the toolkit"
+
+**Standing operator rule:** whenever the operator asks to add "XXX" to the toolkit — in any wording — **extend Gypsy
+Studio** so the tool is reusable by every future project. It is **not** a project-local script, a one-off toolpack, or
+a hack inside one game. A toolkit addition is complete only when it has:
+
+1. a plugin under [`workstream/toolkits/`](./workstream/toolkits/) registered and validated by
+   [`workstream/toolkit.py`](./workstream/toolkit.py);
+2. `gypsy toolkit` commands — the generic `list`, `show`, `probe` and `capabilities`, plus the tool's own verbs;
+3. a capability manifest under [`workstream/capabilities/`](./workstream/capabilities/);
+4. documentation in [`TOOLCHAIN.md`](./TOOLCHAIN.md), [`TOOL-INVENTORY.md`](./TOOL-INVENTORY.md) and an ADR;
+5. tests that need no network, plus the Retrace/BuildNotes entries.
+
+**ActionForge is the reference implementation** — [ADR-015](./docs/ADR-015-actionforge-toolkit.md),
+`gypsy toolkit actionforge catalog|fetch`.
+
 ## What governs your work
 
 In this order:
@@ -61,13 +77,14 @@ In this order:
 5. **[`docs/README.md`](./docs/README.md)** — the ADRs: engines (001), art pipeline (002), workstream architecture
    (003), generative media (004), character/animation automation (005), Blender import matrix (006), language
    boundaries (007), MCP/free local tools (008), vertical slice (009), slice orchestrator (010), toolpacks (011),
-   thin console (012), phase-5 mobile/live/perf (013), local dashboard (014), plus
+   thin console (012), phase-5 mobile/live/perf (013), local dashboard (014), ActionForge toolkit (015), plus
    [`docs/DASHBOARD.md`](./docs/DASHBOARD.md), [`docs/GYPSY-AGENT-GUIDE.md`](./docs/GYPSY-AGENT-GUIDE.md),
    [`docs/UNITY-SLICE.md`](./docs/UNITY-SLICE.md),
    [`docs/ENGINE-SMOKE.md`](./docs/ENGINE-SMOKE.md), [`docs/IMPORT-MATRIX.md`](./docs/IMPORT-MATRIX.md),
    the PHASE-1..5 evidence files and [`docs/PHASE-6-GATE.md`](./docs/PHASE-6-GATE.md).
 6. **[`workstream/README.md`](./workstream/README.md)** — the CLI: `engines probe|smoke`, `tools probe`,
-   `capabilities`, `project`, `game demo|build|capture|verify`, `slices list|plan|run|status`, `toolpacks list|check|run`,
+   `capabilities`, `toolkit list|show|probe|capabilities` and `toolkit actionforge catalog|fetch`, `project`,
+   `game demo|build|capture|verify`, `slices list|plan|run|status`, `toolpacks list|check|run`,
    `console board|preview|diff`, `dashboard`, `game bench`, `live`, `check`.
 7. **[`DEFERRED.md`](./DEFERRED.md)** — the work deliberately not done. Read the entry covering an area before you
    change that area, and do not quietly close a deferred item by implementing it halfway.

@@ -53,6 +53,13 @@ If `project.gypsy.json` exists, do not overwrite it. Read it, then run:
 
     python "$GYPSY_HOME\workstream\gypsy.py" check --project "<PROJECT_DIR>"
 
+## Toolkit additions
+
+If asked to add "XXX" to the toolkit, extend the **Gypsy checkout**, not this project: add a plugin under
+`workstream/toolkits/`, register its capability, document it and test it. Then use
+`python "$GYPSY_HOME\workstream\gypsy.py" toolkit list|show|probe` and the tool's own commands (for example
+`toolkit actionforge fetch`). Do not write a project-local hack for a toolkit request.
+
 ## While working
 
 1. Call Gypsy for checks, probes, slices, toolpacks, game commands and verification.

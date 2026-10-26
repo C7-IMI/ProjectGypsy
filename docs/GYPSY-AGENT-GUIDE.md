@@ -93,7 +93,8 @@ they are; Gypsy is the orchestration/evidence layer, not a replacement for the p
 3. `gypsy engines probe` and `gypsy tools probe` before claiming a tool or engine exists.
 4. `gypsy capabilities` to see what the workstream actually supports.
 5. Use `gypsy slices list|plan|run` for configured slices; do not invent slice ids.
-6. Use `gypsy toolpacks list|check|run` for asset/audio/tool work.
+6. Use `gypsy toolpacks list|check|run` for asset/audio/tool work, and `gypsy toolkit list|show` plus the
+   tool's own verbs for registered reusable tools (for example `gypsy toolkit actionforge fetch`).
 7. Use `gypsy game demo|build|capture|verify` for the configured game adapter.
 8. Use `gypsy dashboard` for visual inspection; the CLI remains the source of truth.
 9. Before claiming completion, run the project's tests/checks and the relevant Gypsy verification; preserve artifacts
@@ -112,9 +113,34 @@ they are; Gypsy is the orchestration/evidence layer, not a replacement for the p
   make a run look newer.
 - **Project manifest is the contract.** `project.gypsy.json` pins the engine, version, adapter, targets and hardware
   gate. An engine change is a port, not a toggle.
+- **A toolkit request extends Gypsy, not the project.** "Add XXX to the toolkit" means a plugin under
+  `workstream/toolkits/`, a capability manifest, docs, tests and a `gypsy toolkit` command in the Gypsy checkout. It
+  is not a project-local script. ActionForge is the reference: `gypsy toolkit actionforge catalog|fetch`.
 - **If Gypsy is missing or misconfigured**, stop and report the exact failure. Do not pretend the workflow ran.
 
-## 8. Copying this into a project
+## 8. Toolkit additions ("add XXX to the toolkit")
+
+**Standing rule:** a request to add "XXX" to the toolkit means extend **Gypsy Studio**, not the current game project, so
+every future project can use it. "XXX" is a placeholder, not a fixed list: apply the rule to any tool named this way.
+
+A toolkit addition is complete only when it has a validated plugin under `workstream/toolkits/` (registered by
+`workstream/toolkit.py`), a `gypsy toolkit` command group, a capability manifest under `workstream/capabilities/`,
+documentation in `TOOLCHAIN.md`, `TOOL-INVENTORY.md` and an ADR, tests that need no network, and the records entries.
+Do not implement a toolkit request as a throwaway script inside one game.
+
+```text
+python "$env:GYPSY_HOME\workstream\gypsy.py" toolkit list [--json]
+python "$env:GYPSY_HOME\workstream\gypsy.py" toolkit show actionforge [--json]
+python "$env:GYPSY_HOME\workstream\gypsy.py" toolkit probe actionforge [--json]
+python "$env:GYPSY_HOME\workstream\gypsy.py" toolkit actionforge catalog [--json]
+python "$env:GYPSY_HOME\workstream\gypsy.py" toolkit actionforge fetch --project <dir> --clips idle_loop,walk_loop --rig
+```
+
+`list`, `show`, `capabilities` and `catalog` work offline. `probe` and `fetch` need network access and report a
+failure honestly instead of faking success. Read [ADR-015](ADR-015-actionforge-toolkit.md) before adding another
+toolkit.
+
+## 9. Copying this into a project
 
 Use [templates/AGENTS.gypsy.md](../templates/AGENTS.gypsy.md). Append the template to the target project's
 `AGENTS.md` (or equivalent harness instruction file) and replace `<GYPSY_HOME>` with the actual checkout path. The

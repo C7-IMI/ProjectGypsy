@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.25.029
+Current version: 2026.10.26.001
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,26 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.26.001
+
+**Add the ActionForge toolkit and a reusable toolkit registry for future projects.**
+
+- Date: 2026-10-26
+- Commit: this change.
+- Change: operator request: "Add ActionForge to Gypsy for all future projects. If I say add 'XXX' to the toolkit, that
+  means Gypsy should be extended (or plugin created, etc.) to include that tool as part of the Studio for future use."
+  AGENTS.md now carries the standing rule; workstream/toolkit.py validates plugins and provides
+  `toolkit list|show|probe|capabilities`; workstream/toolkits/actionforge.py adds `toolkit actionforge catalog|fetch`;
+  capability manifests toolkit.actionforge (partial) and workstream.toolkit; ADR-015 plus TOOLCHAIN, TOOL-INVENTORY,
+  docs/README, README, workstream README and agent guide/template updated; tests in workstream/tests/test_toolkit.py.
+- Verification: `python -m unittest discover -s workstream/tests -v` -> 215 tests, OK (1 skip); `python
+  workstream/gypsy.py check` -> PASS (capabilities 48, tools 16); `python workstream/gypsy.py capabilities check` ->
+  48 capability files, 0 errors; `python scripts/check_all.py` -> 6/6 PASS; `toolkit probe actionforge` -> reachable,
+  HTTP 200 (HEAD, 2026-10-26T06:04:42-05:00); a real fetch smoke in a temp project wrote rig-human.glb (618,624 bytes,
+  SHA-256 1e6c4f98...) and idle_loop.glb (87,216 bytes, SHA-256 fbc6fcdc...) with provenance + NOTICE, then the temp
+  project was removed. Network is not used by the test suite; mocked fetch tests cover writes, idempotence, conflicts,
+  path escape and invalid GLB.
 
 ## 2026.10.25.029
 

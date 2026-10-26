@@ -349,5 +349,18 @@ Each entry has:
 
 ---
 
-Next prompt number: 35. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 35 - 2026-10-26
+
+- Request: Add ActionForge to Gypsy for all future projects, under the standing rule that "add XXX to the toolkit" means
+  extending Gypsy Studio with a reusable toolkit integration, not a project-local hack.
+- Status: Completed — toolkit registry, ActionForge adapter, CLI, capability manifests, docs and 33 toolkit tests.
+- Version: 2026.10.26.001
+- Commit/evidence: workstream/toolkit.py and workstream/toolkits/actionforge.py; `gypsy toolkit
+  list|show|probe|capabilities` and `toolkit actionforge catalog|fetch`; toolkit.actionforge (partial) and
+  workstream.toolkit capability manifests; ADR-015; 215 tests OK (1 skip); check_all 6/6; `gypsy check` PASS with 48
+  capabilities; probe HTTP 200; a temp-project real fetch wrote rig 618,624 bytes and idle_loop 87,216 bytes.
+
+---
+
+Next prompt number: 36. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).
