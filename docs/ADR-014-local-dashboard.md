@@ -1,7 +1,7 @@
 # ADR-014 — local GUI dashboard
 
 - **Status:** accepted, 2026-10-26; **amended 2026-10-26** (operations console default; classic four views preserved)
-- **Scope:** the local-only graphical control panel: operations console and classic views.
+- **Scope:** the local-only graphical control panel: overview, run detail, mission, commands, review, slices, artifacts, and classic views.
 - **Related:** [ADR-012](ADR-012-thin-console.md), [ADR-003](ADR-003-workstream-architecture.md),
   [DASHBOARD.md](DASHBOARD.md), [DEFERRED.md](../DEFERRED.md).
 
@@ -13,9 +13,10 @@ remote service, or accept arbitrary commands from a browser.
 
 ## Decision
 
-1. **One local app, operations console default, classic views preserved.** The default `/` is an Overview with a
-   run-detail drill-down. Studio Board, Mission Control, Command Hybrid and Director's Table remain at `/classic` as
-   views over the same state; the tab selection is remembered and the app is dark-only.
+1. **One local app, operations console default, classic views preserved.** The default `/` has Overview, Run detail,
+   Slices, Artifacts, Mission, Commands and Review screens over the same state. Studio Board, Mission Control, Command
+   Hybrid and Director's Table remain at `/classic`; the app is dark-only and the original views keep their tab
+   selection.
 2. **Localhost only.** workstream/dashboard.py binds 127.0.0.1 (default 8765), serves no external assets, sets CSP and
    anti-framing headers, and is started by python workstream/gypsy.py dashboard.
 3. **Fixed command whitelist.** Actions are an enumerated map of argv lists (no shell string, no arbitrary argv from the

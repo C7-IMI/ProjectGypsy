@@ -26,7 +26,15 @@ four-view app remains available at `/classic`.
 - Right rail keeps **selected artifact** and **gates**, grouped as Passing / Needs attention / Blocked.
 - Gates explicitly say there is no approval queue; evidence is the review surface.
 
-### 2. Run detail — run-detail.png
+### 2. Remaining console screens — live-mission.png, live-commands.png, live-review.png, live-slices.png, live-artifacts.png
+
+- Mission: phase ladder, machine, engine posture, grouped gates.
+- Commands: the fixed whitelist with argv, run/copy and latest job output.
+- Review: release readiness, evidence and checklist; no approval queue.
+- Slices: table of declared slices with run/open actions.
+- Artifacts: hashed artifact library with live previews.
+
+### 3. Run detail — run-detail.png
 
 ![Run detail](run-detail.png)
 

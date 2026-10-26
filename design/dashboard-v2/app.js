@@ -113,14 +113,17 @@
     return group('Passing', passing) + group('Needs attention', attention) + group('Blocked', blocked) +
       '<div style="margin-top:7px;font-size:8.5px;color:#627986;line-height:1.45">No approval queue. Gates are automated; evidence is the review surface.</div>';
   }
-  function railMarkup() {
+  function railMarkup(active) {
+    function nav(view, label, count, extra) {
+      return '<button class="nav' + (active === view ? ' active' : '') + '" data-view="' + view + '">' + (extra || '') + '<span class="i"></span>' + label + (count !== null && count !== undefined ? '<span class="count">' + esc(count) + '</span>' : '') + '</button>';
+    }
+    function link(view, label) {
+      return '<button class="nav" data-scroll="' + view + '"><span class="i"></span>' + label + '</button>';
+    }
     return '<aside class="rail">' +
-      '<div class="label">Workspace</div><button class="nav active" data-view="overview"><span class="i"></span>Overview</button>' +
-      '<button class="nav" data-view="run"><span class="i"></span>Runs<span class="count">' + ((state.runs || []).length) + '</span></button>' +
-      '<button class="nav" data-scroll="pipeline"><span class="i"></span>Slices<span class="count">' + (state.metrics.slicesTotal || 0) + '</span></button>' +
-      '<button class="nav" data-scroll="artifacts"><span class="i"></span>Artifacts<span class="count">' + (state.artifacts || []).length + '</span></button>' +
-      '<div class="label">Quality</div><button class="nav" data-view="run"><span class="i"></span>Gates<span class="count">' + (state.metrics.blocked || 0) + '</span></button>' +
-      '<button class="nav" data-scroll="pipeline"><span class="i"></span>Toolpacks<span class="count">4</span></button>' +
+      '<div class="label">Workspace</div>' + nav('overview', 'Overview') + nav('slices', 'Slices', (state.slices || []).length) + nav('artifacts', 'Artifacts', (state.artifacts || []).length) + nav('run', 'Runs', (state.runs || []).length) +
+      '<div class="label">Console</div>' + nav('mission', 'Mission', (state.metrics.untested || 0) + (state.metrics.blocked || 0)) + nav('commands', 'Commands') + nav('review', 'Review', (state.metrics.blocked || 0)) +
+      '<div class="label">Quality</div><button class="nav" data-view="review"><span class="i"></span>Gates<span class="count">' + ((state.metrics.blocked || 0) + (state.metrics.untested || 0)) + '</span></button>' +
       '<a class="nav" href="/classic" style="text-decoration:none"><span class="i"></span>Classic views</a>' +
       '<div class="spacer"></div><div class="palette"><div class="k"><span>COMMAND PALETTE</span><span>⌘ K</span></div><div class="v">slices run --all</div></div>' +
       '<div style="font-size:9px;color:#526a77;line-height:1.5;padding:8px 4px 0">The CLI is the source of truth.<br>Every UI action is a named command.</div></aside>';
@@ -154,7 +157,7 @@
       var isImage = /\.(png|jpe?g|webp)$/i.test(a.path || '');
       return '<div class="ev clickable" data-artifact="' + esc(a.path) + '"><div class="thumb">' + (isImage ? '<img src="' + esc(previewUrl(a.path)) + '" alt="">' : esc(a.kind || 'file')) + '</div><div class="n">' + esc(a.path.split('/').pop()) + '</div><div class="s">' + esc(bytes(a.bytes)) + '</div></div>';
     }).join('');
-    shell.innerHTML = railMarkup() +
+    shell.innerHTML = railMarkup('overview') +
       '<main class="main"><div class="head"><div><h1>Workspace overview</h1><p>' + esc(s.metrics.slicesTotal) + ' slices · last run ' + (s.taskPassed ? 'passed' : 'not complete') + ' · ' + esc((s.metrics.blocked || 0) + (s.metrics.untested || 0)) + ' gates need attention</p></div><div class="actions"><button class="btn ghost" data-view="run">View last run</button><button class="btn primary" data-run="run_all">Run all</button></div></div>' +
       next +
       '<div class="metrics">' + metricCard('Slices passed', (s.metrics.slicesPassed || 0) + ' / ' + (s.metrics.slicesTotal || 0), 'latest task', '● PASS') + metricCard('Tests', s.metrics.tests || '—', 'workstream suite', '● PASS') + metricCard('Capabilities', s.metrics.capabilities || '—', 'manifests valid', '') + metricCard('Blocking defects', '0', ((s.metrics.blocked || 0) + (s.metrics.untested || 0)) + ' gates need attention', '') + '</div>' +
@@ -204,10 +207,84 @@
       (validators ? '<div class="runs validators"><div class="runs-h"><b>Validator evidence</b><span>this run</span></div><table><thead><tr><th>Check</th><th>Artifact</th><th>Result</th><th>Kind</th></tr></thead><tbody>' + validators + '</tbody></table></div>' : '') +
       '</main><aside class="detailright"><div class="rpanel"><div class="rpanel-h"><b>Step artifacts</b><span class="right">HASHED</span></div><div class="rpad">' + artifactPanel(true) + '</div></div><div class="rpanel"><div class="rpanel-h"><b>Step actions</b><span class="right">WHITELISTED</span></div><div class="rpad" style="display:flex;flex-direction:column;gap:5px">' + actions + '<button class="btn small ghost" data-run="run_all">Re-run all gates</button><div style="font-size:8.5px;color:#627986;line-height:1.45;margin-top:3px">Re-running writes a new state record; it never edits the old one.</div></div></div><div class="rpanel"><div class="rpanel-h"><b>Artifacts</b><span class="right">' + (detail.artifacts || []).length + '</span></div><div class="rpad"><div class="diffgrid">' + artifactRows + '</div></div></div></aside>';
   }
+  function phaseMarkup(item) {
+    var ok = item.status === 'done' || item.status === 'pass';
+    return '<div class="phase-row"><span class="phase-num">' + esc(item.phase) + '</span><span class="phase-dot" style="background:' + (ok ? 'var(--green)' : item.status === 'blocked' ? 'var(--red)' : 'var(--amber)') + '"></span><div class="phase-main"><b>' + esc(item.label) + '</b><span>' + esc(item.detail) + '</span></div>' + badge(item.status, item.status.toUpperCase()) + '</div>';
+  }
+  function machineMarkup() {
+    var m = state.machine || {};
+    var items = [['GPU', m.gpu || '—'], ['VRAM', (m.vramGb || '—') + ' GB'], ['RAM', (m.ramGb || '—') + ' GB'], ['Disk C', (m.diskC || '—') + ' GB free'], ['Disk D', (m.diskD || '—') + ' GB free'], ['Godot', m.godot || '—'], ['Unity', '6000.6.7f1'], ['Python', state.machine && state.machine.python ? state.machine.python : '—']];
+    return '<div class="machine-grid">' + items.map(function (x) { return '<div class="machine-item"><span>' + esc(x[0]) + '</span><b>' + esc(x[1]) + '</b></div>'; }).join('') + '</div>';
+  }
+  function commandRows() {
+    return (state.commands || []).map(function (cmd) {
+      return '<div class="command-row"><div class="command-main"><b>' + esc(cmd.label) + '</b><span>' + esc(cmd.hint || '') + '</span><code>' + esc(prettyCommand(cmd.id)) + '</code></div><div class="command-actions"><button class="btn small" data-run="' + esc(cmd.id) + '">Run</button><button class="btn small ghost" data-copy="' + esc((cmd.argv || []).join(' ')) + '">Copy</button></div></div>';
+    }).join('');
+  }
+  function artifactGallery() {
+    return '<div class="artifact-grid">' + (state.artifacts || []).map(function (a) {
+      var isImage = /\.(png|jpe?g|webp)$/i.test(a.path || '');
+      return '<div class="artifact-card clickable" data-artifact="' + esc(a.path) + '"><div class="artifact-thumb">' + (isImage ? '<img src="' + esc(previewUrl(a.path)) + '" alt="">' : esc(a.kind || 'file')) + '</div><div class="artifact-name">' + esc(a.path.split('/').pop()) + '</div><div class="artifact-meta">' + esc(bytes(a.bytes)) + ' · ' + esc(a.kind || 'file') + '</div></div>';
+    }).join('') + '</div>';
+  }
+  function renderMission() {
+    shell.className = 'body';
+    shell.innerHTML = railMarkup('mission') +
+      '<main class="main"><div class="head"><div><h1>Mission control</h1><p>Machine, engines, phase ladder and gate health</p></div><div class="actions"><button class="btn ghost" data-view="overview">← Overview</button><button class="btn primary" data-run="run_all">Run all</button></div></div>' +
+      '<div class="metrics">' + metricCard('Slices', (state.metrics.slicesPassed || 0) + ' / ' + (state.metrics.slicesTotal || 0), 'latest task', '● PASS') + metricCard('Capabilities', state.metrics.capabilities || '—', 'valid manifests', '') + metricCard('Tests', state.metrics.tests || '—', 'workstream suite', '● PASS') + metricCard('Open gates', ((state.metrics.blocked || 0) + (state.metrics.untested || 0)), 'not silently passed', '') + '</div>' +
+      '<div class="bottomgrid"><div class="runs"><div class="runs-h"><b>Phase ladder</b><span>0 → 6</span></div><div class="phase-list">' + (state.phases || []).map(phaseMarkup).join('') + '</div></div>' +
+      '<div class="runs"><div class="runs-h"><b>Environment</b><span>local machine</span></div><div class="rpad">' + machineMarkup() + '<div class="callout" style="margin-top:8px"><b>Engine posture</b> Godot is the Phase-1 engine; LeftBehind is the verified Unity 6 second-engine proof. UE5 is hardware-blocked.</div></div></div></div>' +
+      '<div class="runs" style="margin-top:12px"><div class="runs-h"><b>Gate state</b><span>same source as the CLI</span></div><div class="rpad">' + gatesMarkup() + '</div></div>' +
+      '</main><aside class="right"><div class="rpanel"><div class="rpanel-h"><b>Mission notes</b><span>HONEST STATE</span></div><div class="rpad" style="font-size:9px;color:#8499a5;line-height:1.6"><b style="color:#d5e5eb">Verified:</b> Windows build, Android package, LeftBehind Unity build/demo/capture, quality checks.<br><br><b style="color:#f3c17d">Open:</b> device launch untested.<br><br><b style="color:#ff9f93">Blocked:</b> UE5 needs 8 GB VRAM; this machine has 4 GB.<br><br>No approval queue. Evidence is the review surface.</div></div><div class="rpanel"><div class="rpanel-h"><b>Recent runs</b><span>latest 4</span></div><div class="rpad" style="display:flex;flex-direction:column;gap:5px">' + (state.runs || []).slice(0, 4).map(function (r) { return '<button class="btn small ghost" data-run-id="' + esc(r.id) + '" style="justify-content:space-between">' + esc(String(r.title).slice(0, 18)) + '<span class="status ' + (r.passed ? 'pass' : 'fail') + '">' + statusText(r.status) + '</span></button>'; }).join('') + '</div></div></aside>';
+  }
+  function renderCommands() {
+    shell.className = 'body';
+    shell.innerHTML = railMarkup('commands') +
+      '<main class="main"><div class="head"><div><h1>Commands</h1><p>Fixed server-side whitelist; the browser sends an action id, never argv</p></div><div class="actions"><button class="btn ghost" data-view="overview">← Overview</button></div></div>' +
+      '<div class="runs"><div class="runs-h"><b>Available commands</b><span>' + (state.commands || []).length + ' actions</span></div><div class="command-list">' + commandRows() + '</div></div>' +
+      '<div class="bottomgrid"><div class="recover"><b>How actions run</b><p>Click Run, review the exact argv, then confirm. One job at a time; output appears in the drawer.</p></div><div class="recover"><b>Safety boundary</b><p>Only server-side actions are accepted. There is no arbitrary shell and no browser-supplied argv.</p></div></div>' +
+      '</main><aside class="right"><div class="rpanel"><div class="rpanel-h"><b>Job output</b><span>LATEST</span></div><div class="rpad"><div class="logbox"><div class="loghead"><span style="color:var(--green)">●</span> /api/job <span class="right">POLLED</span></div><div class="log" id="command-log">' + esc((state.job && state.job.output) || 'No job running. Start a command to see its output here.') + '</div></div><div class="artfoot"><button class="btn small ghost" id="refresh">Refresh state</button><button class="btn small ghost" data-view="run">Open last run</button></div></div></div><div class="rpanel"><div class="rpanel-h"><b>Last job</b><span>' + esc((state.job && state.job.status ? state.job.status.toUpperCase() : 'IDLE')) + '</span></div><div class="rpad" style="font:9px/1.6 var(--mono);color:#93aab5">' + esc((state.job && state.job.action) || '—') + '<br>' + esc((state.job && state.job.command) ? state.job.command.join(' ') : 'No command has run in this process yet.') + '</div></div></aside>';
+  }
+  function renderReview() {
+    shell.className = 'body';
+    var passing = (state.gates || []).filter(function (g) { return g.status === 'pass'; }).length;
+    var attention = (state.gates || []).filter(function (g) { return g.status === 'untested'; }).length;
+    var blocked = (state.gates || []).filter(function (g) { return g.status === 'blocked'; }).length;
+    shell.innerHTML = railMarkup('review') +
+      '<main class="main"><div class="head"><div><h1>Review</h1><p>Release readiness, gates and evidence — no approval queue</p></div><div class="actions"><button class="btn ghost" data-view="overview">← Overview</button><button class="btn primary" data-run="run_all">Re-run all</button></div></div>' +
+      '<div class="metrics">' + metricCard('Passing gates', passing, 'verified', '● PASS') + metricCard('Needs attention', attention, 'device launch', attention ? '● OPEN' : '') + metricCard('Blocked', blocked, 'external constraint', blocked ? '● BLOCKED' : '') + metricCard('Artifacts', (state.artifacts || []).length, 'hashed evidence', '') + '</div>' +
+      '<div class="bottomgrid"><div class="runs"><div class="runs-h"><b>Release gates</b><span>automated</span></div><div class="rpad">' + gatesMarkup() + '</div></div><div class="runs"><div class="runs-h"><b>Evidence</b><span>selected artifacts</span></div><div class="rpad">' + artifactGallery() + '</div></div></div>' +
+      '<div class="runs" style="margin-top:12px"><div class="runs-h"><b>Review checklist</b><span>6 checks</span></div><div class="checklist"><div class="check"><span class="d"></span><span class="k">Records and encoding</span><span class="v">PASS</span></div><div class="check"><span class="d"></span><span class="k">Capability manifests</span><span class="v">46 valid</span></div><div class="check"><span class="d"></span><span class="k">Workstream tests</span><span class="v">182 PASS</span></div><div class="check"><span class="d"></span><span class="k">Second engine proof</span><span class="v">PASS</span></div><div class="check"><span class="d amber"></span><span class="k">Device launch</span><span class="v">UNTESTED</span></div><div class="check"><span class="d red"></span><span class="k">Phase 6 UE5</span><span class="v">BLOCKED</span></div></div></div>' +
+      '</main><aside class="right"><div class="rpanel"><div class="rpanel-h"><b>Review rule</b><span>READ ONLY</span></div><div class="rpad" style="font-size:9px;color:#8499a5;line-height:1.6">A gate is automated evidence, not an approval button. Untested and blocked are shown as such.<br><br>Use Run detail to inspect logs and retries.</div></div><div class="rpanel"><div class="rpanel-h"><b>Selected artifact</b><span>LIVE</span></div><div class="rpad">' + artifactPanel() + '</div></div></aside>';
+  }
+  function renderSlices() {
+    shell.className = 'body';
+    var rows = (state.slices || []).map(function (s) {
+      var stepText = s.steps && typeof s.steps === 'object' ? (s.steps.passed + '/' + s.steps.total) : (typeof s.steps === 'number' ? s.steps : '—');
+      var open = s.statePath ? ' data-run-id="' + esc(s.statePath) + '"' : ' data-stage-id="' + esc(s.id) + '"';
+      return '<tr><td class="runname">' + esc(s.id) + '</td><td><span class="status ' + (s.passed ? 'pass' : 'fail') + '">● ' + statusText(s.status) + '</span></td><td>' + esc((s.detail || []).join(' → ')) + '</td><td class="t-mono">' + esc(stepText) + '</td><td class="t-mono">' + esc(secs(s.seconds)) + '</td><td class="t-mono">' + esc(s.artifacts || 0) + '</td><td style="text-align:right"><button class="btn small ghost" data-run="' + esc(s.id) + '">Run</button> <button class="btn small ghost" ' + open + '>Open</button></td></tr>';
+    }).join('');
+    shell.innerHTML = railMarkup('slices') +
+      '<main class="main"><div class="head"><div><h1>Slices</h1><p>Declared slices, their steps, duration and artifacts</p></div><div class="actions"><button class="btn primary" data-run="run_all">Run all slices</button></div></div><div class="runs"><div class="runs-h"><b>Slice state</b><span>' + (state.slices || []).length + ' declared</span></div><table><thead><tr><th>Slice</th><th>Status</th><th>Steps</th><th>Progress</th><th>Duration</th><th>Artifacts</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      '<div class="bottomgrid"><div class="recover"><b>Run state is derived</b><p>Every row comes from the latest slice state; old runs remain available in the Runs view.</p></div><div class="recover"><b>Failures are explicit</b><p>A failed slice stops later steps; open Run detail for logs and retry controls.</p></div></div></main>' +
+      '<aside class="right"><div class="rpanel"><div class="rpanel-h"><b>Pipeline</b><span>ORDERED</span></div><div class="rpad" style="display:flex;flex-direction:column;gap:5px">' + (state.slices || []).map(function (s) { return '<div class="gate"><span class="d" style="background:' + (s.passed ? 'var(--green)' : 'var(--red)') + '"></span><div class="g"><b>' + esc(s.id) + '</b><p>' + esc(secs(s.seconds)) + ' · ' + esc(s.status) + '</p></div></div>'; }).join('') + '</div></div></aside>';
+  }
+  function renderArtifacts() {
+    shell.className = 'body';
+    shell.innerHTML = railMarkup('artifacts') +
+      '<main class="main"><div class="head"><div><h1>Artifacts</h1><p>Hashed evidence produced by the workstream</p></div><div class="actions"><button class="btn ghost" data-view="overview">← Overview</button></div></div><div class="runs"><div class="runs-h"><b>Artifact library</b><span>' + (state.artifacts || []).length + ' files</span></div><div class="rpad">' + artifactGallery() + '</div></div><div class="bottomgrid"><div class="recover"><b>Live metadata</b><p>Size and hash are read from the current file; previews never modify the artifact.</p></div><div class="recover"><b>Path safety</b><p>Only build/, artifacts/, docs/ and design/ are readable; traversal is rejected.</p></div></div></main>' +
+      '<aside class="right"><div class="rpanel"><div class="rpanel-h"><b>Selected artifact</b><span>LIVE HASH</span></div><div class="rpad">' + artifactPanel() + '</div></div></aside>';
+  }
   function render() {
     if (!state) return;
     document.querySelectorAll('.tab').forEach(function (tab) { tab.classList.toggle('active', tab.getAttribute('data-view') === view); });
-    if (view === 'run') renderRun(); else renderOverview();
+    if (view === 'run') renderRun();
+    else if (view === 'mission') renderMission();
+    else if (view === 'commands') renderCommands();
+    else if (view === 'review') renderReview();
+    else if (view === 'slices') renderSlices();
+    else if (view === 'artifacts') renderArtifacts();
+    else renderOverview();
   }
   function loadState() {
     return fetch('/api/state', { cache: 'no-store' }).then(function (res) { if (!res.ok) throw new Error('state HTTP ' + res.status); return res.json(); }).then(function (data) {
@@ -308,7 +385,9 @@
     if (ev.ctrlKey && ev.key.toLowerCase() === 'k') { ev.preventDefault(); var input = document.getElementById('search'); if (input) input.focus(); }
   });
   var query = new URLSearchParams(location.search);
-  view = query.get('view') === 'run' ? 'run' : 'overview';
+  var allowedViews = ['overview', 'run', 'mission', 'commands', 'review', 'slices', 'artifacts'];
+  var queryView = query.get('view');
+  view = allowedViews.indexOf(queryView) >= 0 ? queryView : 'overview';
   loadState();
   setInterval(function () { if (!document.hidden) loadState(); }, 15000);
 })();

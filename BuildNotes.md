@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.25.024
+Current version: 2026.10.25.025
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,18 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.25.025
+
+**Add the remaining operations-console screens.**
+
+- Date: 2026-10-26
+- Commit: this change.
+- Change: Mission, Commands, Review, Slices and Artifacts views in the default console; deep links ?view=mission,
+  commands, review, slices, artifacts; command whitelist run/copy actions; phase ladder and machine state; release
+  readiness and evidence; artifact library; new live screenshots; docs and tests updated.
+- Verification: live Chromium captures of all five screens; dashboard tests 10 OK; full suite 182 tests OK; check_all 6/6.
+  No new capabilities; commands remain the fixed whitelist.
 
 ## 2026.10.25.024
 

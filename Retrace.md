@@ -300,5 +300,14 @@ Each entry has:
 
 ---
 
-Next prompt number: 30. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 30 - 2026-10-26
+
+- Request: Do the same for the rest of the screens.
+- Status: Completed — Mission, Commands, Review, Slices and Artifacts added to the operations console.
+- Version: 2026.10.25.025
+- Commit/evidence: live-mission/commands/review/slices/artifacts PNGs; deep-link views; 182 tests; check_all 6/6.
+
+---
+
+Next prompt number: 31. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

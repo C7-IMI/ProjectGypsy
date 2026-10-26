@@ -13,18 +13,33 @@ the port. Stop with Ctrl+C. The server binds 127.0.0.1 only.
 | --- | --- |
 | **Overview** (default) | Next best action, pipeline, recent runs, artifacts, readiness checklist, grouped gates |
 | **Run detail** | Step timeline, log, validator evidence, artifacts, retry/re-run controls |
+| **Slices** | Slice table, step progress, duration, artifacts; run/open actions |
+| **Artifacts** | Hashed artifact library with live previews and metadata |
+| **Mission** | Machine, phase ladder, engine posture and gate health |
+| **Commands** | Fixed command whitelist with argv, run/copy actions and latest job output |
+| **Review** | Release readiness, grouped gates, evidence and checklist — no approval queue |
 | Studio Board (`/classic`) | Original four-view app: board, preview/hash, gates, run actions |
 | Mission Control (`/classic`) | Machine health, phase ladder 0-6, run timeline, artifact vault, recent output, gates |
 | Command Hybrid (`/classic`) | Command palette, terminal output, selected artifact, gate summary |
 | Director's Table (`/classic`) | Review mode: passed slices, what needs a decision, artifacts, next command |
 
-The default operations console is deep-linkable with `?view=overview` or `?view=run`; run detail opens the newest
-run and can be selected from any run row. The original four views remain at `/classic` and keep their studio/mission/
-hybrid/director tabs and localStorage selection.
+The operations console is deep-linkable with `?view=overview`, `?view=slices`, `?view=artifacts`, `?view=mission`,
+`?view=commands`, `?view=review` or `?view=run`; run detail opens the newest run and can be selected from any run row.
+The original four views remain at `/classic` and keep their studio/mission/hybrid/director tabs and localStorage selection.
 
 ![Operations overview](../design/dashboard-v2/live-overview.png)
 
 ![Run detail](../design/dashboard-v2/live-run.png)
+
+![Mission](../design/dashboard-v2/live-mission.png)
+
+![Commands](../design/dashboard-v2/live-commands.png)
+
+![Review](../design/dashboard-v2/live-review.png)
+
+![Slices](../design/dashboard-v2/live-slices.png)
+
+![Artifacts](../design/dashboard-v2/live-artifacts.png)
 
 Classic views:
 
