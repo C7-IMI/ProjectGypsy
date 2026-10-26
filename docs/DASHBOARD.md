@@ -1,4 +1,4 @@
-# Local dashboard
+# Gypsy Studio dashboard
 
 A dark, local-only GUI over the workstream. Start it from the repository root:
 
@@ -75,7 +75,7 @@ Phase-5 evidence. Actions are a fixed server-side whitelist; the browser never s
 - `GET /api/job` — current job output; `POST /api/run` starts a whitelisted action.
 - `GET /api/artifact?path=...` — metadata; add `raw=1` for bytes.
 
-The two default views are the operations console; the four classic views remain available at `/classic`.
+The operations console and the classic four views are separate surfaces: `/` is the default, `/classic` preserves the original four-view app.
 
 ## Safety
 

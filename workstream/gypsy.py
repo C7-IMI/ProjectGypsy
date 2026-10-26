@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gypsy workstream CLI.
+"""Gypsy Studio workstream CLI.
 
 Phase 0 of docs/ADR-003-workstream-architecture.md: engine registry, tool discovery, capability
 manifests, project manifests and the checks that keep them honest. It runs real binaries, records
@@ -684,7 +684,7 @@ def print_human_engines(probe: dict):
 
 
 def main(argv=None) -> int:
-    parser = argparse.ArgumentParser(prog="gypsy", description="Gypsy workstream CLI (Phase 0)")
+    parser = argparse.ArgumentParser(prog="gypsy", description="Gypsy Studio workstream CLI")
     sub = parser.add_subparsers(dest="command", required=True)
 
     engines = sub.add_parser("engines", help="engine registry")
@@ -1083,7 +1083,7 @@ def main(argv=None) -> int:
                 print(f"checks: {'PASS' if result['passed'] else 'FAIL'} | capabilities {result['capabilities']} | tools {result['tools']['count']} | project {result['project'] or '-'}")
             return 0 if result["passed"] else 1
         if args.command == "version":
-            print("gypsy workstream 0.1.0 (Phase 0)")
+            print("Gypsy Studio 0.1.0")
             return 0
     except GypsyError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)

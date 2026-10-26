@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.25.025
+Current version: 2026.10.25.026
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,18 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.25.026
+
+**Rename product surface to Gypsy Studio and add portable agent instructions.**
+
+- Date: 2026-10-26
+- Commit: this change.
+- Change: Gypsy Studio/Gypsy naming in the app title/brand, classic title, CLI description/version, README, AGENTS and
+  dashboard docs; docs/GYPSY-AGENT-GUIDE.md for coding agents on new and existing projects; templates/AGENTS.gypsy.md
+  copy-paste harness block; KEEPING repository paths, Python package and manifest schema identifiers unchanged.
+- Verification: live Chromium screenshots show Gypsy Studio; `gypsy version` prints Gypsy Studio; docs links resolve;
+  tests 182; check_all 6/6.
 
 ## 2026.10.25.025
 

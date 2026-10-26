@@ -309,5 +309,15 @@ Each entry has:
 
 ---
 
-Next prompt number: 31. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 31 - 2026-10-26
+
+- Request: Rename to Gypsy Studio/Gypsy and add instructions for coding agents using Gypsy on new/existing projects.
+- Status: Completed.
+- Version: 2026.10.25.026
+- Commit/evidence: docs/GYPSY-AGENT-GUIDE.md and templates/AGENTS.gypsy.md; app/CLI/docs branded Gypsy Studio; live
+  screenshots refreshed; 182 tests; check_all 6/6.
+
+---
+
+Next prompt number: 32. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

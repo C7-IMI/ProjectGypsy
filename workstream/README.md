@@ -1,6 +1,6 @@
-# Workstream (Phase 0-5)
+# Workstream — Gypsy Studio CLI (Phase 0-5)
 
-The studio harness described in [docs/ADR-003-workstream-architecture.md](../docs/ADR-003-workstream-architecture.md):
+The Gypsy Studio harness described in [docs/ADR-003-workstream-architecture.md](../docs/ADR-003-workstream-architecture.md):
 engine/tool detection, manifests and checks (Phase 0), a playable Godot slice (Phase 1), a manifest-driven orchestrator
 (Phase 2), toolpacks (Phase 3), a read-only console (Phase 4), and live/performance/mobile gates (Phase 5).
 

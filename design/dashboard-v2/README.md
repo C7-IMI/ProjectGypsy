@@ -1,4 +1,4 @@
-# Dashboard redesign — operations console
+# Gypsy Studio operations console
 
 The implemented operations console for the local ProjectGypsy dashboard. It is the default at `/`; the original
 four-view app remains available at `/classic`.

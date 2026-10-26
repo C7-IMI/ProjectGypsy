@@ -1,14 +1,28 @@
-# AGENTS.md — read this first
+# AGENTS.md — Gypsy Studio
 
 Entry point for any model working in this repository. Read this file, then the documents it names, before acting.
 
 ## What this repository is
 
-**ProjectGypsy** — a game. Phase 1 runs on **Godot 4.7.2, PC** ([ADR-009](./docs/ADR-009-vertical-slice.md)); other
-platforms and the game's interface standard remain open (PG-D4). The engine-selection mechanism is built
+**Gypsy Studio** (short: **Gypsy**) is the local workstream/orchestration and evidence tool for game projects.
+This repository's Phase 1 game runs on **Godot 4.7.2, PC** ([ADR-009](./docs/ADR-009-vertical-slice.md)); other
+platforms and the game's interface standard remain open (PG-D4). The checkout directory and Python/manifest identifiers
+still say `ProjectGypsy` / `gypsy`; do not rename them as a branding change. The engine-selection mechanism is built
 ([`docs/ADR-001-engines.md`](./docs/ADR-001-engines.md), `workstream/gypsy.py`); the Phase-1 choice can be overridden by
-a new project manifest, but an engine change is a port, not a toggle. Do not describe ProjectGypsy as a website, a web application or a console, and do not apply web interface
+a new project manifest, but an engine change is a port, not a toggle. Do not describe Gypsy Studio as a website, a web application or a console, and do not apply web interface
 rules to it.
+
+## Use Gypsy Studio in every project
+
+When starting or working on any game project, call **Gypsy Studio** instead of reimplementing workstream probes, checks,
+slices, toolpacks or evidence. The portable instructions and copy-paste template are:
+
+- [`docs/GYPSY-AGENT-GUIDE.md`](./docs/GYPSY-AGENT-GUIDE.md) — canonical agent guide (new + existing projects).
+- [`templates/AGENTS.gypsy.md`](./templates/AGENTS.gypsy.md) — append to a target project's `AGENTS.md`; replace
+  `<GYPSY_HOME>` with this checkout.
+
+Verify the CLI before trusting it: `python workstream/gypsy.py version`. If Gypsy cannot be found, report the block;
+do not substitute ad-hoc shell orchestration and do not claim evidence.
 
 ## What governs your work
 
@@ -29,7 +43,8 @@ In this order:
    (003), generative media (004), character/animation automation (005), Blender import matrix (006), language
    boundaries (007), MCP/free local tools (008), vertical slice (009), slice orchestrator (010), toolpacks (011),
    thin console (012), phase-5 mobile/live/perf (013), local dashboard (014), plus
-   [`docs/DASHBOARD.md`](./docs/DASHBOARD.md), [`docs/UNITY-SLICE.md`](./docs/UNITY-SLICE.md),
+   [`docs/DASHBOARD.md`](./docs/DASHBOARD.md), [`docs/GYPSY-AGENT-GUIDE.md`](./docs/GYPSY-AGENT-GUIDE.md),
+   [`docs/UNITY-SLICE.md`](./docs/UNITY-SLICE.md),
    [`docs/ENGINE-SMOKE.md`](./docs/ENGINE-SMOKE.md), [`docs/IMPORT-MATRIX.md`](./docs/IMPORT-MATRIX.md),
    the PHASE-1..5 evidence files and [`docs/PHASE-6-GATE.md`](./docs/PHASE-6-GATE.md).
 6. **[`workstream/README.md`](./workstream/README.md)** — the CLI: `engines probe|smoke`, `tools probe`,
@@ -82,8 +97,8 @@ In this order:
 Phase 0-5 exist: engine/tool probes, hardware gates, manifests, a Godot headless smoke, a playable Godot 4.7.2 PC slice
 with demo/export/capture, a manifest-driven slice orchestrator with state/artifact hashes, toolpacks with
 validators/provenance, a read-only terminal console, a live watcher, a performance baseline, a signed Android debug
-APK and a local dark GUI dashboard with four views; **LeftBehind** proves the same slice on Unity 6 (build, demo and
-capture); records and the one pack check list; the ADRs; a golden Blender import matrix; MCP/ComfyUI/Poly Haven
+APK, the Gypsy Studio operations console and classic four-view dashboard; **LeftBehind** proves the same slice on Unity 6
+(build, demo and capture); records and the one pack check list; the ADRs; a golden Blender import matrix; MCP/ComfyUI/Poly Haven
 tooling. There is still **no hero art/character pipeline, self-extension or tested device launch**; Phase 6 (UE5) is
 hardware-blocked. See `docs/PHASE-5-EVIDENCE.md`, `docs/UNITY-SLICE.md`, `docs/PHASE-6-GATE.md`, `docs/DASHBOARD.md`
 and `DEFERRED.md`.
