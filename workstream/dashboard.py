@@ -30,6 +30,7 @@ except ImportError:
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 ASSETS = REPO_ROOT / "design" / "dashboard"
+V2_ASSETS = REPO_ROOT / "design" / "dashboard-v2"
 STATE = REPO_ROOT / "workstream" / "state"
 TOKEN = secrets.token_urlsafe(24)
 JOB_LOCK = threading.Lock()
@@ -47,6 +48,10 @@ COMMANDS = {
     "check": {"label": "Run pack checks", "argv": [sys.executable, "scripts/check_all.py"], "hint": "records, links, tests"},
     "live_once": {"label": "Live run once", "argv": [sys.executable, "workstream/gypsy.py", "live", "--paths", "game", "--once", "--command", "demo"], "hint": "one-shot live loop"},
     "android_direct": {"label": "Build APK raw", "argv": ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "scripts/build_android.ps1"], "hint": "direct Android script"},
+    "leftbehind": {"label": "Run LeftBehind", "argv": [sys.executable, "workstream/gypsy.py", "slices", "run", "leftbehind"], "hint": "Unity build + demo + capture"},
+    "leftbehind_build": {"label": "LeftBehind build", "argv": [sys.executable, "workstream/gypsy.py", "toolpacks", "run", "leftbehind.unity", "--action", "build"], "hint": "Unity player build only"},
+    "leftbehind_demo": {"label": "LeftBehind demo", "argv": [sys.executable, "workstream/gypsy.py", "toolpacks", "run", "leftbehind.unity", "--action", "demo"], "hint": "headless marker only"},
+    "leftbehind_capture": {"label": "LeftBehind capture", "argv": [sys.executable, "workstream/gypsy.py", "toolpacks", "run", "leftbehind.unity", "--action", "capture"], "hint": "windowed capture only"},
 }
 
 CSP = "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'"
@@ -154,7 +159,7 @@ def _gates(task, states):
         {"id": "windows", "label": "Windows build", "status": "pass" if exe else "ready", "detail": "109,127,680 B" if exe else "not built"},
         {"id": "mobile", "label": "Android package", "status": "pass" if apk else "ready", "detail": "signed arm64 APK" if apk else "not built"},
         {"id": "device", "label": "Device launch", "status": "untested", "detail": "no device or emulator used"},
-        {"id": "engine2", "label": "Second engine", "status": "blocked", "detail": "LeftBehind Unity PASS; UE5 VRAM; Flax no headless"},
+        {"id": "engine2", "label": "Second engine", "status": "pass" if (REPO_ROOT / "unity" / "LeftBehind" / "Build" / "LeftBehind.exe").exists() else "blocked", "detail": "LeftBehind Unity build/demo/capture PASS" if (REPO_ROOT / "unity" / "LeftBehind" / "Build" / "LeftBehind.exe").exists() else "no Unity build evidence"},
         {"id": "ue5", "label": "Phase 6 UE5", "status": "blocked", "detail": "4 GB VRAM < 8 GB minimum"},
         {"id": "quality", "label": "Quality + records", "status": "pass" if passed_quality(states) else "ready", "detail": "checks, tests, records"},
     ]
@@ -179,6 +184,130 @@ def _engine_state():
         "diskC": (disks.get("C") or {}).get("free_gb"),
         "diskD": (disks.get("D") or {}).get("free_gb"),
         "godot": ((data.get("engines") or {}).get("godot") or {}).get("version"),
+    }
+
+
+def _run_summaries(limit=20):
+    runs = []
+    state_root = STATE
+    try:
+        tasks = sorted((state_root / "slices").glob("task-*.json"), key=lambda item: item.stat().st_mtime, reverse=True)
+    except OSError:
+        tasks = []
+    for path in tasks[:limit]:
+        data = _read_json(path)
+        if not isinstance(data, dict) or data.get("schema") != "gypsy.task-state/v1":
+            continue
+        steps = data.get("steps") or {}
+        total = steps.get("total", len(data.get("slices", [])))
+        passed = steps.get("passed", 0)
+        runs.append({
+            "id": path.relative_to(REPO_ROOT).as_posix(),
+            "kind": "task",
+            "title": data.get("task") or path.stem,
+            "status": "passed" if data.get("passed") else "failed",
+            "passed": bool(data.get("passed")),
+            "startedAt": data.get("startedAt"),
+            "durationSeconds": data.get("durationSeconds"),
+            "steps": {"total": total, "passed": passed},
+            "sliceCount": len(data.get("slices", [])),
+            "artifactCount": len(data.get("artifacts", [])),
+        })
+    try:
+        toolpacks = sorted((state_root / "toolpacks").glob("*.json"), key=lambda item: item.stat().st_mtime, reverse=True)
+    except OSError:
+        toolpacks = []
+    for path in toolpacks:
+        if "-build-" in path.name or "-demo-" in path.name or "-capture-" in path.name:
+            continue
+        data = _read_json(path)
+        if not isinstance(data, dict) or data.get("scope") != "toolpack":
+            continue
+        actions = data.get("actions", [])
+        runs.append({
+            "id": path.relative_to(REPO_ROOT).as_posix(),
+            "kind": "toolpack",
+            "title": data.get("toolpack") or path.stem,
+            "status": "passed" if data.get("passed") else "failed",
+            "passed": bool(data.get("passed")),
+            "startedAt": data.get("startedAt"),
+            "durationSeconds": data.get("durationSeconds"),
+            "steps": {"total": len(actions), "passed": sum(1 for item in actions if item.get("passed"))},
+            "sliceCount": 0,
+            "artifactCount": len(data.get("artifacts", [])),
+        })
+        if len(runs) >= limit:
+            break
+    runs.sort(key=lambda item: item.get("startedAt") or "", reverse=True)
+    seen = set()
+    unique = []
+    for item in runs:
+        key = (item.get("kind"), item.get("title"))
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(item)
+    return unique[:limit]
+
+
+def _run_detail(run_id):
+    candidate = (REPO_ROOT / run_id).resolve()
+    if not candidate.is_relative_to(REPO_ROOT / "workstream" / "state") or candidate.suffix != ".json" or not candidate.is_file():
+        return None
+    data = _read_json(candidate)
+    if not isinstance(data, dict):
+        return None
+    steps = []
+    artifacts = []
+    validators = []
+    command = "python workstream/gypsy.py slices run --all"
+    if data.get("schema") == "gypsy.task-state/v1":
+        command = "python workstream/gypsy.py slices run --all"
+        for slice_summary in data.get("slices", []):
+            state = _read_json(Path(slice_summary["statePath"])) if slice_summary.get("statePath") else None
+            if not isinstance(state, dict):
+                continue
+            for step in state.get("steps", []):
+                steps.append({
+                    "id": state.get("slice", "?") + " · " + str(step.get("id")),
+                    "status": step.get("status"),
+                    "seconds": step.get("seconds"),
+                    "output": step.get("output") or step.get("error") or "",
+                    "error": step.get("error"),
+                })
+            for artifact in state.get("artifacts", []):
+                artifacts.append({"path": artifact.get("path"), "sha256": artifact.get("sha256"), "bytes": artifact.get("bytes"), "exists": artifact.get("exists")})
+        # task summaries may include artifacts not in slice state; keep aggregate copies
+        for artifact in data.get("artifacts", []):
+            if not any(item.get("path") == artifact.get("path") for item in artifacts):
+                artifacts.append({"path": artifact.get("path"), "sha256": artifact.get("sha256"), "bytes": artifact.get("bytes"), "exists": artifact.get("exists")})
+        title = data.get("task")
+    elif data.get("scope") == "toolpack":
+        command = "python workstream/gypsy.py toolpacks run " + str(data.get("toolpack"))
+        for action in data.get("actions", []):
+            state = _read_json(Path(action["statePath"])) if action.get("statePath") else None
+            output = ""
+            if isinstance(state, dict):
+                output = (state.get("stdout") or "") + (state.get("stderr") or "")
+            steps.append({"id": action.get("action"), "status": action.get("status"), "seconds": action.get("seconds"), "output": output, "error": "; ".join(action.get("errors", [])) or None})
+        for artifact in data.get("artifacts", []):
+            artifacts.append({"path": artifact.get("path"), "sha256": artifact.get("sha256"), "bytes": artifact.get("bytes"), "exists": artifact.get("exists")})
+        validators = data.get("validators", [])
+        title = data.get("toolpackName") or data.get("toolpack")
+    else:
+        return None
+    return {
+        "id": run_id,
+        "title": title,
+        "kind": "task" if data.get("schema") == "gypsy.task-state/v1" else "toolpack",
+        "passed": bool(data.get("passed")),
+        "status": "passed" if data.get("passed") else "failed",
+        "startedAt": data.get("startedAt"),
+        "durationSeconds": data.get("durationSeconds"),
+        "command": command,
+        "steps": steps,
+        "artifacts": artifacts,
+        "validators": validators,
     }
 
 
@@ -256,6 +385,7 @@ def collect_state():
         },
         "benchmark": benchmark,
         "job": job,
+        "runs": _run_summaries(),
         "commands": [{"id": key, **value} for key, value in COMMANDS.items()],
         "links": {
             "phase5": "docs/PHASE-5-EVIDENCE.md",
@@ -365,14 +495,33 @@ class Handler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         if parsed.path in {"/", "/index.html"}:
             try:
-                html = (ASSETS / "index.html").read_text(encoding="utf-8").replace("__TOKEN__", TOKEN)
+                html = (V2_ASSETS / "index.html").read_text(encoding="utf-8").replace("__TOKEN__", TOKEN)
             except OSError as exc:
                 self._send(HTTPStatus.INTERNAL_SERVER_ERROR, "dashboard assets missing: " + str(exc), "text/plain")
                 return
             self._send(HTTPStatus.OK, html, "text/html; charset=utf-8")
             return
-        if parsed.path in {"/app.css", "/app.js"}:
+        if parsed.path == "/classic":
+            try:
+                html = (ASSETS / "index.html").read_text(encoding="utf-8").replace("__TOKEN__", TOKEN)
+                html = html.replace('href="/app.css"', 'href="/classic/app.css"').replace('src="/app.js"', 'src="/classic/app.js"')
+            except OSError as exc:
+                self._send(HTTPStatus.INTERNAL_SERVER_ERROR, "classic assets missing: " + str(exc), "text/plain")
+                return
+            self._send(HTTPStatus.OK, html, "text/html; charset=utf-8")
+            return
+        if parsed.path in {"/app.css", "/app.js", "/mockups.css"}:
             name = parsed.path.lstrip("/")
+            try:
+                data = (V2_ASSETS / name).read_bytes()
+            except OSError:
+                self._send(HTTPStatus.NOT_FOUND, "missing", "text/plain")
+                return
+            content_type = "text/css" if name.endswith(".css") else "application/javascript"
+            self._send(HTTPStatus.OK, data, content_type + "; charset=utf-8")
+            return
+        if parsed.path in {"/classic/app.css", "/classic/app.js"}:
+            name = parsed.path.rsplit("/", 1)[-1]
             try:
                 data = (ASSETS / name).read_bytes()
             except OSError:
@@ -380,6 +529,18 @@ class Handler(BaseHTTPRequestHandler):
                 return
             content_type = "text/css" if name.endswith(".css") else "application/javascript"
             self._send(HTTPStatus.OK, data, content_type + "; charset=utf-8")
+            return
+        if parsed.path == "/api/runs":
+            self._json(HTTPStatus.OK, {"runs": _run_summaries()})
+            return
+        if parsed.path == "/api/run":
+            query = parse_qs(parsed.query)
+            run_id = (query.get("id") or [""])[0]
+            detail = _run_detail(run_id)
+            if detail is None:
+                self._json(HTTPStatus.NOT_FOUND, {"error": "run not found"})
+            else:
+                self._json(HTTPStatus.OK, detail)
             return
         if parsed.path == "/api/state":
             try:
@@ -452,7 +613,9 @@ def _hash(path):
 
 def serve(port=8765, open_browser=True):
     if not (ASSETS / "index.html").exists():
-        raise SystemExit("dashboard assets missing at " + str(ASSETS))
+        raise SystemExit("classic dashboard assets missing at " + str(ASSETS))
+    if not (V2_ASSETS / "index.html").exists():
+        raise SystemExit("dashboard assets missing at " + str(V2_ASSETS))
     server = ThreadingHTTPServer(("127.0.0.1", int(port)), Handler)
     url = "http://127.0.0.1:" + str(port) + "/"
     print("ProjectGypsy dashboard: " + url)

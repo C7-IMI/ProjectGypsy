@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.25.023
+Current version: 2026.10.25.024
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,20 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.25.024
+
+**Implement the operations-console dashboard: overview + run detail.**
+
+- Date: 2026-10-26
+- Commit: this change.
+- Change: new default app at / (design/dashboard-v2) with Workspace overview and Run detail views; run history/detail
+  backend (/api/runs, /api/run?id=, runs in /api/state); fixed actions leftbehind, leftbehind_build/demo/capture;
+  responsive dark layout; search, grouped gates, pipeline, runs, artifacts, checklist; run step timeline, logs,
+  validator table, retries and copy controls; original four-view app served at /classic.
+- Verification: dashboard tests 10 OK; full suite 182 tests OK (1 skip); API state has 5 slices/46 capabilities and
+  deduped runs; GET /api/run returns steps/artifacts/validators; live Chromium screenshots overview + run detail;
+  POST leftbehind_demo through the token-protected API passed. check_all 6/6.
 
 ## 2026.10.25.023
 

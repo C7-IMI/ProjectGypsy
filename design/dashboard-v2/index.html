@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="gypsy-token" content="__TOKEN__">
+<title>ProjectGypsy — operations console</title>
+<link rel="stylesheet" href="/classic.css">
+<link rel="stylesheet" href="/mockups.css">
+<link rel="stylesheet" href="/app.css">
+<script defer src="/app.js"></script></head>
+<body><div class="app">
+  <header class="top">
+    <div class="brand"><span class="mark"></span><div><b>ProjectGypsy</b><small>operations console</small></div></div>
+    <nav class="tabs" aria-label="Views">
+      <button class="tab" data-view="overview">Overview</button>
+      <button class="tab" data-view="run">Run detail</button>
+      <a class="classic" href="/classic">Classic views →</a>
+    </nav>
+    <label class="search"><span>⌕</span><input id="search" type="search" placeholder="Search runs, slices, artifacts…" autocomplete="off"><span class="key">Ctrl K</span></label>
+    <button class="btn ghost small" id="refresh">Refresh</button>
+    <button class="btn primary" id="run-all">▶ Run all gates</button>
+    <div class="avatar">SS</div>
+  </header>
+  <div id="shell" class="body"><div class="loading">Connecting to the local workstream…</div></div>
+  <footer class="foot"><span>LOCAL ONLY · 127.0.0.1</span><span class="grow"></span><span>CLI source of truth</span><span class="grow"></span><span class="cmd">python workstream/gypsy.py slices run --all</span><span>v0.23</span></footer>
+</div>
+<div class="job" id="job"><div class="job-h"><span id="job-state" class="status">RUNNING</span><b id="job-title">run</b><button class="close" id="job-close">×</button></div><div class="job-body" id="job-output"></div><div class="job-foot"><span id="job-meta"></span></div></div>
+<div class="modal" id="modal"><div class="dialog"><h3 id="modal-title">Run command?</h3><p id="modal-hint">This executes a real local command and writes state.</p><div class="cmd" id="modal-cmd"></div><div class="row"><button class="btn ghost" id="modal-cancel">Cancel</button><button class="btn primary" id="modal-run">Run</button></div></div></div>
+<div class="toast" id="toast"></div>
+</body></html>

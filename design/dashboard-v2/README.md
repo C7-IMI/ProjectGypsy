@@ -1,9 +1,9 @@
 # Dashboard redesign — operations console
 
-Mockups for a more intuitive, robust version of the local ProjectGypsy dashboard. **Not implemented yet.** The current
-app remains design/dashboard; this is a design proposal.
+The implemented operations console for the local ProjectGypsy dashboard. It is the default at `/`; the original
+four-view app remains available at `/classic`.
 
-## Why the current screen is hard to use
+## Why the old default screen was hard to use
 
 - Two board columns (Ready/Running) take half the width even when empty.
 - Gates mix “untested”, “blocked” and “passing”, so the important distinction is buried.
@@ -12,7 +12,7 @@ app remains design/dashboard; this is a design proposal.
 - Few controls have a clear consequence; the current inspector is mostly passive.
 - At five slices the kanban no longer scales; it will get worse with more slices.
 
-## Proposed structure
+## Structure
 
 ### 1. Workspace overview — overview.png
 
@@ -50,17 +50,21 @@ app remains design/dashboard; this is a design proposal.
 9. **Responsive fallback:** below 1200 px, the right rail moves under the main column and the pipeline becomes a
    two-row grid; below 760 px, the rail collapses and runs become stacked cards.
 
-## What implementation needs
+## What is implemented
 
-- Backend: add API routes for run history, run detail (steps, artifacts, validators) and per-step logs, plus explicit
-  retry action IDs. The current state endpoint is a good base but is snapshot-only.
-- Frontend: route-level views for overview and run detail; replace the current kanban with pipeline + runs table; keep
-  the existing artifact preview and command confirmation.
-- Data already exists under workstream/state (task and slice state, toolpack state, artifacts); no new evidence model is
-  required for the first implementation.
-- Preserve localhost-only/token protections and the fixed action whitelist.
+- Backend: `GET /api/runs` returns newest-first run summaries; `GET /api/run?id=...` returns steps, artifacts and
+  validators; `/api/state` now includes `runs`. Run IDs are state paths, path-checked under `workstream/state`.
+- Frontend: `/` uses `design/dashboard-v2/index.html`, `app.css` and `app.js`; overview is the default, run rows open
+  the run-detail view, and the original four-view app is served at `/classic`.
+- Actions: new fixed whitelist entries `leftbehind`, `leftbehind_build`, `leftbehind_demo`, `leftbehind_capture`; all UI
+  actions still go through the existing confirmation and token-protected POST `/api/run`.
+- Retry buttons map to real commands; no per-step argv is accepted from the browser.
+- Data comes from task/slice/toolpack state; no second evidence model.
+- Localhost-only and token protections remain.
 
 ## Current data used in the mockups
 
-5 slices (phase1, quality, toolpacks, leftbehind, mobile) · 181 tests · 46 capabilities · 2 gates needing attention
+5 slices (phase1, quality, toolpacks, leftbehind, mobile) · 182 tests · 46 capabilities · 2 gates needing attention
 (device launch untested, UE5 hardware-blocked) · LeftBehind Unity 6 PASS.
+
+Live screenshots: `live-overview.png` and `live-run.png`.

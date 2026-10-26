@@ -5,6 +5,7 @@ import sys
 import threading
 import unittest
 import urllib.error
+import urllib.parse
 import urllib.request
 from http.server import ThreadingHTTPServer
 from pathlib import Path
@@ -19,12 +20,14 @@ import gypsy  # noqa: E402
 class StateTests(unittest.TestCase):
     def test_collect_state_shape(self):
         state = dashboard.collect_state()
-        for key in ("generated", "branch", "head", "clean", "slices", "artifacts", "gates", "phases", "metrics", "commands"):
+        for key in ("generated", "branch", "head", "clean", "slices", "artifacts", "gates", "phases", "metrics", "commands", "runs"):
             self.assertIn(key, state)
         self.assertEqual(len(state["slices"]), state["metrics"]["slicesTotal"])
         self.assertGreaterEqual(state["metrics"]["capabilities"], 40)
         self.assertIsInstance(state["commands"], list)
         self.assertIn("run_all", [item["id"] for item in state["commands"]])
+        self.assertIn("leftbehind", [item["id"] for item in state["commands"]])
+        self.assertIsInstance(state["runs"], list)
 
     def test_commands_are_fixed_argv_lists(self):
         for action, command in dashboard.COMMANDS.items():
@@ -84,21 +87,41 @@ class ServerTests(unittest.TestCase):
         status, body = self.get("/")
         self.assertEqual(status, 200)
         text = body.decode("utf-8")
-        self.assertIn("Studio Board", text)
-        self.assertIn("Mission Control", text)
-        self.assertIn("Command Hybrid", text)
-        self.assertIn("Director's Table", text)
+        self.assertIn("Overview", text)
+        self.assertIn("Run detail", text)
+        self.assertIn("Classic views", text)
         self.assertIn("gypsy-token", text)
         self.assertNotIn("__TOKEN__", text)
         status, js = self.get("/app.js")
         self.assertEqual(status, 200)
-        self.assertIn(b"renderStudio", js)
+        self.assertIn(b"renderOverview", js)
+        self.assertIn(b"renderRun", js)
+        status, classic = self.get("/classic")
+        self.assertEqual(status, 200)
+        classic_text = classic.decode("utf-8")
+        self.assertIn("Studio Board", classic_text)
+        self.assertIn("/classic/app.js", classic_text)
 
     def test_state_endpoint(self):
         status, body = self.get("/api/state")
         self.assertEqual(status, 200)
         data = json.loads(body)
         self.assertGreaterEqual(data["metrics"]["capabilities"], 40)
+
+    def test_run_history_endpoint(self):
+        status, body = self.get("/api/runs")
+        self.assertEqual(status, 200)
+        runs = json.loads(body)["runs"]
+        if not runs:
+            self.skipTest("no run state in this checkout")
+        status, body = self.get("/api/run?id=" + urllib.parse.quote(runs[0]["id"], safe=""))
+        self.assertEqual(status, 200)
+        detail = json.loads(body)
+        self.assertIn("steps", detail)
+        self.assertIn("artifacts", detail)
+        with self.assertRaises(urllib.error.HTTPError) as missing:
+            self.get("/api/run?id=not-a-run")
+        self.assertEqual(missing.exception.code, 404)
 
     def test_run_requires_token_and_known_action(self):
         status, _ = self.post("/api/run", {"action": "live_once"})

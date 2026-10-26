@@ -11,21 +11,26 @@ the port. Stop with Ctrl+C. The server binds 127.0.0.1 only.
 
 | View | What it is for |
 | --- | --- |
-| Studio Board (default) | Board of slices, step progress, artifact preview/hash, release gates, run actions |
-| Mission Control | Machine health, phase ladder 0-6, run timeline, artifact vault, recent output, gates |
-| Command Hybrid | Command palette, terminal output, selected artifact, gate summary |
-| Director's Table | Review mode: passed slices, what needs a decision, artifacts, next command |
+| **Overview** (default) | Next best action, pipeline, recent runs, artifacts, readiness checklist, grouped gates |
+| **Run detail** | Step timeline, log, validator evidence, artifacts, retry/re-run controls |
+| Studio Board (`/classic`) | Original four-view app: board, preview/hash, gates, run actions |
+| Mission Control (`/classic`) | Machine health, phase ladder 0-6, run timeline, artifact vault, recent output, gates |
+| Command Hybrid (`/classic`) | Command palette, terminal output, selected artifact, gate summary |
+| Director's Table (`/classic`) | Review mode: passed slices, what needs a decision, artifacts, next command |
 
-All four are views of the same state; the selected tab is remembered in localStorage and can be deep-linked with
-?view=studio, ?view=mission, ?view=hybrid or ?view=director.
+The default operations console is deep-linkable with `?view=overview` or `?view=run`; run detail opens the newest
+run and can be selected from any run row. The original four views remain at `/classic` and keep their studio/mission/
+hybrid/director tabs and localStorage selection.
+
+![Operations overview](../design/dashboard-v2/live-overview.png)
+
+![Run detail](../design/dashboard-v2/live-run.png)
+
+Classic views:
 
 ![Studio Board](../design/dashboard/studio.png)
 
 ![Mission Control](../design/dashboard/mission.png)
-
-![Command Hybrid](../design/dashboard/hybrid.png)
-
-![Director's Table](../design/dashboard/director.png)
 
 ## Actions
 
@@ -41,9 +46,21 @@ Buttons run the same commands as the CLI, after a confirmation that shows the ex
 | Run pack checks | python scripts/check_all.py |
 | Live run once | live --paths game --once --command demo |
 | Build APK raw | scripts/build_android.ps1 |
+| Run LeftBehind | slices run leftbehind |
+| LeftBehind build / demo / capture | toolpacks run leftbehind.unity --action <id> |
 
 One action at a time; output appears in the job drawer and is polled until completion. The drawer links to the latest
 Phase-5 evidence. Actions are a fixed server-side whitelist; the browser never sends argv.
+
+## State API
+
+- `GET /api/state` — slices, artifacts, gates, phases, machine, metrics, commands and run summaries.
+- `GET /api/runs` — newest-first run summaries from task and toolpack state.
+- `GET /api/run?id=...` — one run's steps, artifacts and validators; the id is a state path under workstream/state.
+- `GET /api/job` — current job output; `POST /api/run` starts a whitelisted action.
+- `GET /api/artifact?path=...` — metadata; add `raw=1` for bytes.
+
+The two default views are the operations console; the four classic views remain available at `/classic`.
 
 ## Safety
 
@@ -63,7 +80,8 @@ Phase-5 evidence. Actions are a fixed server-side whitelist; the browser never s
 
 ## Source
 
-- Server: workstream/dashboard.py
-- App: design/dashboard/app.css, app.js, index.html
+- Server: workstream/dashboard.py (serves `/` from design/dashboard-v2; `/classic` from design/dashboard)
+- App: design/dashboard-v2/app.css, app.js, index.html
+- Classic app: design/dashboard/app.css, app.js, index.html
 - Tests: workstream/tests/test_dashboard.py
 - Decision: ADR-014

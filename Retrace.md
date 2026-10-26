@@ -290,5 +290,15 @@ Each entry has:
 
 ---
 
-Next prompt number: 29. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 29 - 2026-10-26
+
+- Request: Build all of the redesigned dashboard (overview and run detail).
+- Status: Completed — default operations console, run history/detail API, classic views preserved.
+- Version: 2026.10.25.024
+- Commit/evidence: / overview and /?view=run live in Chromium; /classic preserved; 10 dashboard tests, 182 total;
+  token-protected leftbehind_demo action passed; check_all 6/6.
+
+---
+
+Next prompt number: 30. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).
