@@ -32,7 +32,7 @@ export-template list) to `workstream/state/smoke-godot.json` (gitignored).
 
 **Not proven yet:** rendering. Godot headless uses a dummy renderer, so no frame can be captured in this mode. The
 visual-evidence path (windowed run + OBS, or Godot movie-maker mode) is a separate capability
-(`engine.godot.capture`, maturity **partial**) and is registered as deferred work.
+(`engine.godot.capture`, maturity **planned**) and is registered as deferred work.
 
 **Export/build** is not proven: no Godot export templates are installed. Headless export will fail until the 4.7.2
 templates are installed. This is registered (PG-D14).

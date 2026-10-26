@@ -7,8 +7,8 @@ A game. The repository is its working home. The engine, target platforms and int
 
 - [`AGENTS.md`](AGENTS.md) — read first; entry point for any model working here.
 - [`TOOLCHAIN.md`](TOOLCHAIN.md) — installed engines, art/audio/build tools, paths and the PATH loader.
-- [`docs/README.md`](docs/README.md) — the ADRs (engines, art pipeline, workstream architecture, generative media)
-  and the Phase-0 engine evidence.
+- [`docs/README.md`](docs/README.md) — all seven ADRs (engines, art pipeline, workstream architecture, generative
+  media, character/animation automation, Blender import matrix, language boundaries) and the Phase-0 evidence.
 - [`workstream/README.md`](workstream/README.md) — the Phase-0 CLI: engine registry, hardware gates, capability and
   project manifests, checks, Godot smoke test.
 

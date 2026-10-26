@@ -23,7 +23,8 @@ provenance) · [ADR-003](ADR-003-workstream-architecture.md) (capability bus) ·
 
 ## Decision
 
-Adopt a committed **golden-asset kit** and a **per-engine, per-format import matrix**. Every asset class is exported
+Adopt a versioned **golden-asset generator** and a **per-engine, per-format import matrix**. The kit itself is regenerated
+into gitignored `artifacts/golden/`; only the generator and the matrix record are committed. Every asset class is exported
 from its `.blend` source with pinned Blender 5.2.3 settings, re-imported and measured in Blender, validated as glTF,
 and asserted in each engine that can actually run. Blocked engines are recorded as blocked with their evidence, never
 as a pass.

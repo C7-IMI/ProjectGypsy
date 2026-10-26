@@ -14,6 +14,7 @@ import os
 import re
 import shutil
 import subprocess
+import struct
 import sys
 import time
 from datetime import datetime, timezone
@@ -164,8 +165,6 @@ def engine_matrix(probe: dict):
         reason = "; ".join(record.get("notes", []))
         if record.get("installed"):
             status = "not run"
-            if engine_id == "gold":
-                pass
             if engine_id == "unity":
                 if not (record.get("licence") or {}).get("proven"):
                     status = "blocked: no licence"
@@ -181,6 +180,35 @@ def engine_matrix(probe: dict):
                 status = "not run"
         matrix.append({"engine": engine_id, "version": record.get("version"), "status": status, "reason": reason})
     return matrix
+
+
+def glb_metadata(path: Path):
+    """Read the JSON chunk of a GLB and return the asset generator/version."""
+    try:
+        data = path.read_bytes()
+        if data[:4] != b"glTF":
+            return {"error": "not a GLB"}
+        chunk_length = int.from_bytes(data[12:16], "little")
+        chunk_type = data[16:20]
+        if chunk_type != b"JSON":
+            return {"error": "first chunk is not JSON"}
+        document = json.loads(data[20:20 + chunk_length].decode("utf-8"))
+        asset = document.get("asset") or {}
+        return {"generator": asset.get("generator"), "version": asset.get("version"), "extensionsUsed": document.get("extensionsUsed") or []}
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        return {"error": str(exc)}
+
+
+def fbx_metadata(path: Path):
+    """Read the FBX binary header version (e.g. 7400 = FBX 7.4)."""
+    try:
+        data = path.read_bytes()
+        if not data.startswith(b"Kaydara FBX Binary"):
+            return {"error": "not a binary FBX"}
+        version = struct.unpack("<I", data[23:27])[0]
+        return {"version": version, "label": str(version // 1000) + "." + str((version % 1000) // 100)}
+    except (OSError, struct.error) as exc:
+        return {"error": str(exc)}
 
 
 def markdown(report: dict) -> str:
@@ -245,6 +273,16 @@ def markdown(report: dict) -> str:
     lines.append("A warning is recorded, not hidden: NODE_SKINNED_MESH_NON_ROOT is expected with Blender's armature export and is")
     lines.append("checked by the engine import test rather than treated as a pass by itself.")
     lines.append("")
+    lines.append("## Export metadata (recorded per run)")
+    lines.append("")
+    lines.append("| Asset | glTF generator | glTF version | FBX header |")
+    lines.append("| --- | --- | --- | --- |")
+    for item in report.get("exports", []):
+        glb = item.get("glb", {})
+        fbx = item.get("fbx", {})
+        fbx_text = "-" if "version" not in fbx else str(fbx.get("version")) + " (" + str(fbx.get("label")) + ")"
+        lines.append("| " + item["asset"] + " | " + str(glb.get("generator") or glb.get("error") or "-") + " | " + str(glb.get("version") or "-") + " | " + fbx_text + " |")
+    lines.append("")
     lines.append("## Pinned baseline")
     lines.append("")
     lines.append("| Item | Value |")
@@ -291,6 +329,15 @@ def main() -> int:
     report["blender"] = golden.get("blender", "?")
     report["golden"] = golden
     report["gltf"] = [validate_gltf(path) for path in sorted(GOLDEN_DIR.glob("*.glb"))]
+    report["exports"] = []
+    for asset in golden.get("assets", []):
+        glb = Path((asset.get("exports") or {}).get("glb", ""))
+        fbx = Path((asset.get("exports") or {}).get("fbx", ""))
+        report["exports"].append({
+            "asset": asset.get("name"),
+            "glb": glb_metadata(glb) if glb.exists() else {"error": "missing"},
+            "fbx": fbx_metadata(fbx) if fbx.exists() else {"error": "missing"},
+        })
     probe = probe_engines()
     report["probe"] = {k: v for k, v in probe.items() if k in ("generated", "staleRegistry")} if isinstance(probe, dict) else probe
     report["engines"] = engine_matrix(probe)
@@ -299,6 +346,10 @@ def main() -> int:
         report["godot"] = godot_import(godot_cli)
     else:
         report["godot"] = {"status": "fail", "error": "Godot CLI not found", "failures": ["godot missing"]}
+    for item in report["engines"]:
+        if item["engine"] == "godot":
+            item["status"] = "pass: glTF import" if report["godot"].get("status") == "pass" else "fail: glTF import"
+            item["reason"] = "headless --import + scene assertions; FBX not native"
     json_path = Path(args.json)
     json_path.parent.mkdir(parents=True, exist_ok=True)
     with open(json_path, "w", encoding="utf-8", newline="\n") as handle:

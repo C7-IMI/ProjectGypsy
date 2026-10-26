@@ -1,6 +1,6 @@
 # IMPORT-MATRIX.md — Blender 5.2 golden-asset import matrix
 
-Generated 2026-10-25T22:20:11-05:00 by scripts/import_matrix.py. This is Phase-0 evidence for
+Generated 2026-10-25T22:28:03-05:00 by scripts/import_matrix.py. This is Phase-0 evidence for
 [ADR-006](ADR-006-blender-import-matrix.md); it is not an art-quality claim.
 
 ## Result
@@ -39,6 +39,15 @@ Counts below are what Blender itself read back; the engine is what the engine re
 
 A warning is recorded, not hidden: NODE_SKINNED_MESH_NON_ROOT is expected with Blender's armature export and is
 checked by the engine import test rather than treated as a pass by itself.
+
+## Export metadata (recorded per run)
+
+| Asset | glTF generator | glTF version | FBX header |
+| --- | --- | --- | --- |
+| static_cube | Khronos glTF Blender I/O v5.2.41 | 2.0 | 7400 (7.4) |
+| rigged_character | Khronos glTF Blender I/O v5.2.41 | 2.0 | 7400 (7.4) |
+| morph_face | Khronos glTF Blender I/O v5.2.41 | 2.0 | 7400 (7.4) |
+| lod_set | Khronos glTF Blender I/O v5.2.41 | 2.0 | 7400 (7.4) |
 
 ## Pinned baseline
 
