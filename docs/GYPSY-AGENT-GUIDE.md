@@ -15,7 +15,21 @@ Gypsy, the agent must call Gypsy rather than reimplementing probes, builds, chec
 The product name is **Gypsy Studio / Gypsy**. The checkout directory, Python package and manifest schema still use the
 legacy `ProjectGypsy` / `gypsy` identifiers; do not rename repository paths or schema keys as a branding change.
 
-## 2. Locate and verify Gypsy
+## 2. Trigger phrase: “Open Gypsy”
+
+When the operator says **Open Gypsy** (or **open gypsy**, case-insensitive), do not ask for clarification. Treat it as:
+
+1. **Load Gypsy** — read this guide and verify the CLI with `python "$env:GYPSY_HOME\workstream\gypsy.py" version`.
+2. **Call it up** — check `http://127.0.0.1:8765/api/state`; if the dashboard is down, start
+   `python "$env:GYPSY_HOME\workstream\gypsy.py" dashboard --no-open`, wait for the endpoint, then open or report
+   `http://127.0.0.1:8765/`.
+3. **Import it into the current project** — if you are outside this checkout, read
+   [templates/AGENTS.gypsy.md](../templates/AGENTS.gypsy.md) and the target project's `AGENTS.gypsy.md` block, and use
+   Gypsy for the workstream actions. Do not create a duplicate copy or an ad-hoc orchestrator.
+4. **Report current state** — summarize the slices and gates from `/api/state`; name the dashboard URL.
+5. If Gypsy is missing or the dashboard cannot start, report the exact failure; never fake the URL or state.
+
+## 3. Locate and verify Gypsy
 
 Preferred setup on this machine:
 
@@ -26,7 +40,7 @@ If `GYPSY_HOME` is not set, look for `workstream/gypsy.py` in the project, a sib
 the operator. **Do not silently replace Gypsy with ad-hoc shell orchestration.** If Gypsy cannot be found, say so and
 record the block; do not claim probes, builds or evidence.
 
-## 3. New project bootstrap
+## 4. New project bootstrap
 
 For a new game project, initialize the target directory from the Gypsy checkout:
 
@@ -48,7 +62,7 @@ Read the manifest and hardware gate before coding. A new project does **not** au
 slices, toolpacks or game code. Add project-specific slices/toolpacks only when they exist; otherwise use Gypsy for
 project checks, engine/tool probes, evidence and the workflow contract, and say what is not configured yet.
 
-## 4. Existing project setup
+## 5. Existing project setup
 
 If the project has no `project.gypsy.json`, initialize it with its **actual** engine and version:
 
@@ -62,7 +76,7 @@ If it already has one, do not overwrite it. Inspect it, then run:
 Treat warnings as information, not permission to fake a pass. Existing game code, build systems and assets stay where
 they are; Gypsy is the orchestration/evidence layer, not a replacement for the project.
 
-## 5. Daily workflow
+## 6. Daily workflow
 
 1. Read the target project's `AGENTS.md`, `project.gypsy.json`, and any slice/toolpack manifests.
 2. `gypsy check --project <dir>`; report what it actually prints.
@@ -77,7 +91,7 @@ they are; Gypsy is the orchestration/evidence layer, not a replacement for the p
 10. Record human-facing work in the project's records system if it has one. Never write a pass into a record without
     evidence.
 
-## 6. The agent contract
+## 7. The agent contract
 
 - **Call Gypsy when it exists.** Prefer `gypsy check`, probes, slices, toolpacks and game commands over ad-hoc scripts.
 - **Never invent commands.** Run `gypsy --help`, `gypsy <group> --help` or read `workstream/README.md` first.
@@ -90,7 +104,7 @@ they are; Gypsy is the orchestration/evidence layer, not a replacement for the p
   gate. An engine change is a port, not a toggle.
 - **If Gypsy is missing or misconfigured**, stop and report the exact failure. Do not pretend the workflow ran.
 
-## 7. Copying this into a project
+## 8. Copying this into a project
 
 Use [templates/AGENTS.gypsy.md](../templates/AGENTS.gypsy.md). Append the template to the target project's
 `AGENTS.md` (or equivalent harness instruction file) and replace `<GYPSY_HOME>` with the actual checkout path. The

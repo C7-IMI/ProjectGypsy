@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.25.026
+Current version: 2026.10.25.027
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,17 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.25.027
+
+**Add “Open Gypsy” as an explicit agent trigger.**
+
+- Date: 2026-10-26
+- Commit: this change.
+- Change: root AGENTS, docs/GYPSY-AGENT-GUIDE.md, templates/AGENTS.gypsy.md and README now define the case-insensitive
+  trigger “Open Gypsy” as: load Gypsy, verify the CLI, ensure the local dashboard is responding, report/open the URL and
+  summarize slices/gates; outside the Gypsy checkout it also means import the guide/template and use Gypsy.
+- Verification: guide commands checked against `gypsy dashboard --help`; docs links resolve; 182 tests; check_all 6/6.
 
 ## 2026.10.25.026
 

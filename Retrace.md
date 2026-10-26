@@ -319,5 +319,15 @@ Each entry has:
 
 ---
 
-Next prompt number: 32. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 32 - 2026-10-26
+
+- Request: Make “Open Gypsy” trigger Gypsy being called up or imported.
+- Status: Completed.
+- Version: 2026.10.25.027
+- Commit/evidence: trigger documented in AGENTS.md, docs/GYPSY-AGENT-GUIDE.md, templates/AGENTS.gypsy.md and README;
+  exact dashboard/verification steps included; 182 tests; check_all 6/6.
+
+---
+
+Next prompt number: 33. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

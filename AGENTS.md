@@ -14,6 +14,19 @@ rules to it.
 
 ## Use Gypsy Studio in every project
 
+### Trigger phrase: “Open Gypsy”
+
+If the operator says **Open Gypsy** (case-insensitive, including “open gypsy”), treat it as an instruction to load Gypsy
+Studio and bring up the dashboard. Do not ask what they mean.
+
+1. Resolve `GYPSY_HOME` (or this checkout) and verify `python "$env:GYPSY_HOME\workstream\gypsy.py" version`.
+2. Check `http://127.0.0.1:8765/api/state`. If it is down, start
+   `python "$env:GYPSY_HOME\workstream\gypsy.py" dashboard --no-open` and wait for the endpoint.
+3. Open or report `http://127.0.0.1:8765/` and summarize the current slices/gates from `/api/state`.
+4. When in another project, this also means **import Gypsy**: read `docs/GYPSY-AGENT-GUIDE.md` and follow the target
+   project's `AGENTS.gypsy.md` block; do not start a second copy or an ad-hoc orchestrator.
+5. If Gypsy cannot be found or started, report the exact failure. Do not fake the URL or the state.
+
 When starting or working on any game project, call **Gypsy Studio** instead of reimplementing workstream probes, checks,
 slices, toolpacks or evidence. The portable instructions and copy-paste template are:
 

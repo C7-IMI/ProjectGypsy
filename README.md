@@ -7,6 +7,13 @@ platforms remain open (PG-D4). The workstream selects and pins an engine per pro
 > **Name:** the product/application is **Gypsy Studio / Gypsy**. The checkout directory, Python package and manifest
 > schema retain `ProjectGypsy` / `gypsy` identifiers; do not rename those as a branding change.
 
+## Open Gypsy
+
+Say **Open Gypsy** (or **open gypsy**) to tell a coding agent to load Gypsy Studio, ensure the local dashboard is
+running at http://127.0.0.1:8765/, and summarize the current slices and gates. In another project, the same phrase
+means “import Gypsy”: read [the agent guide](docs/GYPSY-AGENT-GUIDE.md) and the target project's copy of
+[templates/AGENTS.gypsy.md](templates/AGENTS.gypsy.md).
+
 ## Start here
 
 - [`AGENTS.md`](AGENTS.md) — read first; entry point for any model working here.
