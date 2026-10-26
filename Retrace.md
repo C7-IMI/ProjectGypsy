@@ -270,5 +270,15 @@ Each entry has:
 
 ---
 
-Next prompt number: 27. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 27 - 2026-10-26
+
+- Request: Create a Unity project named LeftBehind and prove the same slice on Unity.
+- Status: Completed.
+- Version: 2026.10.25.022
+- Commit/evidence: LeftBehind Unity 6 build, headless demo GYPSY_DEMO_OK collected=3 frames=74, 1280x720 capture;
+  toolpack/slice pass; docs/UNITY-SLICE.md; 181 tests/46 capabilities; second-engine gate met.
+
+---
+
+Next prompt number: 28. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

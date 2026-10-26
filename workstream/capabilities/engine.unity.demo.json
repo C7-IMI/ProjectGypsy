@@ -1,0 +1,41 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "engine.unity.demo",
+  "layer": "engine",
+  "engine": "unity",
+  "kind": "run",
+  "maturity": "stable",
+  "description": "LeftBehind Unity Windows player deterministic demo: batchmode/nographics run, collects three crystals, prints GYPSY_DEMO_OK and exits 0.",
+  "requires": [
+    "unity.build.leftbehind"
+  ],
+  "inputs": [
+    {
+      "name": "log",
+      "type": "path"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "marker",
+      "type": "text"
+    }
+  ],
+  "checks": [
+    "exit 0",
+    "GYPSY_DEMO_OK collected=3",
+    "frames bounded"
+  ],
+  "provenance": {
+    "record": [
+      "player.log",
+      "exit",
+      "marker",
+      "engine.version",
+      "buildHash"
+    ]
+  },
+  "notes": [
+    "Phase-5 second-engine proof; evidence artifacts/leftbehind/player.log."
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "engine.unity.capture",
+  "layer": "engine",
+  "engine": "unity",
+  "kind": "capture",
+  "maturity": "stable",
+  "description": "LeftBehind windowed 1280x720 ScreenCapture frame from the Unity player.",
+  "requires": [
+    "unity.build.leftbehind",
+    "display"
+  ],
+  "inputs": [
+    {
+      "name": "capture",
+      "type": "path"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "png",
+      "type": "file"
+    }
+  ],
+  "checks": [
+    "process exits 0",
+    "PNG 1280x720",
+    "non-empty"
+  ],
+  "provenance": {
+    "record": [
+      "frame.png",
+      "sha256",
+      "width",
+      "height",
+      "player.log"
+    ]
+  },
+  "notes": [
+    "Requires a visible window; Start-Process Hidden made ScreenCapture fail, so capture uses Normal."
+  ]
+}

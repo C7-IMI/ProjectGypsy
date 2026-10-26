@@ -29,7 +29,7 @@ In this order:
    (003), generative media (004), character/animation automation (005), Blender import matrix (006), language
    boundaries (007), MCP/free local tools (008), vertical slice (009), slice orchestrator (010), toolpacks (011),
    thin console (012), phase-5 mobile/live/perf (013), local dashboard (014), plus
-   [`docs/DASHBOARD.md`](./docs/DASHBOARD.md),
+   [`docs/DASHBOARD.md`](./docs/DASHBOARD.md), [`docs/UNITY-SLICE.md`](./docs/UNITY-SLICE.md),
    [`docs/ENGINE-SMOKE.md`](./docs/ENGINE-SMOKE.md), [`docs/IMPORT-MATRIX.md`](./docs/IMPORT-MATRIX.md),
    the PHASE-1..5 evidence files and [`docs/PHASE-6-GATE.md`](./docs/PHASE-6-GATE.md).
 6. **[`workstream/README.md`](./workstream/README.md)** — the CLI: `engines probe|smoke`, `tools probe`,
@@ -59,7 +59,7 @@ In this order:
   projects are peers. A prompt asked here is logged here; nothing crosses without explicit instruction.
 - **Nothing fake in the build** (Part 11.6): no dead controls, no pretend features; unavailable behaviour says so.
   An engine capability that is hardware-gated or licence-blocked is reported as such, not tested halfway
-  (`engine.ue5.build` is `blocked`; Unity licence is proven but its adapter/build is still planned).
+  (`engine.ue5.build` is `blocked`; Unity build/demo/capture is proven by LeftBehind, asset import is not).
 - **Generated media is prototype-only until licensed.** MusicGen-small weights are CC-BY-NC 4.0; every generated
   asset needs provenance and human approval (ADR-004). Never ship it as a commercial asset.
 - **Background agents are evidence only after they are read** (§10.8). A dispatch is not progress; read the status
@@ -82,7 +82,8 @@ In this order:
 Phase 0-5 exist: engine/tool probes, hardware gates, manifests, a Godot headless smoke, a playable Godot 4.7.2 PC slice
 with demo/export/capture, a manifest-driven slice orchestrator with state/artifact hashes, toolpacks with
 validators/provenance, a read-only terminal console, a live watcher, a performance baseline, a signed Android debug
-APK and a local dark GUI dashboard with four views; records and the one pack check list; the ADRs; a golden Blender
-import matrix; MCP/ComfyUI/Poly Haven tooling. There is still **no hero art/character pipeline, self-extension, tested
-device launch or second engine**; Phase 6 (UE5) is hardware-blocked. See `docs/PHASE-5-EVIDENCE.md`,
-`docs/PHASE-6-GATE.md`, `docs/DASHBOARD.md` and `DEFERRED.md`.
+APK and a local dark GUI dashboard with four views; **LeftBehind** proves the same slice on Unity 6 (build, demo and
+capture); records and the one pack check list; the ADRs; a golden Blender import matrix; MCP/ComfyUI/Poly Haven
+tooling. There is still **no hero art/character pipeline, self-extension or tested device launch**; Phase 6 (UE5) is
+hardware-blocked. See `docs/PHASE-5-EVIDENCE.md`, `docs/UNITY-SLICE.md`, `docs/PHASE-6-GATE.md`, `docs/DASHBOARD.md`
+and `DEFERRED.md`.

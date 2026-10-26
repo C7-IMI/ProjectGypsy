@@ -21,6 +21,7 @@ A toolpack step can also be declared in a slice:
 | art.import.golden.json | python scripts/import_matrix.py --no-doc | workstream/state/import-matrix.json | Godot status pass, rigged character animations >= 3, LOD meshes >= 4 |
 | audio.musicgen.json | tools/musicgen/musicgen.ps1 --seed 1234 | artifacts/toolpacks/musicgen.wav | 16-bit PCM WAV, >= 3 s, RMS >= 0.01; seeded runs are byte-identical |
 | mobile.android.json | powershell scripts/build_android.ps1 | build/ProjectGypsy.apk | file >= 20 MB; script asserts package/ABI/signature |
+| leftbehind.unity.json | powershell scripts/build_unity_leftbehind.ps1 then run_unity_leftbehind.ps1 | unity/LeftBehind/Build/LeftBehind.exe, artifacts/leftbehind/{build.log,player.log,frame.png} | build success text, demo marker, 1280×720 PNG |
 
 The art pack regenerates the Blender golden kit, round-trips GLB/FBX, validates glTF and imports
 into Godot 4.7.2. The audio pack uses local MusicGen-small; its weights are CC-BY-NC 4.0 and the

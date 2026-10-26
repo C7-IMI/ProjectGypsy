@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.25.021
+Current version: 2026.10.25.022
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,21 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.25.022
+
+**LeftBehind: Unity 6 second-engine slice builds, runs and captures.**
+
+- Date: 2026-10-26
+- Commit: this change.
+- Change: unity/LeftBehind Unity 6000.6.7f1 project (procedural arena, CharacterController player, three crystals,
+  camera, deterministic --demo autopilot); BuildLeftBehind.Build; build/run wrappers; toolpacks/leftbehind.unity.json;
+  slices/leftbehind.json; project.gypsy.json; capabilities engine.unity.build (stable), engine.unity.demo and
+  engine.unity.capture; docs/UNITY-SLICE.md and engine/gate/status updates.
+- Verification: Unity batchmode build LEFTBEHIND_BUILD Succeeded (exe 667,136 B; data 95,921,964 B); headless player
+  GYPSY_DEMO_OK collected=3 frames=74 exit 0; windowed capture 1280x720 PNG SHA-256 6da0cd85...; toolpack
+  leftbehind.unity passed build/demo/capture; slices run leftbehind passed; 181 tests; 46 capabilities; second-engine
+  gate now met (Godot + Unity). UE5/Flax remain blocked; device launch untested.
 
 ## 2026.10.25.021
 

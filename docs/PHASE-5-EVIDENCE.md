@@ -13,7 +13,7 @@ Recorded 2026-10-26. Phase-5 proof for [ADR-013](ADR-013-phase5-mobile-live-perf
 | Live watcher | PASS — 34 tests; real --once demo run 2.726 s, exit 0 |
 | Performance | PASS — 3 demos: 2.612/2.602/2.605 s, median 2.605 s, p95 2.605 s, frames=143, GPU render 0.56 ms/frame |
 | Budgets | PASS — median <=5 s, p95 <=8 s, GPU <=16.67 ms/frame |
-| Second engine | PARTIAL — Unity licence PASS; no Unity slice/build yet; UE5/Flax still blocked |
+| Second engine | **PASS** — LeftBehind Unity 6 slice builds, runs `GYPSY_DEMO_OK collected=3 frames=74`, and captures a 1280×720 frame; UE5/Flax remain blocked |
 | Tests / capabilities | 172 tests; 42 capability manifests |
 
 ## Mobile toolchain
@@ -44,11 +44,11 @@ not gameplay FPS.
 
 | Engine | Evidence | Verdict |
 | --- | --- | --- |
-| Unity 6000.6.7f1 | batchmode exit 0, entitlements resolved, `GYPSY_UNITY_SMOKE_OK` in 50.891 s (2026-10-26) | LICENCE PASS; adapter/slice NOT BUILT |
+| Unity 6000.6.7f1 | batchmode exit 0, `GYPSY_UNITY_SMOKE_OK` in 50.891 s; LeftBehind build/demo/capture pass | PASS (second engine) |
 | Unreal Engine 5.8.4 | probe gate: GPU VRAM 4.0 GB below the 8 GB minimum (free D: 60.0 GB meets 60) | BLOCKED (hardware) |
 | Flax 1.13 | probe notes: experimental adapter; no headless build/run demonstrated | BLOCKED (no proven path) |
 
-Therefore the ADR-003 Phase-5 gate "same slice runs on two engines" is not met and is recorded, not faked.
+Therefore the ADR-003 Phase-5 second-engine gate "same slice runs on two engines" is met by Godot + LeftBehind/Unity; the mobile device launch remains untested, and UE5/Flax remain blocked.
 Mobile package gate and live/perf gates are met; device launch is unverified.
 
 ## Commands
@@ -65,4 +65,4 @@ Mobile package gate and live/perf gates are met; device launch is unverified.
 - Debug keystore only; no release signing.
 - Watcher is not hot reload; .godot churn can retrigger it.
 - Benchmark is prototype-scale and machine-specific.
-- Unity licence is proven but the Unity slice adapter is not built; UE5 and Flax remain blocked. Phase 6 is recorded in PHASE-6-GATE.md.
+- Unity second-engine slice is proven by LeftBehind; device launch remains untested; UE5 and Flax remain blocked. Phase 6 is recorded in PHASE-6-GATE.md.

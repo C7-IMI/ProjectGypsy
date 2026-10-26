@@ -14,6 +14,7 @@ Godot; the CLI surface in ADR-010 is a thin wrapper on top of their functions.
 | [quality.json](quality.json) | quality (project: repository root) | check -> tests -> records | none |
 | [toolpacks.json](toolpacks.json) | toolpacks (project: repository root) | art import -> audio | toolpack state ledgers under workstream/state/toolpacks (gitignored) |
 | [mobile.json](mobile.json) | mobile (project: repository root) | Android APK toolpack | build/ProjectGypsy.apk |
+| [leftbehind.json](leftbehind.json) | leftbehind (project: repository root) | Unity build → demo → capture toolpack | artifacts/leftbehind/{build.log,player.log,frame.png} |
 
 The four slices are independent manifests: phase1 proves the game vertical slice again from a clean state; quality
 proves the pack check list, the workstream unit tests and the records guard; toolpacks proves golden import + audio;

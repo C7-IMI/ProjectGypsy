@@ -1,6 +1,6 @@
 # ADR-013 — Phase 5: mobile, live iteration and performance; second-engine gate
 
-- **Status:** accepted, 2026-10-26 (autonomous Phase-5 build; mobile/live/perf proven, second engine blocked)
+- **Status:** accepted, 2026-10-26; amended 2026-10-26 (mobile/live/perf proven; second engine proven by LeftBehind; device/UE5/Flax remain gated)
 - **Scope:** Android package gate, live watcher, performance baseline, and the second-engine/Phase-6 gate.
 - **Related:** [ADR-003](ADR-003-workstream-architecture.md) (phase 5), [ADR-009](ADR-009-vertical-slice.md),
   [ADR-010](ADR-010-slice-orchestrator.md), [ADR-011](ADR-011-toolpacks.md), [PHASE-5-EVIDENCE.md](PHASE-5-EVIDENCE.md),
@@ -26,7 +26,7 @@ blocked second engine.
 4. **Performance baseline has declared budgets:** three headless demos, median <= 5 s, p95 <= 8 s, frames=143 each, plus
    a windowed movie-maker capture with GPU render <= 16.67 ms/frame. The result is a baseline, not a promise across
    hardware.
-5. **Second engine is not faked:** Unity licence is now proven via batchmode smoke, but no Unity slice exists; UE5
+5. **Second engine is proven, not faked:** LeftBehind (unity/LeftBehind) builds, runs the same marker and captures a frame; UE5
    fails the 8 GB VRAM gate (4 GB actual); Flax has no demonstrated headless build/run. The Phase-5 gate "same slice on
    two engines" is therefore blocked, while the mobile package gate and live/perf work pass.
 6. **Phase 6 remains gated:** the UE5 adapter is not built because the hardware gate fails; it needs a machine that
@@ -41,7 +41,7 @@ blocked second engine.
 | On-device launch | NOT TESTED — no device/emulator |
 | Live watcher | PASS — change detection/debounce/runner tests; real --once demo run 2.726 s |
 | Performance | PASS — median 2.605 s, p95 2.605 s, GPU 0.56 ms/frame, frames=143 |
-| Second engine | BLOCKED — Unity licence 198; UE5 VRAM gate; Flax no headless |
+| Second engine | PASS — LeftBehind Unity 6 build/demo/capture; UE5/Flax still blocked |
 | Phase 6 UE5 | BLOCKED — hardware gate |
 
 ## Out of scope

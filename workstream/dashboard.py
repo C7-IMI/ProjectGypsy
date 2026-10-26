@@ -154,7 +154,7 @@ def _gates(task, states):
         {"id": "windows", "label": "Windows build", "status": "pass" if exe else "ready", "detail": "109,127,680 B" if exe else "not built"},
         {"id": "mobile", "label": "Android package", "status": "pass" if apk else "ready", "detail": "signed arm64 APK" if apk else "not built"},
         {"id": "device", "label": "Device launch", "status": "untested", "detail": "no device or emulator used"},
-        {"id": "engine2", "label": "Second engine", "status": "blocked", "detail": "Unity licence PASS, no Unity slice; UE5 VRAM; Flax no headless"},
+        {"id": "engine2", "label": "Second engine", "status": "blocked", "detail": "LeftBehind Unity PASS; UE5 VRAM; Flax no headless"},
         {"id": "ue5", "label": "Phase 6 UE5", "status": "blocked", "detail": "4 GB VRAM < 8 GB minimum"},
         {"id": "quality", "label": "Quality + records", "status": "pass" if passed_quality(states) else "ready", "detail": "checks, tests, records"},
     ]

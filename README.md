@@ -32,6 +32,6 @@ Phase 0 + 1 + 2 + 3 + 4 + 5 exist: engine/tool probes, hardware gates, manifests
 headless demo/export/capture, a manifest-driven slice orchestrator with state and artifact hashes, toolpacks with
 validators/provenance for golden Blender->Godot import and local MusicGen audio, a read-only terminal console, records
 and the pack check list, the ADRs, MCP/ComfyUI/Poly Haven tooling and the installed toolchain. Also present: a live
-watcher, performance baseline, a signed Android debug APK (not device-tested) and a local dark GUI dashboard. Not built yet: hero art/character
-pipeline, self-extension, second engine; UE5 is hardware-blocked. See `docs/PHASE-5-EVIDENCE.md`, `docs/PHASE-6-GATE.md`
+watcher, performance baseline, a signed Android debug APK (not device-tested), a local dark GUI dashboard and the LeftBehind Unity 6 second-engine slice. Not built yet: hero art/character
+pipeline, self-extension; second engine is proven by Unity LeftBehind; UE5 is hardware-blocked. See `docs/PHASE-5-EVIDENCE.md`, `docs/PHASE-6-GATE.md`
 and `DEFERRED.md`.

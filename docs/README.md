@@ -24,6 +24,7 @@
 | [PHASE-4-EVIDENCE.md](PHASE-4-EVIDENCE.md) | generated evidence: console board, preview, diff, no-write audit |
 | [PHASE-5-EVIDENCE.md](PHASE-5-EVIDENCE.md) | generated evidence: APK package/signature, live watcher, performance, blocked second engine |
 | [PHASE-6-GATE.md](PHASE-6-GATE.md) | UE5 hardware gate: blocked, no adapter claimed |
+| [UNITY-SLICE.md](UNITY-SLICE.md) | LeftBehind Unity 6 second-engine build/demo/capture evidence |
 | [DASHBOARD.md](DASHBOARD.md) | launch/use guide for the local GUI dashboard and its four views |
 
 Related: [../TOOLCHAIN.md](../TOOLCHAIN.md), [../TOOL-INVENTORY.md](../TOOL-INVENTORY.md),

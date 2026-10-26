@@ -1,0 +1,19 @@
+{
+  "schema": "gypsy.slice/v1",
+  "id": "leftbehind",
+  "project": ".",
+  "description": "Second-engine proof: LeftBehind Unity 6 slice builds, runs the deterministic demo and captures a frame.",
+  "artifacts": [],
+  "steps": [
+    {
+      "id": "unity",
+      "kind": "toolpack",
+      "needs": [],
+      "required": true,
+      "timeout": 1200,
+      "args": {
+        "toolpack": "leftbehind.unity"
+      }
+    }
+  ]
+}

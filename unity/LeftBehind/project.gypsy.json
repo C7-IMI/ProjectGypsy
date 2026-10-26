@@ -1,0 +1,24 @@
+{
+  "schema": "gypsy.project/v1",
+  "name": "LeftBehind",
+  "engine": {
+    "id": "unity",
+    "version": "6000.6.7f1",
+    "adapter": "unity-6"
+  },
+  "targets": [
+    "pc"
+  ],
+  "paths": {
+    "game": "unity/LeftBehind",
+    "artifacts": "artifacts/leftbehind"
+  },
+  "created": "2026-10-26T03:30:00-05:00",
+  "decisions": [
+    {
+      "date": "2026-10-26T03:30:00-05:00",
+      "decision": "create the LeftBehind Unity 6 slice after Unity licence verification",
+      "reason": "Second-engine proof: the same three-collectible slice is ported to Unity, built as a Windows player, and run with the deterministic demo marker. This does not change the Godot Phase-1 project choice; it is a second-engine adapter proof."
+    }
+  ]
+}

@@ -47,7 +47,7 @@ python workstream/gypsy.py engines probe
 | Engine | Version | Path | Status |
 | --- | --- | --- | --- |
 | Godot | 4.7.2 | `%LOCALAPPDATA%\Microsoft\WinGet\Links\godot.exe` | reference adapter; headless smoke, export, exported-binary demo and windowed capture all pass |
-| Unity | 6000.6.7f1 | `C:\Program Files\Unity 6000.6.7f1\Editor\Unity.exe` | installed; **licence proven** via batchmode smoke (2026-10-26); adapter/build not built |
+| Unity | 6000.6.7f1 | `C:\Program Files\Unity 6000.6.7f1\Editor\Unity.exe` | installed; licence + LeftBehind Windows build/demo/capture pass; asset import not run |
 | Unreal Engine 5 | 5.8.4 | `D:\UnrealEngine\UE_5.8\Engine\Binaries\Win64\UnrealEditor-Cmd.exe` | detected; hardware gate fails (4 GB VRAM, 51.5 GB free on D) |
 | Flax | 1.13 | `C:\Program Files (x86)\Flax\Flax_1.13\Binaries\Editor\Win64\Release\FlaxEditor.exe` | experimental; no headless path demonstrated |
 
@@ -129,6 +129,9 @@ python workstream/gypsy.py game bench --runs 3              # performance baseli
 python workstream/live.py --paths game --once --command demo  # live watcher, one run
 powershell -File scripts/build_android.ps1                 # Android debug APK, signed + package-verified
 python workstream/gypsy.py dashboard                      # local dark GUI at 127.0.0.1:8765
+powershell -File scripts/build_unity_leftbehind.ps1       # LeftBehind Unity build
+powershell -File scripts/run_unity_leftbehind.ps1 -Mode demo
+powershell -File scripts/run_unity_leftbehind.ps1 -Mode capture
 ~~~
 
 - Engine: Godot 4.7.2, PC; export templates installed under `%APPDATA%\\Godot\\export_templates\\4.7.2.stable`.

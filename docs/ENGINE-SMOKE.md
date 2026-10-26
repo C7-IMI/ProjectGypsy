@@ -45,8 +45,11 @@ templates are installed. This is registered (PG-D14).
   temporary Unity project with `Assets/Editor/GypsySmoke.cs`, runs `-executeMethod GypsySmoke.Run`, and asserts
   `GYPSY_UNITY_SMOKE_OK version=6000.6.7f1`; evidence is `workstream/state/smoke-unity.json` (gitignored).
 - `gypsy project init --engine unity` is now allowed because `licence.proven` is true (read from that evidence).
-- **What is still not proven:** a Unity build of the ProjectGypsy slice, playmode demo, rendering, and the second-engine
-  gate. Those need a real `unity/` project and adapter, not just a licence. Do not report a Unity slice as working.
+- **LeftBehind slice (2026-10-26):** `unity/LeftBehind` builds to `Build/LeftBehind.exe`, runs
+  `GYPSY_DEMO_OK collected=3 frames=74` headlessly, and captures a 1280×720 frame. See
+  [UNITY-SLICE.md](UNITY-SLICE.md).
+- **What is still not proven:** Unity import of the Blender golden kit, playmode editor tests, Unity mobile, or that the
+  Unity project is the final game. Asset import remains Godot-only.
 
 ## Unreal Engine 5 — gated, not attempted
 

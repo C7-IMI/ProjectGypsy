@@ -1,0 +1,101 @@
+{
+  "schema": "gypsy.toolpack/v1",
+  "id": "leftbehind.unity",
+  "name": "LeftBehind Unity 6 Windows player",
+  "tools": [
+    "Unity 6000.6.7f1",
+    "Windows Standalone Build Support"
+  ],
+  "license": "Unity licence verified via batchmode smoke; game asset/rights review remains operator responsibility",
+  "actions": [
+    {
+      "id": "build",
+      "argv": [
+        "powershell",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/build_unity_leftbehind.ps1"
+      ],
+      "cwd": ".",
+      "timeout": 900,
+      "artifacts": [
+        "unity/LeftBehind/Build/LeftBehind.exe",
+        "artifacts/leftbehind/build.log"
+      ],
+      "args": {
+        "note": "batchmode BuildLeftBehind.Build"
+      }
+    },
+    {
+      "id": "demo",
+      "argv": [
+        "powershell",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/run_unity_leftbehind.ps1",
+        "-Mode",
+        "demo"
+      ],
+      "cwd": ".",
+      "timeout": 180,
+      "artifacts": [
+        "artifacts/leftbehind/player.log"
+      ],
+      "args": {
+        "note": "headless deterministic acceptance marker"
+      }
+    },
+    {
+      "id": "capture",
+      "argv": [
+        "powershell",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/run_unity_leftbehind.ps1",
+        "-Mode",
+        "capture"
+      ],
+      "cwd": ".",
+      "timeout": 180,
+      "artifacts": [
+        "artifacts/leftbehind/frame.png"
+      ],
+      "args": {
+        "note": "windowed 1280x720 ScreenCapture"
+      }
+    }
+  ],
+  "validators": [
+    {
+      "id": "exe",
+      "kind": "file",
+      "artifact": "unity/LeftBehind/Build/LeftBehind.exe",
+      "minBytes": 100000
+    },
+    {
+      "id": "build-ok",
+      "kind": "text",
+      "artifact": "artifacts/leftbehind/build.log",
+      "contains": "LEFTBEHIND_BUILD Succeeded"
+    },
+    {
+      "id": "demo-ok",
+      "kind": "text",
+      "artifact": "artifacts/leftbehind/player.log",
+      "contains": "GYPSY_DEMO_OK collected=3"
+    },
+    {
+      "id": "frame",
+      "kind": "png",
+      "artifact": "artifacts/leftbehind/frame.png",
+      "minWidth": 1280,
+      "minHeight": 720
+    }
+  ]
+}

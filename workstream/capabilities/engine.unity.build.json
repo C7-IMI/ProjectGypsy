@@ -4,8 +4,8 @@
   "layer": "engine",
   "engine": "unity",
   "kind": "build",
-  "maturity": "planned",
-  "description": "Unity batchmode build. Licence is proven via smoke; the project adapter/build harness is not yet built.",
+  "maturity": "stable",
+  "description": "Unity 6000.6.7f1 batchmode Windows player build for the LeftBehind slice; verified with a real build.",
   "requires": [
     "unity.installed",
     "unity.licence"
@@ -43,5 +43,8 @@
       "exitCode",
       "logHash"
     ]
-  }
+  },
+  "notes": [
+    "LeftBehind: BuildLeftBehind.Build -> Build/LeftBehind.exe; build log LEFTBEHIND_BUILD Succeeded."
+  ]
 }
