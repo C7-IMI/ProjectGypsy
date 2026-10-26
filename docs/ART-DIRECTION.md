@@ -20,8 +20,8 @@ weathered, not military or glossy.
 | Proportions | ~1.8 m; stylised 6.5–7 heads; oversized hands and boots for readability |
 | Palette | cloak/teal #17464d, underlayer #0d252b, leather #4a3324, brass #c08a46, skin #b98262, wayfinder glow #63f5d8 |
 | Materials | flat/painted PBR, roughness 0.5–0.8; metal brass; emissive wayfinder only |
-| Detail budget | 1k–8k triangles; 1 texture atlas 256² (prototype) or 512²; 4–6 material slots |
-| Rig | humanoid root/hips/spine/chest/neck/head, clavicle/arms/hands, thighs/shins/feet; cloak chain 2–3 bones; scarf 2 bones |
+| Detail budget | 1k–8k triangles; 512² base/normal/roughmetal maps; 4 material slots |
+| Rig | humanoid root/hips/spine/chest/neck/head, clavicle/arms/hands, thighs/shins/feet; cloak chain 3 bones; scarf 2 bones |
 | Animation set | **idle** (breathing, lantern sway), **run** (contact/passing/contact), **reach** (collect gesture) |
 | Readability | cyan glow visible from behind/side; boots and hood distinct in silhouette; no thin danglers that vanish at 720p |
 
@@ -49,6 +49,7 @@ are later if the art direction is accepted. No third-party asset may be shipped 
 - Asset files exist and are non-empty.
 - Armature has a humanoid root/spine/limb hierarchy.
 - At least three named actions exist and are non-empty.
+- LOD1/LOD2 preserve the rig/actions; normal/roughness maps and the Smile morph are present.
 - Bounds are approximately human scale; origin at feet.
 - Materials/textures are present and the glTF/FBX re-imports without errors.
 - The Godot slice still passes the headless marker and produces a rendered frame.

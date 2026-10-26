@@ -17,6 +17,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -32,6 +33,7 @@ import gypsy  # noqa: E402
 RUN_SOURCE = """#!/usr/bin/env python3
 import argparse
 import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -55,6 +57,20 @@ if args.action == "sleep":
     import time
     time.sleep(2)
     print("SAMPLE_SLEEP")
+    sys.exit(0)
+if args.action == "spawn-exit":
+    child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+    Path("grandchild.pid").write_text(str(child.pid), encoding="utf-8")
+    Path("parent.pid").write_text(str(os.getpid()), encoding="utf-8")
+    print("SAMPLE_SPAWNED=" + str(child.pid))
+    sys.exit(0)
+if args.action == "spawn-sleep":
+    import time
+    child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+    Path("grandchild.pid").write_text(str(child.pid), encoding="utf-8")
+    Path("parent.pid").write_text(str(os.getpid()), encoding="utf-8")
+    print("SAMPLE_SPAWNED=" + str(child.pid), flush=True)
+    time.sleep(30)
     sys.exit(0)
 sys.exit(2)
 """
@@ -108,6 +124,16 @@ def base_manifest(extension_id="sample.one"):
                 "argv": ["python", "run.py", "--action", "sleep"],
                 "timeout": 0.5,
             },
+            "spawn-exit": {
+                "description": "spawn a grandchild then exit 0",
+                "argv": ["python", "run.py", "--action", "spawn-exit"],
+                "timeout": 10,
+            },
+            "spawn-sleep": {
+                "description": "spawn a grandchild then sleep past the timeout",
+                "argv": ["python", "run.py", "--action", "spawn-sleep"],
+                "timeout": 1,
+            },
         },
         "tests": [
             {
@@ -135,11 +161,65 @@ def run_cli(argv):
     return code, stdout.getvalue(), stderr.getvalue()
 
 
+WINDOWS = sys.platform == "win32"
+WAIT_TIMEOUT = 0x00000102
+
+
+def _pid_alive(pid) -> bool:
+    """Return True while the Windows process id still exists."""
+    if not WINDOWS:
+        return False
+    import ctypes
+
+    kernel32 = ctypes.windll.kernel32
+    handle = kernel32.OpenProcess(0x00100000, False, int(pid))  # SYNCHRONIZE
+    if not handle:
+        return False
+    try:
+        return kernel32.WaitForSingleObject(handle, 0) == WAIT_TIMEOUT
+    finally:
+        kernel32.CloseHandle(handle)
+
+
+def _terminate_pid(pid) -> None:
+    """Best-effort cleanup so a failing assertion cannot leak a test process."""
+    if not WINDOWS:
+        return
+    import ctypes
+
+    kernel32 = ctypes.windll.kernel32
+    handle = kernel32.OpenProcess(0x0001, False, int(pid))  # PROCESS_TERMINATE
+    if not handle:
+        return
+    try:
+        kernel32.TerminateProcess(handle, 1)
+    finally:
+        kernel32.CloseHandle(handle)
+
+
+def _wait_until_dead(pid, timeout: float = 10.0) -> bool:
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        if not _pid_alive(pid):
+            return True
+        time.sleep(0.05)
+    return False
+
+
+def _read_pid(path) -> int:
+    return int(Path(path).read_text(encoding="utf-8").strip())
+
+
 class ExtensionTestCase(unittest.TestCase):
     def setUp(self):
         holder = tempfile.TemporaryDirectory()
         self.addCleanup(holder.cleanup)
         self.root = Path(holder.name)
+        previous = os.environ.pop(extensions.CONTAINMENT_ENV, None)
+        if previous is not None:
+            self.addCleanup(
+                os.environ.__setitem__, extensions.CONTAINMENT_ENV, previous
+            )
 
     def write_extension(
         self,
@@ -684,6 +764,154 @@ class ExecutionTests(ExtensionTestCase):
         with self.assertRaises(extensions.ExtensionError) as raised:
             extensions.run_extension(self.root, "sample.one", "nope")
         self.assertIn("has no action", str(raised.exception))
+
+
+@unittest.skipUnless(WINDOWS, "Windows Job Objects are Windows-only")
+class ProcessContainmentTests(ExtensionTestCase):
+    def test_support_reports_windows_job_object_backend(self):
+        support = extensions.containment_support()
+        self.assertTrue(support["available"])
+        self.assertEqual(support["backend"], "windows-job-object")
+        self.assertEqual(support["platform"], "win32")
+        self.assertEqual(support["envVariable"], "GYPSY_EXTENSION_CONTAIN")
+        self.assertEqual(support["defaultLimits"]["activeProcessLimit"], 8)
+        self.assertTrue(support["defaultLimits"]["killOnJobClose"])
+        self.assertFalse(support["claims"]["filesystemSandbox"])
+        self.assertFalse(support["claims"]["networkSandbox"])
+        self.assertTrue(support["claims"]["resourceLimits"])
+        self.assertTrue(support["claims"]["processTreeKillOnTimeout"])
+
+    def test_job_limits_are_configured(self):
+        job = extensions._job_api().create()
+        self.addCleanup(job.close)
+        info = job.info()
+        self.assertTrue(info["limitFlags"] & 0x00002000)  # kill on job close
+        self.assertTrue(info["limitFlags"] & 0x00000008)  # active process limit
+        self.assertTrue(info["limitFlags"] & 0x00000100)  # process memory
+        self.assertTrue(info["limitFlags"] & 0x00000200)  # job memory
+        self.assertEqual(info["activeProcessLimit"], 8)
+        self.assertEqual(info["processMemoryLimitBytes"], 2048 * 1024 * 1024)
+        self.assertEqual(info["jobMemoryLimitBytes"], 4096 * 1024 * 1024)
+        self.assertEqual(info["perProcessUserTimeLimit100ns"], 0)
+        self.assertEqual(
+            extensions._job_api().create({"cpuSeconds": 2}).info()[
+                "perProcessUserTimeLimit100ns"
+            ],
+            20_000_000,
+        )
+
+    def test_contained_run_reports_applied_and_reaps_tree_on_close(self):
+        directory = self.write_extension()
+        self.register()
+        data = extensions.run_extension(
+            self.root, "sample.one", "spawn-exit", contain=True
+        )
+        self.assertTrue(data["passed"], data)
+        self.assertTrue(data["containment"]["applied"])
+        self.assertEqual(data["containment"]["backend"], "windows-job-object")
+        self.assertEqual(data["containment"]["limits"]["activeProcessLimit"], 8)
+        document = json.loads(Path(data["statePath"]).read_text(encoding="utf-8"))
+        self.assertTrue(document["containment"]["applied"])
+        pid = _read_pid(directory / "grandchild.pid")
+        self.addCleanup(_terminate_pid, pid)
+        self.assertTrue(
+            _wait_until_dead(pid), "grandchild survived kill-on-job-close"
+        )
+
+    def test_contained_timeout_kills_the_process_tree(self):
+        directory = self.write_extension()
+        self.register()
+        started = time.time()
+        data = extensions.run_extension(
+            self.root, "sample.one", "spawn-sleep", contain=True
+        )
+        elapsed = time.time() - started
+        self.assertFalse(data["passed"])
+        self.assertTrue(data["timedOut"])
+        self.assertIsNone(data["exit"])
+        self.assertLess(elapsed, 15.0)
+        self.assertTrue(data["containment"]["applied"])
+        grandchild = _read_pid(directory / "grandchild.pid")
+        parent = _read_pid(directory / "parent.pid")
+        self.addCleanup(_terminate_pid, grandchild)
+        self.addCleanup(_terminate_pid, parent)
+        self.assertTrue(
+            _wait_until_dead(grandchild), "grandchild survived the job timeout"
+        )
+        self.assertTrue(
+            _wait_until_dead(parent), "direct child survived the job timeout"
+        )
+
+    def test_non_contained_run_reports_direct_child_only(self):
+        self.write_extension()
+        self.register()
+        data = extensions.run_extension(
+            self.root, "sample.one", "hello", contain=False
+        )
+        self.assertTrue(data["passed"])
+        self.assertFalse(data["containment"]["requested"])
+        self.assertFalse(data["containment"]["applied"])
+        self.assertIn("direct child", data["containment"]["reason"])
+
+    def test_containment_falls_back_when_the_job_api_is_unavailable(self):
+        self.write_extension()
+        self.register()
+        with mock.patch.object(extensions, "_job_api", return_value=None):
+            data = extensions.run_extension(
+                self.root, "sample.one", "hello", contain=True
+            )
+        self.assertTrue(data["passed"])
+        self.assertTrue(data["containment"]["requested"])
+        self.assertFalse(data["containment"]["applied"])
+        self.assertEqual(data["containment"]["backend"], "none")
+        self.assertTrue(data["containment"]["reason"])
+
+    def test_contained_dry_run_executes_nothing(self):
+        directory = self.write_extension()
+        self.register()
+        data = extensions.run_extension(
+            self.root, "sample.one", "write", dry_run=True, contain=True
+        )
+        self.assertTrue(data["dryRun"])
+        self.assertTrue(data["containment"]["requested"])
+        self.assertTrue(data["containment"]["available"])
+        self.assertEqual(data["containment"]["backend"], "windows-job-object")
+        self.assertFalse((directory / "dry-run-marker.txt").exists())
+        self.assertFalse((self.root / ".state").exists())
+
+    def test_contained_extension_test_reports_applied_containment(self):
+        self.write_extension()
+        data = extensions.test_extension(self.root, "sample.one", contain=True)
+        self.assertTrue(data["passed"], data)
+        self.assertTrue(data["containment"]["applied"])
+        self.assertTrue(data["tests"][0]["containment"]["applied"])
+
+    def test_environment_switch_opts_cli_runs_into_containment(self):
+        directory = self.write_extension()
+        self.register()
+        with mock.patch.dict(
+            os.environ, {extensions.CONTAINMENT_ENV: "1"}
+        ):
+            code, out, err = run_cli(
+                [
+                    "extension",
+                    "run",
+                    "sample.one",
+                    "--action",
+                    "spawn-exit",
+                    "--dir",
+                    str(self.root),
+                    "--json",
+                ]
+            )
+        self.assertEqual(code, 0, out + err)
+        data = json.loads(out)
+        self.assertTrue(data["containment"]["applied"])
+        pid = _read_pid(directory / "grandchild.pid")
+        self.addCleanup(_terminate_pid, pid)
+        self.assertTrue(
+            _wait_until_dead(pid), "CLI environment containment did not reap the tree"
+        )
 
 
 class CliTests(ExtensionTestCase):

@@ -25,8 +25,13 @@
       "timeout": 600,
       "artifacts": [
         "assets/hero/wayfarer.glb",
+        "assets/hero/wayfarer_lod1.glb",
+        "assets/hero/wayfarer_lod2.glb",
+        "assets/hero/wayfarer_lods.json",
         "assets/hero/wayfarer.fbx",
         "assets/hero/textures/wayfarer_atlas.png",
+        "assets/hero/textures/wayfarer_normal.png",
+        "assets/hero/textures/wayfarer_roughmetal.png",
         "artifacts/hero/generation-report.json"
       ]
     },
@@ -70,6 +75,16 @@
       "artifact": "assets/hero/wayfarer.glb"
     },
     {
+      "id": "lod1",
+      "kind": "glb",
+      "artifact": "assets/hero/wayfarer_lod1.glb"
+    },
+    {
+      "id": "lod2",
+      "kind": "glb",
+      "artifact": "assets/hero/wayfarer_lod2.glb"
+    },
+    {
       "id": "fbx",
       "kind": "file",
       "artifact": "assets/hero/wayfarer.fbx",
@@ -79,8 +94,22 @@
       "id": "atlas",
       "kind": "png",
       "artifact": "assets/hero/textures/wayfarer_atlas.png",
-      "minWidth": 256,
-      "minHeight": 256
+      "minWidth": 512,
+      "minHeight": 512
+    },
+    {
+      "id": "normal",
+      "kind": "png",
+      "artifact": "assets/hero/textures/wayfarer_normal.png",
+      "minWidth": 512,
+      "minHeight": 512
+    },
+    {
+      "id": "roughmetal",
+      "kind": "png",
+      "artifact": "assets/hero/textures/wayfarer_roughmetal.png",
+      "minWidth": 512,
+      "minHeight": 512
     },
     {
       "id": "gen-report",
@@ -108,7 +137,7 @@
         },
         {
           "path": "facts.skinning.joints",
-          "equals": 20
+          "equals": 23
         }
       ]
     },

@@ -30,7 +30,7 @@ class HeroAssetTests(unittest.TestCase):
             data = json.loads(report.read_text(encoding="utf-8"))
             self.assertTrue(data["passed"])
             self.assertGreaterEqual(len(data["checks"]), 50)
-            self.assertEqual(data["facts"]["skinning"]["joints"], 20)
+            self.assertEqual(data["facts"]["skinning"]["joints"], 23)
             self.assertEqual(len(data["facts"]["animations"]), 3)
 
     def test_godot_player_keeps_collision_and_uses_hero(self):

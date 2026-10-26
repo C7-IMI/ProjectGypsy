@@ -29,6 +29,7 @@
 | [PHASE-5-EVIDENCE.md](PHASE-5-EVIDENCE.md) | generated evidence: APK package/signature, live watcher, performance, blocked second engine |
 | [PHASE-6-GATE.md](PHASE-6-GATE.md) | UE5 hardware gate: blocked, no adapter claimed |
 | [UNITY-SLICE.md](UNITY-SLICE.md) | LeftBehind Unity 6 second-engine build/demo/capture evidence |
+| [DEVICE-LAUNCH.md](DEVICE-LAUNCH.md) | Android emulator attempt, exact host block and retry path |
 | [DASHBOARD.md](DASHBOARD.md) | launch/use guide for the operations console and classic views |
 | [GYPSY-AGENT-GUIDE.md](GYPSY-AGENT-GUIDE.md) | instructions for coding agents using Gypsy on new or existing projects |
 | [../extensions/README.md](../extensions/README.md) | extension schema, commands, safety model and limitations |

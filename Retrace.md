@@ -373,5 +373,16 @@ Each entry has:
 
 ---
 
-Next prompt number: 37. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 37 - 2026-10-26
+
+- Request: Build what can from the remaining gates (device launch, UE5, hero production pass, extension sandbox).
+- Status: Hero production pass and extension process containment completed; Android emulator installed/AVD created but
+  launch is blocked by a host emulator multi-instance error; UE5 remains hardware-blocked.
+- Version: 2026.10.26.003
+- Commit/evidence: 23-bone/LOD/512-map hero, 94-check validator, Job Object containment and 281 tests; AVD Gypsy_API35b
+  and SDK installed; docs/DEVICE-LAUNCH.md records the exact block; no device pass claimed.
+
+---
+
+Next prompt number: 38. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

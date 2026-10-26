@@ -62,6 +62,11 @@ Safety rules enforced by this module:
   extension directory.
 * The extension is executed with its own directory as cwd, a sanitised environment and
   bytecode writing disabled. Run evidence is written under extensions/.state/ (ignored).
+* Execution can be optionally contained by a Windows Job Object (contain=True or
+  GYPSY_EXTENSION_CONTAIN=1): kill-on-job-close, an active-process limit and memory limits,
+  and a timeout terminates the whole job (process tree). On non-Windows, or when the Job
+  Object API is unavailable, the run falls back to uncontained execution and reports the
+  containment state honestly. This is resource containment, not a filesystem/network sandbox.
 * Every manifest must declare a negative test (expectExit: 'nonzero'). extension test runs
   the declared tests and fails when the negative test unexpectedly succeeds.
 * extension register --accept is the review gate: it hashes the whole extension tree and
@@ -74,9 +79,11 @@ extension is executable code and can still perform any operation its process is 
 perform; the containment rules cover manifest paths, entrypoints, cwd and pipeline writes,
 not every runtime syscall. Permissions (network and read/write declarations) are review
 metadata, not enforced. An extension must not mutate its own registered tree; outputs belong
-under GYPSY_EXTENSION_STATE. A timeout kills the direct child, not an arbitrary grandchild
-process tree. Arbitrary dependency installation and destructive actions remain explicit
-operator decisions.
+under GYPSY_EXTENSION_STATE. A plain timeout kills the direct child only; opt-in Job Object
+containment additionally terminates the job's process tree on timeout and at job close, with
+job resource limits. Containment is not a filesystem/network sandbox and not a security
+boundary against code acting within its OS rights. Arbitrary dependency installation and
+destructive actions remain explicit operator decisions.
 
 Public API is used by gypsy extension ... in workstream/gypsy.py.
 """
@@ -104,6 +111,16 @@ STATE_SCHEMA = "gypsy.extension-state/v1"
 DEFAULT_TIMEOUT = 60.0
 MAX_TIMEOUT = 300.0
 OUTPUT_LIMIT = 4000
+
+CONTAINMENT_ENV = "GYPSY_EXTENSION_CONTAIN"
+CONTAINMENT_BACKEND = "windows-job-object"
+DEFAULT_CONTAINMENT_LIMITS = {
+    "killOnJobClose": True,
+    "activeProcessLimit": 8,
+    "processMemoryMb": 2048,
+    "jobMemoryMb": 4096,
+    "cpuSeconds": None,
+}
 
 ID_RE = re.compile(r"^[a-z][a-z0-9._-]{0,63}$")
 SEMVER_RE = re.compile(
@@ -1372,16 +1389,487 @@ def _execute(plan: dict) -> dict:
     return output
 
 
+# -- opt-in OS process containment (Windows Job Objects) --------------------
+
+
+def _containment_unavailable_reason() -> str:
+    if sys.platform != "win32":
+        return (
+            "Windows Job Objects are unavailable on "
+            + sys.platform
+            + "; the run is not contained (direct-child timeout only)"
+        )
+    return (
+        "Windows Job Object containment could not be initialised; "
+        "the run is not contained (direct-child timeout only)"
+    )
+
+
+def _containment_env_requested() -> bool:
+    value = os.environ.get(CONTAINMENT_ENV, "").strip().casefold()
+    return value in ("1", "true", "yes", "on")
+
+
+def _containment_requested(explicit=None) -> bool:
+    """Resolve containment: an explicit bool wins; otherwise the environment opts in."""
+    if explicit is not None:
+        return bool(explicit)
+    return _containment_env_requested()
+
+
+def _empty_containment(requested=False, reason=None) -> dict:
+    return {
+        "requested": bool(requested),
+        "applied": False,
+        "backend": "none",
+        "platform": sys.platform,
+        "limits": None,
+        "reason": reason,
+    }
+
+
+def _applied_containment(limits) -> dict:
+    return {
+        "requested": True,
+        "applied": True,
+        "backend": CONTAINMENT_BACKEND,
+        "platform": sys.platform,
+        "limits": dict(limits or DEFAULT_CONTAINMENT_LIMITS),
+        "reason": None,
+    }
+
+
+def containment_support() -> dict:
+    """Report whether OS process containment is available, its backend and its defaults.
+
+    available is true only on Windows when the Job Object API initialises. The claims block
+    states explicitly that this is not a filesystem or network sandbox.
+    """
+    api = _job_api()
+    available = api is not None
+    return {
+        "available": available,
+        "platform": sys.platform,
+        "backend": CONTAINMENT_BACKEND if available else "none",
+        "reason": None if available else _containment_unavailable_reason(),
+        "envVariable": CONTAINMENT_ENV,
+        "defaultLimits": dict(DEFAULT_CONTAINMENT_LIMITS),
+        "claims": {
+            "filesystemSandbox": False,
+            "networkSandbox": False,
+            "resourceLimits": available,
+            "processTreeKillOnTimeout": available,
+        },
+    }
+
+
+def _containment_plan(requested: bool) -> dict:
+    """Describe planned containment for a dry run."""
+    support = containment_support()
+    return {
+        "requested": bool(requested),
+        "available": support["available"],
+        "backend": support["backend"],
+        "platform": support["platform"],
+        "limits": support["defaultLimits"] if requested and support["available"] else None,
+        "reason": None if not requested else support["reason"],
+    }
+
+
+class _WindowsJobFactory:
+    """Kernel32 function table and limit structures; built once, only on Windows."""
+
+    JOB_OBJECT_EXTENDED_LIMIT_INFORMATION = 9
+    LIMIT_PROCESS_TIME = 0x00000002
+    LIMIT_ACTIVE_PROCESS = 0x00000008
+    LIMIT_PROCESS_MEMORY = 0x00000100
+    LIMIT_JOB_MEMORY = 0x00000200
+    LIMIT_KILL_ON_JOB_CLOSE = 0x00002000
+
+    def __init__(self):
+        import ctypes
+        from ctypes import wintypes
+
+        self.ctypes = ctypes
+        self.wintypes = wintypes
+
+        class _BasicLimits(ctypes.Structure):
+            _fields_ = [
+                ("PerProcessUserTimeLimit", ctypes.c_longlong),
+                ("PerJobUserTimeLimit", ctypes.c_longlong),
+                ("LimitFlags", wintypes.DWORD),
+                ("MinimumWorkingSetSize", ctypes.c_size_t),
+                ("MaximumWorkingSetSize", ctypes.c_size_t),
+                ("ActiveProcessLimit", wintypes.DWORD),
+                ("Affinity", ctypes.c_size_t),
+                ("PriorityClass", wintypes.DWORD),
+                ("SchedulingClass", wintypes.DWORD),
+            ]
+
+        class _IoCounters(ctypes.Structure):
+            _fields_ = [
+                ("ReadOperationCount", ctypes.c_ulonglong),
+                ("WriteOperationCount", ctypes.c_ulonglong),
+                ("OtherOperationCount", ctypes.c_ulonglong),
+                ("ReadTransferCount", ctypes.c_ulonglong),
+                ("WriteTransferCount", ctypes.c_ulonglong),
+                ("OtherTransferCount", ctypes.c_ulonglong),
+            ]
+
+        class _ExtendedLimits(ctypes.Structure):
+            _fields_ = [
+                ("BasicLimitInformation", _BasicLimits),
+                ("IoInfo", _IoCounters),
+                ("ProcessMemoryLimit", ctypes.c_size_t),
+                ("JobMemoryLimit", ctypes.c_size_t),
+                ("PeakProcessMemoryUsed", ctypes.c_size_t),
+                ("PeakJobMemoryUsed", ctypes.c_size_t),
+            ]
+
+        self._basic_limits = _BasicLimits
+        self._extended_limits = _ExtendedLimits
+
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel32.CreateJobObjectW.restype = wintypes.HANDLE
+        kernel32.CreateJobObjectW.argtypes = [ctypes.c_void_p, wintypes.LPCWSTR]
+        kernel32.SetInformationJobObject.restype = wintypes.BOOL
+        kernel32.SetInformationJobObject.argtypes = [
+            wintypes.HANDLE,
+            ctypes.c_int,
+            ctypes.c_void_p,
+            wintypes.DWORD,
+        ]
+        kernel32.AssignProcessToJobObject.restype = wintypes.BOOL
+        kernel32.AssignProcessToJobObject.argtypes = [wintypes.HANDLE, wintypes.HANDLE]
+        kernel32.TerminateJobObject.restype = wintypes.BOOL
+        kernel32.TerminateJobObject.argtypes = [wintypes.HANDLE, wintypes.UINT]
+        kernel32.QueryInformationJobObject.restype = wintypes.BOOL
+        kernel32.QueryInformationJobObject.argtypes = [
+            wintypes.HANDLE,
+            ctypes.c_int,
+            ctypes.c_void_p,
+            wintypes.DWORD,
+            ctypes.POINTER(wintypes.DWORD),
+        ]
+        kernel32.CloseHandle.restype = wintypes.BOOL
+        kernel32.CloseHandle.argtypes = [wintypes.HANDLE]
+        kernel32.IsProcessInJob.restype = wintypes.BOOL
+        kernel32.IsProcessInJob.argtypes = [
+            wintypes.HANDLE,
+            wintypes.HANDLE,
+            ctypes.POINTER(wintypes.BOOL),
+        ]
+        self._kernel32 = kernel32
+
+    def last_error(self) -> int:
+        return int(self.ctypes.get_last_error())
+
+    def create(self, limits=None) -> "_WindowsJob":
+        merged = dict(DEFAULT_CONTAINMENT_LIMITS)
+        if limits:
+            merged.update(limits)
+        active = int(merged.get("activeProcessLimit") or 0)
+        process_mb = int(merged.get("processMemoryMb") or 0)
+        job_mb = int(merged.get("jobMemoryMb") or 0)
+        cpu = merged.get("cpuSeconds")
+        if active < 0 or process_mb < 0 or job_mb < 0:
+            raise ExtensionError("containment limits must not be negative")
+        if cpu is not None and (not _is_number(cpu) or cpu <= 0):
+            raise ExtensionError(
+                "containment cpuSeconds must be a positive number or null"
+            )
+
+        handle = self._kernel32.CreateJobObjectW(None, None)
+        if not handle:
+            raise ExtensionError(
+                "CreateJobObjectW failed with error " + str(self.last_error())
+            )
+        info = self._extended_limits()
+        basic = info.BasicLimitInformation
+        flags = 0
+        if merged.get("killOnJobClose", True):
+            flags |= self.LIMIT_KILL_ON_JOB_CLOSE
+        if active:
+            flags |= self.LIMIT_ACTIVE_PROCESS
+            basic.ActiveProcessLimit = active
+        if process_mb:
+            flags |= self.LIMIT_PROCESS_MEMORY
+            info.ProcessMemoryLimit = process_mb * 1024 * 1024
+        if job_mb:
+            flags |= self.LIMIT_JOB_MEMORY
+            info.JobMemoryLimit = job_mb * 1024 * 1024
+        if cpu:
+            flags |= self.LIMIT_PROCESS_TIME
+            basic.PerProcessUserTimeLimit = int(float(cpu) * 10_000_000)
+        basic.LimitFlags = flags
+        ok = self._kernel32.SetInformationJobObject(
+            handle,
+            self.JOB_OBJECT_EXTENDED_LIMIT_INFORMATION,
+            self.ctypes.byref(info),
+            self.ctypes.sizeof(info),
+        )
+        if not ok:
+            error = self.last_error()
+            self._kernel32.CloseHandle(handle)
+            raise ExtensionError(
+                "SetInformationJobObject failed with error " + str(error)
+            )
+        return _WindowsJob(self, handle, merged)
+
+    def assign(self, job_handle, process_handle) -> bool:
+        return bool(
+            self._kernel32.AssignProcessToJobObject(job_handle, process_handle)
+        )
+
+    def in_job(self, process_handle, job_handle) -> bool:
+        flag = self.wintypes.BOOL()
+        ok = self._kernel32.IsProcessInJob(
+            process_handle, job_handle, self.ctypes.byref(flag)
+        )
+        return bool(ok and flag.value)
+
+    def terminate(self, job_handle, exit_code=1) -> bool:
+        return bool(self._kernel32.TerminateJobObject(job_handle, int(exit_code)))
+
+    def close(self, job_handle) -> None:
+        if job_handle:
+            self._kernel32.CloseHandle(job_handle)
+
+    def query(self, job_handle) -> dict:
+        info = self._extended_limits()
+        returned = self.wintypes.DWORD(0)
+        ok = self._kernel32.QueryInformationJobObject(
+            job_handle,
+            self.JOB_OBJECT_EXTENDED_LIMIT_INFORMATION,
+            self.ctypes.byref(info),
+            self.ctypes.sizeof(info),
+            self.ctypes.byref(returned),
+        )
+        if not ok:
+            raise ExtensionError(
+                "QueryInformationJobObject failed with error " + str(self.last_error())
+            )
+        basic = info.BasicLimitInformation
+        return {
+            "limitFlags": int(basic.LimitFlags),
+            "activeProcessLimit": int(basic.ActiveProcessLimit),
+            "processMemoryLimitBytes": int(info.ProcessMemoryLimit),
+            "jobMemoryLimitBytes": int(info.JobMemoryLimit),
+            "perProcessUserTimeLimit100ns": int(basic.PerProcessUserTimeLimit),
+            "peakProcessMemoryBytes": int(info.PeakProcessMemoryUsed),
+            "peakJobMemoryBytes": int(info.PeakJobMemoryUsed),
+        }
+
+
+class _WindowsJob:
+    """A created Job Object. close() triggers kill-on-close, so it always reaps the tree."""
+
+    def __init__(self, factory: _WindowsJobFactory, handle, limits):
+        self._factory = factory
+        self._handle = handle
+        self._limits = dict(limits)
+        self._closed = False
+
+    def assign(self, process) -> None:
+        if self._closed or not self._handle:
+            raise ExtensionError("containment job is already closed")
+        handle = getattr(process, "_handle", None)
+        if not handle:
+            raise ExtensionError("containment job cannot see the child process handle")
+        if not self._factory.assign(self._handle, int(handle)):
+            raise ExtensionError(
+                "AssignProcessToJobObject failed with error "
+                + str(self._factory.last_error())
+            )
+
+    def in_job(self, process) -> bool:
+        handle = getattr(process, "_handle", None)
+        if not handle or self._closed or not self._handle:
+            return False
+        return self._factory.in_job(int(handle), self._handle)
+
+    def terminate(self, exit_code: int = 1) -> None:
+        if self._closed or not self._handle:
+            return
+        self._factory.terminate(self._handle, exit_code)
+
+    def close(self) -> None:
+        if self._closed or not self._handle:
+            return
+        handle = self._handle
+        self._handle = None
+        self._closed = True
+        self._factory.close(handle)
+
+    def info(self) -> dict:
+        if self._closed or not self._handle:
+            raise ExtensionError("containment job is already closed")
+        return self._factory.query(self._handle)
+
+    @property
+    def limits(self) -> dict:
+        return dict(self._limits)
+
+
+_WINDOWS_JOB_FACTORY = None
+_WINDOWS_JOB_FACTORY_READY = False
+
+
+def _job_api():
+    """Return the Job Object factory, or None when this platform cannot provide it."""
+    global _WINDOWS_JOB_FACTORY, _WINDOWS_JOB_FACTORY_READY
+    if _WINDOWS_JOB_FACTORY_READY:
+        return _WINDOWS_JOB_FACTORY
+    _WINDOWS_JOB_FACTORY_READY = True
+    if sys.platform != "win32":
+        return None
+    try:
+        _WINDOWS_JOB_FACTORY = _WindowsJobFactory()
+    except Exception:  # an unavailable kernel32 API is a fallback, not a crash
+        _WINDOWS_JOB_FACTORY = None
+    return _WINDOWS_JOB_FACTORY
+
+
+def _containment_output(
+    started,
+    started_at,
+    *,
+    exit_code,
+    stdout,
+    stderr,
+    timed_out,
+    error,
+    job: _WindowsJob,
+) -> dict:
+    return {
+        "exit": exit_code,
+        "stdout": _clip(stdout),
+        "stderr": _clip(stderr),
+        "timedOut": bool(timed_out),
+        "error": error,
+        "startedAt": started_at,
+        "finishedAt": _iso_now(),
+        "seconds": round(time.time() - started, 3),
+        "containment": _applied_containment(job.limits),
+    }
+
+
+def _read_capture(path) -> str:
+    try:
+        text = Path(path).read_bytes().decode("utf-8", "replace")
+    except OSError:
+        return ""
+    return text.replace("\r\n", "\n").replace("\r", "\n")
+
+
+def _execute_contained(plan: dict) -> dict:
+    """Run one plan inside a Windows Job Object; a timeout terminates the whole job.
+
+    Output is captured through temporary files rather than pipes. A grandchild inherits pipe
+    handles and would otherwise keep communicate() waiting after the direct child exits, which
+    would turn a fast action into a false timeout; file capture is not affected.
+    """
+    api = _job_api()
+    if api is None:  # run_extension checks support; defensive only
+        raise ExtensionError(_containment_unavailable_reason())
+    job = api.create()
+    process = None
+    started = time.time()
+    started_at = _iso_now()
+    timed_out = False
+    error = None
+    exit_code = None
+    popen_error = None
+    stdout = stderr = ""
+    with tempfile.TemporaryDirectory(prefix="gypsy-extension-run-") as capture_dir:
+        stdout_path = Path(capture_dir) / "stdout.bin"
+        stderr_path = Path(capture_dir) / "stderr.bin"
+        try:
+            with open(stdout_path, "wb") as stdout_handle, open(
+                stderr_path, "wb"
+            ) as stderr_handle:
+                try:
+                    process = subprocess.Popen(
+                        list(plan["argv"]),
+                        cwd=plan["cwd"],
+                        env=plan["env"],
+                        shell=False,
+                        stdout=stdout_handle,
+                        stderr=stderr_handle,
+                    )
+                except FileNotFoundError as exc:
+                    popen_error = f"command not found: {exc}"
+                except OSError as exc:
+                    popen_error = f"could not run command: {exc}"
+                if process is not None:
+                    try:
+                        job.assign(process)
+                    except ExtensionError:
+                        process.kill()
+                        try:
+                            process.wait(timeout=5)
+                        except subprocess.TimeoutExpired:
+                            pass
+                        raise
+                    try:
+                        process.wait(timeout=float(plan["timeout"]))
+                    except subprocess.TimeoutExpired:
+                        timed_out = True
+                        job.terminate(1)
+                        try:
+                            process.wait(timeout=10)
+                        except subprocess.TimeoutExpired:
+                            process.kill()
+                            process.wait()
+                    exit_code = None if timed_out else process.returncode
+                    error = (
+                        "timeout after " + format(float(plan["timeout"]), "g") + "s"
+                        if timed_out
+                        else None
+                    )
+        finally:
+            job.close()
+        if popen_error is None:
+            stdout = _read_capture(stdout_path)
+            stderr = _read_capture(stderr_path)
+    if popen_error is not None:
+        error = popen_error
+    return _containment_output(
+        started,
+        started_at,
+        exit_code=exit_code,
+        stdout=stdout,
+        stderr=stderr,
+        timed_out=timed_out,
+        error=error,
+        job=job,
+    )
+
+
 def _execute_action(
     extension: Extension,
     action_id: str,
     *,
     timeout_override=None,
     record: bool = True,
+    contain=None,
 ) -> dict:
     _check_plan_tree(extension)
     plan = _build_plan(extension, action_id, timeout_override=timeout_override)
-    result = _execute(plan)
+    if _containment_requested(contain):
+        if _job_api() is None:
+            result = _execute(plan)
+            result["containment"] = _empty_containment(
+                requested=True, reason=_containment_unavailable_reason()
+            )
+        else:
+            result = _execute_contained(plan)
+    else:
+        result = _execute(plan)
+        result["containment"] = _empty_containment(
+            requested=False,
+            reason="containment not requested; a timeout kills the direct child only",
+        )
     result["passed"] = bool(result["exit"] == 0 and not result["timedOut"] and not result["error"])
     result["extension"] = extension.id
     result["version"] = extension.version
@@ -1414,6 +1902,7 @@ def _execute_action(
             "stdout": result["stdout"],
             "stderr": result["stderr"],
             "passed": result["passed"],
+            "containment": result.get("containment"),
             "errors": [result["error"]] if result["error"] else [],
         }
         state_path = plan["stateRoot"] / f"{action_id}-{run_id}.json"
@@ -1429,8 +1918,14 @@ def run_extension(
     *,
     dry_run: bool = False,
     timeout=None,
+    contain=None,
 ) -> dict:
-    """Run a registered, enabled, unchanged extension action (or preview it)."""
+    """Run a registered, enabled, unchanged extension action (or preview it).
+
+    contain=True runs the action inside a Windows Job Object (kill-on-close, active-process
+    and memory limits, whole-job kill on timeout). contain=None follows the
+    GYPSY_EXTENSION_CONTAIN environment switch; contain=False keeps direct-child behaviour.
+    """
     root = ensure_root(root)
     if not isinstance(extension_id, str) or not extension_id:
         raise ExtensionError("run requires an extension id")
@@ -1443,6 +1938,7 @@ def run_extension(
     extension = entry["extension"]
     lock = load_lock(root)
     status = _status(extension, lock)
+    containment_requested = _containment_requested(contain)
     if not dry_run:
         _assert_runnable(extension, lock)
     if dry_run:
@@ -1457,6 +1953,7 @@ def run_extension(
             "version": extension.version,
             "action": action_id,
             "status": status,
+            "containment": _containment_plan(containment_requested),
             "plan": {
                 "argv": plan["argv"],
                 "declaredArgv": plan["declaredArgv"],
@@ -1466,13 +1963,19 @@ def run_extension(
             },
             "treeSha256": extension.tree_sha256,
         }
-    result = _execute_action(extension, action_id, timeout_override=timeout)
+    result = _execute_action(
+        extension, action_id, timeout_override=timeout, contain=contain
+    )
     result["status"] = status
     return result
 
 
-def test_extension(root=None, extension_id=None) -> dict:
-    """Run the manifest's declared tests, including the required negative test."""
+def test_extension(root=None, extension_id=None, *, contain=None) -> dict:
+    """Run the manifest's declared tests, including the required negative test.
+
+    contain behaves as in run_extension: True uses the Windows Job Object, None follows the
+    GYPSY_EXTENSION_CONTAIN switch and False keeps direct-child behaviour.
+    """
     root = ensure_root(root)
     if not isinstance(extension_id, str) or not extension_id:
         raise ExtensionError("test requires an extension id")
@@ -1483,10 +1986,11 @@ def test_extension(root=None, extension_id=None) -> dict:
     extension = entry["extension"]
     lock = load_lock(root)
     status = _status(extension, lock)
+    containment_requested = _containment_requested(contain)
     results = []
     for test in extension.manifest["tests"]:
         action_id = test["action"]
-        result = _execute_action(extension, action_id)
+        result = _execute_action(extension, action_id, contain=contain)
         failures = []
         expected = test["expectExit"]
         actual = result["exit"]
@@ -1515,15 +2019,25 @@ def test_extension(root=None, extension_id=None) -> dict:
                 "errors": failures,
                 "stdout": result["stdout"],
                 "stderr": result["stderr"],
+                "containment": result.get("containment"),
                 "statePath": result.get("statePath"),
             }
         )
     negative = sum(1 for test in extension.manifest["tests"] if test["expectExit"] == "nonzero")
+    applied = next(
+        (
+            item["containment"]
+            for item in results
+            if item.get("containment") and item["containment"].get("applied")
+        ),
+        None,
+    )
     return {
         "extension": extension.id,
         "version": extension.version,
         "status": status,
         "treeSha256": extension.tree_sha256,
+        "containment": applied or _containment_plan(containment_requested),
         "tests": results,
         "count": len(results),
         "negativeTests": negative,
@@ -1792,6 +2306,43 @@ def render_validate(data: dict) -> str:
     return "\n".join(lines)
 
 
+def _render_containment_line(containment) -> str:
+    if not containment:
+        return "containment: unknown"
+    if containment.get("applied"):
+        limits = containment.get("limits") or {}
+        return (
+            "containment: applied "
+            + str(containment.get("backend"))
+            + " (kill-on-close, active process limit "
+            + str(limits.get("activeProcessLimit"))
+            + ", process memory "
+            + str(limits.get("processMemoryMb"))
+            + " MB, job memory "
+            + str(limits.get("jobMemoryMb"))
+            + " MB)"
+        )
+    if "available" in containment:
+        if containment.get("requested") and containment.get("available"):
+            return (
+                "containment: would apply "
+                + str(containment.get("backend"))
+                + " "
+                + json.dumps(containment.get("limits") or {}, sort_keys=True)
+            )
+        if containment.get("requested"):
+            return (
+                "containment: requested but unavailable - "
+                + str(containment.get("reason"))
+            )
+        return "containment: not requested (direct-child timeout only)"
+    if containment.get("requested"):
+        return "containment: requested but NOT applied - " + str(
+            containment.get("reason")
+        )
+    return "containment: not requested (direct-child timeout only)"
+
+
 def render_test(data: dict) -> str:
     lines = [f"extension {data['extension']} {data['version']} | status {data['status']['state']}"]
     for test in data.get("tests") or []:
@@ -1806,6 +2357,7 @@ def render_test(data: dict) -> str:
         f"tests: {data['count']} | negative {data['negativeTests']} | "
         f"{'PASS' if data['passed'] else 'FAIL'}"
     )
+    lines.append(_render_containment_line(data.get("containment")))
     return "\n".join(lines)
 
 
@@ -1844,6 +2396,7 @@ def render_run(data: dict) -> str:
                 f"cwd: {plan['cwd']}",
                 f"timeout: {plan['timeoutSeconds']}s",
                 f"argv: {json.dumps(plan['argv'])}",
+                _render_containment_line(data.get("containment")),
                 "not executed",
             ]
         )
@@ -1853,6 +2406,7 @@ def render_run(data: dict) -> str:
         f"{data.get('seconds')}s | timeout={data.get('timedOut')}",
         f"cwd: {data['command']['cwd']}",
         f"argv: {json.dumps(data['command']['argv'])}",
+        _render_containment_line(data.get("containment")),
         f"state: {data.get('statePath')}",
     ]
     if data.get("stdout"):

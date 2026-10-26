@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.26.002
+Current version: 2026.10.26.003
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,22 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.26.003
+
+**Hero production pass, extension process containment, and Android emulator attempt.**
+
+- Date: 2026-10-26
+- Commit: this change.
+- Change: Wayfarer production pass — 23-bone rig (3 cape bones), 512² base/normal/roughmetal maps, Smile morph,
+  LOD1 (615 tris) / LOD2 (306 tris), larger GLB/FBX, updated generator/validator/toolpack; self-extension opt-in
+  Windows Job Object containment (kill-on-close, active-process/memory limits, process-tree timeout kill, honest
+  fallback); Android SDK emulator 37.2.12 + API 35 system image + AVD Gypsy_API35b installed; device launch blocked at
+  the host emulator's multi-instance error before ADB registration, documented in docs/DEVICE-LAUNCH.md.
+- Verification: Blender production generation exit 0, WAYFARER_GEN_OK bytes=904964 bones=23 actions=3 lods=2 morph=Smile
+  maps=3; validator HERO_VALIDATE_OK checks=94; Godot headless demo x2 exit 0 GYPSY_DEMO_OK frames=143;
+  HERO_CHECK_OK; production hero slice passed; 9 containment tests; full suite 281 tests OK (2 skipped); 50
+  capabilities; check_all pending final. Device launch is NOT claimed.
 
 ## 2026.10.26.002
 

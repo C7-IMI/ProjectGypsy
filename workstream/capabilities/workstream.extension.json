@@ -6,7 +6,7 @@
   "tool": "gypsy",
   "kind": "registry",
   "maturity": "experimental",
-  "description": "Discover, validate, test, review-register and run isolated declarative extensions with fixed argv, no shell, timeouts, dry-run, path containment, a lockfile gate and disable/remove/reload. The pipeline is tested; OS-level sandboxing and network enforcement are not claimed.",
+  "description": "Discover, validate, test, review-register and run isolated declarative extensions with fixed argv, no shell, dry-run, path containment, a lockfile gate, disable/remove/reload, and opt-in Windows Job Object containment (kill-on-close, active-process/memory limits, process-tree timeout kill). The pipeline is tested; filesystem/network sandboxing is not claimed.",
   "requires": [
     "python 3.14 standard library",
     "write access to the extension root for the lockfile and run state"
@@ -56,7 +56,10 @@
     "run refuses an unregistered, disabled or changed extension",
     "dry-run executes nothing and writes no lockfile",
     "register --accept hashes the tree and writes gypsy.lock.json atomically",
-    "disable/reload/remove are explicit, reversible or confirmed paths"
+    "disable/reload/remove are explicit, reversible or confirmed paths",
+    "opt-in Windows Job Object applies kill-on-close, active-process/memory limits and kills the process tree on timeout",
+    "non-Windows/unavailable containment falls back to direct-child execution with containment.applied=false",
+    "containment is not claimed as a filesystem or network sandbox"
   ],
   "provenance": {
     "record": [
@@ -72,5 +75,8 @@
       "exit",
       "seconds"
     ]
-  }
+  },
+  "notes": [
+    "Prototype boundary: containment is process/resource containment, not an OS sandbox; network/read-write permissions are review metadata."
+  ]
 }

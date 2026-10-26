@@ -41,16 +41,19 @@ validate, hash, enable/disable and execute without changing core files.
    CLI wiring), not by itself at runtime.
 9. **CLI:** gypsy extension list|show|validate|test|register|disable|remove|run|reload, backed by
    workstream/extensions.py and the safe example in extensions/example.hello/.
-10. **Limits are documented, not hidden.** This is a Python-level safety pipeline, not an OS sandbox. Reviewed extension
-    code runs with the user's rights; network and read/write declarations are review metadata, not enforcement.
-    Timeouts kill the direct child only.
+10. **Opt-in OS process containment, with explicit limits.** On Windows the pipeline can assign a reviewed run to a
+    Job Object with kill-on-close, an active-process limit, process/job memory limits and process-tree termination on
+    timeout (`GYPSY_EXTENSION_CONTAIN=1`). Non-Windows/unavailable APIs fall back to direct-child execution and report
+    `containment.applied=false`. This is not a filesystem or network sandbox; `network`/read-write permissions remain
+    review metadata, and the microsecond spawn-to-assign window is documented.
 
 ## Evidence
 
 - python -m unittest workstream.tests.test_extensions: **55 tests, OK** (one symlink test skipped — Windows account
   cannot create symlinks).
-- Full suite at the time of this decision: **270 tests, OK (2 skipped)**; scripts/check_all.py **6/6 PASS**;
-  **49 capability manifests**.
+- Full suite after containment: **281 tests, OK (2 skipped)**; scripts/check_all.py **6/6 PASS**;
+  **50 capability manifests**. Containment tests: 9 (job limits queried, grandchild reaped, timeout tree kill,
+  fallback, dry-run, CLI env opt-in).
 - Real flow: list → validate → test (pass + intentional fail detected) → register without --accept refused →
   register --accept → run hello PASS → run fail exit 1/action exit 3 by design → dry-run executes nothing.
 - Lifecycle: register → disable → run refused → reload → run passes → remove --delete confines deletion to the

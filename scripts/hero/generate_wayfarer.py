@@ -44,10 +44,16 @@ ASSET_SUBDIR = Path("assets") / "hero"
 GAME_SUBDIR = Path("game") / "assets" / "hero"
 ART_SUBDIR = Path("artifacts") / "hero"
 FPS = 24
-TEXTURE_SIZE = 256
+TEXTURE_SIZE = 512
 TEXTURE_BANDS = 4
 BAND_HEIGHT = TEXTURE_SIZE // TEXTURE_BANDS
 MAX_INFLUENCES = 4
+# production pass: explicit LOD chain, cape bones, atlas companions and a morph target
+LOD_SPECS = (("lod1", 0.55), ("lod2", 0.28))
+CAPE_BONES = ("cape_a", "cape_b", "cape_c")
+TEXTURE_ATLAS_NAME = "wayfarer_atlas"
+TEXTURE_NORMAL_NAME = "wayfarer_normal"
+TEXTURE_ROUGHMETAL_NAME = "wayfarer_roughmetal"
 
 CLOTH = 0
 LEATHER = 1
@@ -77,16 +83,22 @@ BONES = [
     ("thigh.L", "hips", (-0.095, 0.0, 0.94), (-0.10, 0.0, 0.55), True),
     ("shin.L", "thigh.L", (-0.10, 0.0, 0.55), (-0.105, 0.0, 0.16), True),
     ("foot.L", "shin.L", (-0.105, 0.0, 0.16), (-0.105, 0.18, 0.045), True),
+    # production pass: a three-bone cape chain hanging behind the torso
+    ("cape_a", "chest", (0.0, -0.105, 1.40), (0.0, -0.185, 1.12), True),
+    ("cape_b", "cape_a", (0.0, -0.185, 1.12), (0.0, -0.245, 0.84), True),
+    ("cape_c", "cape_b", (0.0, -0.245, 0.84), (0.0, -0.29, 0.55), True),
 ]
 BONE_BY_NAME = {name: (Vector(head), Vector(tail)) for name, _parent, head, tail, _deform in BONES}
 CONNECTED = {"spine", "chest", "neck", "head", "upper_arm.R", "forearm.R", "hand.R",
-             "upper_arm.L", "forearm.L", "hand.L", "shin.R", "foot.R", "shin.L", "foot.L"}
+             "upper_arm.L", "forearm.L", "hand.L", "shin.R", "foot.R", "shin.L", "foot.L",
+             "cape_b", "cape_c"}
 
 ANIM_BONES = [
     "hips", "spine", "chest", "neck", "head",
     "shoulder.L", "upper_arm.L", "forearm.L", "hand.L",
     "shoulder.R", "upper_arm.R", "forearm.R", "hand.R",
     "thigh.L", "shin.L", "foot.L", "thigh.R", "shin.R", "foot.R",
+    "cape_a", "cape_b", "cape_c",
 ]
 
 # rest stance offsets (radians); applied as the neutral pose for every clip
@@ -140,62 +152,116 @@ def rgb(hex_value: str) -> tuple[float, float, float]:
 
 ATLAS_BANDS = [
     # band 0 - weathered ochre cloak
-    {"base": "#c99a68", "shadow": "#9a6c45", "pattern": "weave", "noise": 0.020},
+    {"base": "#c99a68", "shadow": "#9a6c45", "pattern": "weave", "noise": 0.022, "roughness": 0.80},
     # band 1 - deep teal tunic / trousers
-    {"base": "#4a7f8a", "shadow": "#35636c", "pattern": "twill", "noise": 0.016},
+    {"base": "#4a7f8a", "shadow": "#35636c", "pattern": "twill", "noise": 0.018, "roughness": 0.72},
     # band 2 - warm leather
-    {"base": "#7a5136", "shadow": "#543525", "pattern": "leather", "noise": 0.024},
+    {"base": "#7a5136", "shadow": "#543525", "pattern": "leather", "noise": 0.026, "roughness": 0.62},
     # band 3 - sun-worn skin
-    {"base": "#d8af8e", "shadow": "#b88766", "pattern": "skin", "noise": 0.010},
+    {"base": "#d8af8e", "shadow": "#b88766", "pattern": "skin", "noise": 0.011, "roughness": 0.52},
 ]
 
 
-def build_atlas(path: Path) -> dict:
-    """Author the 256x256 RGBA atlas deterministically and save it as a PNG."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    rng = np.random.default_rng(20261026)
-    pixels = np.zeros((TEXTURE_SIZE, TEXTURE_SIZE, 4), dtype=np.float32)
-    for band, cfg in enumerate(ATLAS_BANDS):
-        y0 = band * BAND_HEIGHT
-        y1 = y0 + BAND_HEIGHT
-        ys = np.arange(BAND_HEIGHT, dtype=np.float32)[:, None]
-        xs = np.arange(TEXTURE_SIZE, dtype=np.float32)[None, :]
-        tile = np.ones((BAND_HEIGHT, TEXTURE_SIZE), dtype=np.float32)
-        if cfg["pattern"] == "weave":
-            tile *= 1.0 - 0.075 * ((ys % 8.0) < 1.6)
-            tile *= 1.0 - 0.050 * ((xs % 16.0) < 1.0)
-            tile *= 1.0 + 0.028 * np.sin(xs * 0.21 + ys * 0.07)
-            # occasional stitch dashes in the shadow tone
-            stitch = ((ys > 30) & (ys < 34) & ((xs % 24.0) < 12.0))
-            tile = np.where(stitch, 0.82, tile)
-        elif cfg["pattern"] == "twill":
-            tile *= 1.0 - 0.065 * (((xs + ys) % 10.0) < 2.0)
-            tile *= 1.0 + 0.020 * np.sin(ys * 0.33)
-        elif cfg["pattern"] == "leather":
-            tile *= 1.0 - 0.10 * ((ys % 32.0) < 1.4)
-            scratches = rng.random((BAND_HEIGHT, TEXTURE_SIZE)) < 0.010
-            tile = np.where(scratches, tile * 1.22, tile)
-            pores = rng.random((BAND_HEIGHT, TEXTURE_SIZE)) < 0.035
-            tile = np.where(pores, tile * 0.90, tile)
-        else:  # skin
-            freckles = rng.random((BAND_HEIGHT, TEXTURE_SIZE)) < 0.012
-            tile = np.where(freckles, tile * 0.93, tile)
-            tile *= 1.0 + 0.012 * np.sin(xs * 0.09) * np.cos(ys * 0.11)
-        noise = rng.normal(0.0, cfg["noise"], (BAND_HEIGHT, TEXTURE_SIZE)).astype(np.float32)
-        base = np.array(rgb(cfg["base"]), dtype=np.float32)
-        band_rgb = base[None, None, :] * np.clip(tile, 0.55, 1.18)[..., None]
-        band_rgb = band_rgb * (1.0 + noise[..., None])
-        pixels[y0:y1, :, :3] = np.clip(band_rgb, 0.0, 1.0)
-        pixels[y0:y1, :, 3] = 1.0
-    image = bpy.data.images.new("wayfarer_atlas", width=TEXTURE_SIZE, height=TEXTURE_SIZE, alpha=True)
-    image.colorspace_settings.name = "sRGB"
-    image.pixels.foreach_set(pixels.ravel())
+def _band_arrays(cfg, rng):
+    """Return (base colour multiplier, height field, tile multiplier) for one atlas band."""
+    ys = np.arange(BAND_HEIGHT, dtype=np.float32)[:, None]
+    xs = np.arange(TEXTURE_SIZE, dtype=np.float32)[None, :]
+    tile = np.ones((BAND_HEIGHT, TEXTURE_SIZE), dtype=np.float32)
+    height = np.zeros((BAND_HEIGHT, TEXTURE_SIZE), dtype=np.float32)
+    if cfg["pattern"] == "weave":
+        weft = (ys % 10.0) < 1.8
+        warp = (xs % 20.0) < 1.2
+        tile *= 1.0 - 0.075 * weft
+        tile *= 1.0 - 0.050 * warp
+        tile *= 1.0 + 0.028 * np.sin(xs * 0.11 + ys * 0.07)
+        # occasional stitch dashes in the shadow tone
+        stitch = ((ys > 44) & (ys < 50) & ((xs % 32.0) < 16.0))
+        tile = np.where(stitch, 0.82, tile)
+        height = 0.55 * weft.astype(np.float32) + 0.75 * warp.astype(np.float32)
+        height += 0.12 * np.sin(xs * 0.11 + ys * 0.07).astype(np.float32)
+        height = np.where(stitch, 0.35, height)
+    elif cfg["pattern"] == "twill":
+        diagonal = ((xs + ys) % 14.0) < 3.0
+        tile *= 1.0 - 0.065 * diagonal
+        tile *= 1.0 + 0.020 * np.sin(ys * 0.17)
+        height = 0.8 * diagonal.astype(np.float32)
+    elif cfg["pattern"] == "leather":
+        grain = (ys % 48.0) < 1.6
+        tile *= 1.0 - 0.10 * grain
+        scratches = rng.random((BAND_HEIGHT, TEXTURE_SIZE)) < 0.010
+        tile = np.where(scratches, tile * 1.22, tile)
+        pores = rng.random((BAND_HEIGHT, TEXTURE_SIZE)) < 0.035
+        tile = np.where(pores, tile * 0.90, tile)
+        height = 0.5 * grain.astype(np.float32) + 0.8 * scratches.astype(np.float32)
+        height -= 0.4 * pores.astype(np.float32)
+    else:  # skin
+        freckles = rng.random((BAND_HEIGHT, TEXTURE_SIZE)) < 0.012
+        tile = np.where(freckles, tile * 0.93, tile)
+        tile *= 1.0 + 0.012 * np.sin(xs * 0.045) * np.cos(ys * 0.055)
+        height = 0.3 * freckles.astype(np.float32)
+        height += 0.05 * np.sin(xs * 0.045) * np.cos(ys * 0.055)
+    noise = rng.normal(0.0, cfg["noise"], (BAND_HEIGHT, TEXTURE_SIZE)).astype(np.float32)
+    base = np.array(rgb(cfg["base"]), dtype=np.float32)
+    band_rgb = base[None, None, :] * np.clip(tile, 0.55, 1.18)[..., None]
+    band_rgb = band_rgb * (1.0 + noise[..., None])
+    return np.clip(band_rgb, 0.0, 1.0), height.astype(np.float32), tile.astype(np.float32)
+
+
+def _save_texture(name: str, pixels: np.ndarray, colorspace: str, path: Path) -> dict:
+    image = bpy.data.images.new(name, width=TEXTURE_SIZE, height=TEXTURE_SIZE, alpha=True)
+    image.colorspace_settings.name = colorspace
+    image.pixels.foreach_set(np.ascontiguousarray(pixels, dtype=np.float32).ravel())
     image.update()
     image.filepath_raw = str(path.resolve())
     image.file_format = "PNG"
     image.save()
     image.pack()
-    return {"path": str(path), "width": image.size[0], "height": image.size[1], "bytes": path.stat().st_size}
+    return {
+        "image": image,
+        "path": str(path),
+        "name": name,
+        "colorspace": colorspace,
+        "width": image.size[0],
+        "height": image.size[1],
+        "bytes": path.stat().st_size,
+    }
+
+
+def build_material_textures(texture_dir: Path) -> dict:
+    """Author the 512px base atlas plus normal and roughness/metal maps deterministically."""
+    texture_dir.mkdir(parents=True, exist_ok=True)
+    rng = np.random.default_rng(20261026)
+    base_pixels = np.zeros((TEXTURE_SIZE, TEXTURE_SIZE, 4), dtype=np.float32)
+    height_pixels = np.zeros((TEXTURE_SIZE, TEXTURE_SIZE), dtype=np.float32)
+    rough_pixels = np.ones((TEXTURE_SIZE, TEXTURE_SIZE), dtype=np.float32)
+    metal_pixels = np.zeros((TEXTURE_SIZE, TEXTURE_SIZE), dtype=np.float32)
+    for band, cfg in enumerate(ATLAS_BANDS):
+        y0 = band * BAND_HEIGHT
+        y1 = y0 + BAND_HEIGHT
+        band_rgb, height, tile = _band_arrays(cfg, rng)
+        base_pixels[y0:y1, :, :3] = band_rgb
+        base_pixels[y0:y1, :, 3] = 1.0
+        height_pixels[y0:y1, :] = height
+        variation = 0.10 * (tile - 1.0) + rng.normal(0.0, 0.012, (BAND_HEIGHT, TEXTURE_SIZE))
+        rough_pixels[y0:y1, :] = np.clip(cfg["roughness"] + variation, 0.25, 1.0)
+    # tangent-space normal map derived from the height field
+    gradient_y, gradient_x = np.gradient(height_pixels)
+    normal_x = -gradient_x * 1.2
+    normal_y = -gradient_y * 1.2
+    normal_z = np.ones_like(normal_x)
+    length = np.sqrt(normal_x * normal_x + normal_y * normal_y + normal_z * normal_z)
+    normal_pixels = np.stack(
+        [normal_x / length * 0.5 + 0.5, normal_y / length * 0.5 + 0.5,
+         normal_z / length * 0.5 + 0.5, np.ones_like(normal_x)], axis=-1)
+    roughmetal_pixels = np.stack(
+        [np.ones_like(rough_pixels), rough_pixels, metal_pixels, np.ones_like(rough_pixels)], axis=-1)
+
+    atlas = _save_texture(TEXTURE_ATLAS_NAME, base_pixels, "sRGB", texture_dir / (TEXTURE_ATLAS_NAME + ".png"))
+    normal = _save_texture(TEXTURE_NORMAL_NAME, normal_pixels, "Non-Color", texture_dir / (TEXTURE_NORMAL_NAME + ".png"))
+    roughmetal = _save_texture(TEXTURE_ROUGHMETAL_NAME, roughmetal_pixels, "Non-Color",
+                               texture_dir / (TEXTURE_ROUGHMETAL_NAME + ".png"))
+    return {"base": atlas, "normal": normal, "roughmetal": roughmetal,
+            "files": {"base": atlas, "normal": normal, "roughmetal": roughmetal}}
 
 
 # --------------------------------------------------------------------------------------------------
@@ -389,15 +455,15 @@ def add_cape() -> None:
             c = (row + 1) * stride + col + 1
             d = (row + 1) * stride + col
             faces.append([a, b, c, d])
-    B.add(verts, faces, CLOTH, ("chest", "spine", "hips"), 0)
+    B.add(verts, faces, CLOTH, ("chest", "cape_a", "cape_b", "cape_c"), 0)
 
 
 # --------------------------------------------------------------------------------------------------
 # character construction
 # --------------------------------------------------------------------------------------------------
 
-def build_character(texture_image):
-    materials = make_materials(texture_image)
+def build_character(textures):
+    materials = make_materials(textures)
 
     # torso / tunic
     add_loft(
@@ -530,28 +596,51 @@ def build_character(texture_image):
     return materials
 
 
-def make_materials(texture_image):
+def make_materials(textures):
     materials = []
+    atlas_image = textures["base"]["image"]
+    normal_image = textures["normal"]["image"]
+    roughmetal_image = textures["roughmetal"]["image"]
 
-    def base(name, roughness):
+    def base(name):
         mat = bpy.data.materials.new(name)
         mat.use_nodes = True
         mat.use_backface_culling = False
         nodes = mat.node_tree.nodes
+        links = mat.node_tree.links
         bsdf = nodes.get("Principled BSDF")
+        # painted base-colour atlas (sRGB)
         tex = nodes.new("ShaderNodeTexImage")
-        tex.image = texture_image
+        tex.image = atlas_image
         tex.interpolation = "Linear"
-        tex.location = (-420, 220)
-        mat.node_tree.links.new(tex.outputs["Color"], bsdf.inputs["Base Color"])
-        bsdf.inputs["Roughness"].default_value = roughness
-        bsdf.inputs["Metallic"].default_value = 0.0
+        tex.location = (-560, 260)
+        links.new(tex.outputs["Color"], bsdf.inputs["Base Color"])
+        # tangent-space normal map (Non-Color)
+        normal_tex = nodes.new("ShaderNodeTexImage")
+        normal_tex.image = normal_image
+        normal_tex.interpolation = "Linear"
+        normal_tex.location = (-560, -40)
+        normal_map = nodes.new("ShaderNodeNormalMap")
+        normal_map.location = (-300, -40)
+        normal_map.inputs["Strength"].default_value = 1.0
+        links.new(normal_tex.outputs["Color"], normal_map.inputs["Color"])
+        links.new(normal_map.outputs["Normal"], bsdf.inputs["Normal"])
+        # baked roughness (G) / metallic (B) map, glTF metallic-roughness layout
+        orm_tex = nodes.new("ShaderNodeTexImage")
+        orm_tex.image = roughmetal_image
+        orm_tex.interpolation = "Linear"
+        orm_tex.location = (-560, -360)
+        separate = nodes.new("ShaderNodeSeparateColor")
+        separate.location = (-300, -360)
+        links.new(orm_tex.outputs["Color"], separate.inputs["Color"])
+        links.new(separate.outputs["Green"], bsdf.inputs["Roughness"])
+        links.new(separate.outputs["Blue"], bsdf.inputs["Metallic"])
         materials.append(mat)
         return mat
 
-    base(MATERIAL_NAMES[0], 0.74)
-    base(MATERIAL_NAMES[1], 0.68)
-    base(MATERIAL_NAMES[2], 0.52)
+    base(MATERIAL_NAMES[0])
+    base(MATERIAL_NAMES[1])
+    base(MATERIAL_NAMES[2])
 
     accent = bpy.data.materials.new(MATERIAL_NAMES[3])
     accent.use_nodes = True
@@ -682,6 +771,67 @@ def skin(obj, arm_obj) -> dict:
     }
 
 
+def add_facial_shape_key(obj) -> dict:
+    """Add one safe facial morph target ("Smile") on the mouth-plate vertices only."""
+    if obj.data.shape_keys is None:
+        obj.shape_key_add(name="Basis", from_mix=False)
+    key = obj.shape_key_add(name="Smile", from_mix=False)
+    moved = 0
+    max_offset = 0.0
+    for vertex in key.data:
+        co = vertex.co
+        # mouth plate and lower cheeks: a few millimetres, never structural geometry
+        if 1.585 <= co.z <= 1.640 and co.y >= 0.095 and abs(co.x) <= 0.060:
+            rise = 0.005 * (1.0 - abs(co.x) / 0.060) + 0.002
+            vertex.co.z += rise
+            vertex.co.y += 0.0015
+            moved += 1
+            max_offset = max(max_offset, rise + 0.0015)
+    return {"name": "Smile", "movedVertices": moved, "maxOffset": round(max_offset, 5)}
+
+
+def triangle_count(obj) -> int:
+    return sum(len(polygon.vertices) - 2 for polygon in obj.data.polygons)
+
+
+def select_only(objects) -> None:
+    bpy.ops.object.select_all(action="DESELECT")
+    for obj in objects:
+        obj.hide_set(False)
+        obj.select_set(True)
+    bpy.context.view_layer.objects.active = objects[0]
+
+
+def create_lod_meshes(obj, arm_obj) -> list:
+    """Duplicate the skinned mesh and decimate copies into an explicit LOD chain."""
+    lods = []
+    for level, ratio in LOD_SPECS:
+        copy = obj.copy()
+        copy.data = obj.data.copy()
+        copy.name = "Wayfarer_Mesh_" + level.upper()
+        copy.data.name = copy.name + "_mesh"
+        bpy.context.collection.objects.link(copy)
+        for modifier in list(copy.modifiers):
+            copy.modifiers.remove(modifier)
+        select_only([copy])
+        decimate = copy.modifiers.new("Decimate", "DECIMATE")
+        decimate.decimate_type = "COLLAPSE"
+        decimate.ratio = ratio
+        decimate.use_collapse_triangulate = True
+        bpy.ops.object.modifier_apply(modifier=decimate.name)
+        copy.data.validate(verbose=False)
+        copy.data.update()
+        modifier = copy.modifiers.new("Armature", "ARMATURE")
+        modifier.object = arm_obj
+        modifier.use_vertex_groups = True
+        copy.parent = arm_obj
+        copy.matrix_parent_inverse = arm_obj.matrix_world.inverted()
+        lods.append({"level": level, "object": copy, "ratio": ratio,
+                     "triangles": triangle_count(copy), "vertices": len(copy.data.vertices)})
+    select_only([arm_obj, obj])
+    return lods
+
+
 # --------------------------------------------------------------------------------------------------
 # animation
 # --------------------------------------------------------------------------------------------------
@@ -737,6 +887,9 @@ def idle_sampler(frame: int):
         "thigh.L": (-0.02, 0.0, 0.0),
         "shin.R": (-0.05, 0.0, 0.0),
         "shin.L": (-0.05, 0.0, 0.0),
+        "cape_a": (0.012 * breath, 0.0, 0.006 * sway),
+        "cape_b": (0.020 * breath, 0.0, 0.010 * sway),
+        "cape_c": (0.030 * breath, 0.0, 0.014 * sway),
     }
     pose = pose_with_base(overrides)
     hips_loc = (0.008 * sway, 0.0, 0.006 * breath)
@@ -776,6 +929,9 @@ def run_sampler(frame: int):
         "thigh.L": (thigh_l, 0.0, -0.02),
         "shin.L": (knee_l, 0.0, 0.0),
         "foot.L": (foot_l, 0.0, 0.0),
+        "cape_a": (-0.22 - 0.06 * sin, 0.0, 0.05 * sin),
+        "cape_b": (-0.30 - 0.08 * math.sin(phase + 0.4), 0.0, 0.07 * sin),
+        "cape_c": (-0.40 - 0.10 * math.sin(phase + 0.8), 0.0, 0.09 * sin),
     }
     pose = pose_with_base(overrides)
     hips_loc = (0.012 * sin, 0.004, 0.022 * math.cos(2.0 * phase) + 0.006)
@@ -847,6 +1003,12 @@ def reach_sampler(frame: int):
     else:
         lower = max(key for key in REACH_KEYS if key <= frame)
         overrides, hips_loc = REACH_KEYS[lower]
+    # cape reacts to the torso twist with a smooth bell over the one-shot
+    overrides = dict(overrides)
+    bell = math.sin(math.pi * max(0.0, min(1.0, (frame - 1) / 48.0)))
+    overrides.setdefault("cape_a", (-0.05 * bell, 0.0, 0.010 * bell))
+    overrides.setdefault("cape_b", (-0.08 * bell, 0.0, 0.016 * bell))
+    overrides.setdefault("cape_c", (-0.11 * bell, 0.0, 0.022 * bell))
     return pose_with_base(overrides), hips_loc
 
 
@@ -907,15 +1069,19 @@ def create_animations(arm_obj):
 # export
 # --------------------------------------------------------------------------------------------------
 
-def export_glb(path: Path) -> dict:
-    record = {"path": str(path), "args": {}, "errors": []}
+def export_glb(path: Path, morph: bool = True) -> dict:
+    record = {"path": str(path), "args": {}, "errors": [], "morph": morph}
     full = dict(
         filepath=str(path),
         export_format="GLB",
         export_apply=True,
         export_yup=True,
+        use_selection=True,
         export_animations=True,
         export_skins=True,
+        export_morph=morph,
+        export_morph_normal=False,
+        export_leaf_bone=False,
         export_materials="EXPORT",
         export_nla_strips=True,
         export_force_sampling=True,
@@ -931,9 +1097,11 @@ def export_glb(path: Path) -> dict:
         record["errors"].append("full arg set rejected: " + str(exc))
         minimal = dict(
             filepath=str(path), export_format="GLB", export_apply=True, export_yup=True,
-            export_animations=True, export_skins=True, export_materials="EXPORT",
-            export_nla_strips=True, export_force_sampling=True,
+            use_selection=True, export_animations=True, export_skins=True,
+            export_materials="EXPORT", export_nla_strips=True, export_force_sampling=True,
         )
+        if morph:
+            minimal["export_morph"] = True
         bpy.ops.export_scene.gltf(**minimal)
         record["args"] = minimal
     record["bytes"] = path.stat().st_size if path.exists() else 0
@@ -948,7 +1116,7 @@ def export_fbx(path: Path) -> dict:
         bake_anim_use_nla_strips=True, bake_anim_force_startend_keying=True,
         bake_anim_step=1.0, bake_anim_simplify_factor=0.0, path_mode="COPY",
         embed_textures=True, axis_forward="-Z", axis_up="Y",
-        apply_scale_options="FBX_SCALE_ALL", use_selection=False,
+        apply_scale_options="FBX_SCALE_ALL", use_selection=True,
     )
     try:
         bpy.ops.export_scene.fbx(**kwargs)
@@ -1033,6 +1201,8 @@ def add_preview_scene(actions):
         ("hero_run", "run", 7, (2.85, 2.70, 1.55), (0.0, 0.05, 0.92)),
         ("hero_reach", "reach", 21, (2.65, 3.35, 1.80), (0.0, 0.12, 1.08)),
         ("hero_back", "idle", 37, (-2.55, -3.20, 1.72), (0.0, 0.0, 0.96)),
+        ("hero_run_back", "run", 7, (-2.35, -2.95, 1.62), (0.0, 0.05, 0.95)),
+        ("hero_detail", "idle", 19, (1.30, 2.05, 1.58), (0.0, 0.06, 1.42)),
     ]
     art_dir = Path(ART_SUBDIR)
     for name, action_name, frame, location, target in views:
@@ -1101,12 +1271,17 @@ def count_imported(glb: Path, kind: str) -> dict:
             bounds_max.y = max(bounds_max.y, point.y)
             bounds_max.z = max(bounds_max.z, point.z)
     bones = len(armatures[0].data.bones) if armatures else 0
+    morph_targets = 0
+    for obj in meshes:
+        if obj.data.shape_keys:
+            morph_targets += max(0, len(obj.data.shape_keys.key_blocks) - 1)
     result.update({
         "status": "pass" if meshes and armatures and actions else "fail",
         "meshes": len(meshes),
         "vertices": sum(len(o.data.vertices) for o in meshes),
         "armatures": len(armatures),
         "bones": bones,
+        "morphTargets": morph_targets,
         "actions": len(actions),
         "actionNames": actions,
         "materials": materials,
@@ -1159,13 +1334,16 @@ def main() -> int:
         scene.unit_settings.system = "METRIC"
         scene.unit_settings.scale_length = 1.0
 
-        texture = build_atlas(asset_dir / "textures" / "wayfarer_atlas.png")
+        textures = build_material_textures(asset_dir / "textures")
         bpy.context.scene.render.image_settings.file_format = "PNG"
-        log("atlas " + str(texture["bytes"]) + " bytes")
-        materials = build_character(bpy.data.images["wayfarer_atlas"])
+        texture_bytes = {key: meta["bytes"] for key, meta in textures["files"].items()}
+        log("textures " + json.dumps(texture_bytes))
+        materials = build_character(textures)
         obj = create_mesh_object(materials)
         arm_obj = create_armature()
         weight_stats = skin(obj, arm_obj)
+        lods = create_lod_meshes(obj, arm_obj)
+        shape_key = add_facial_shape_key(obj)
         bpy.context.view_layer.objects.active = arm_obj
         actions = create_animations(arm_obj)
         action_records = [
@@ -1174,7 +1352,9 @@ def main() -> int:
             for name, action in actions.items()
         ]
         log("mesh verts=" + str(weight_stats["vertices"]) + " tris=" + str(weight_stats["triangles"]) +
-            " bones=" + str(len(BONES)) + " actions=" + str(len(actions)))
+            " bones=" + str(len(BONES)) + " actions=" + str(len(actions)) +
+            " lodTris=" + str([lod["triangles"] for lod in lods]) +
+            " morph=" + shape_key["name"] + " moved=" + str(shape_key["movedVertices"]))
 
         bounds_min = Vector((1e9, 1e9, 1e9))
         bounds_max = Vector((-1e9, -1e9, -1e9))
@@ -1185,12 +1365,44 @@ def main() -> int:
                 bounds_max[axis] = max(bounds_max[axis], point[axis])
 
         glb = asset_dir / "wayfarer.glb"
-        glb_export = export_glb(glb)
+        select_only([arm_obj, obj])
+        glb_export = export_glb(glb, morph=True)
         log("glb " + str(glb_export["bytes"]) + " bytes")
         shutil.copyfile(glb, game_dir / "wayfarer.glb")
         fbx = asset_dir / "wayfarer.fbx"
+        select_only([arm_obj, obj])
         fbx_export = export_fbx(fbx)
         log("fbx " + str(fbx_export["bytes"]) + " bytes")
+
+        lod_records = []
+        for lod in lods:
+            lod_path = asset_dir / ("wayfarer_" + lod["level"] + ".glb")
+            select_only([arm_obj, lod["object"]])
+            lod_export = export_glb(lod_path, morph=False)
+            lod_records.append({
+                "level": lod["level"], "ratio": lod["ratio"], "file": lod_path.name,
+                "triangles": lod["triangles"], "vertices": lod["vertices"],
+                "bytes": lod_export["bytes"], "sha256": sha256(lod_path),
+                "export": lod_export,
+            })
+            log("lod " + lod["level"] + " tris=" + str(lod["triangles"]) + " bytes=" + str(lod_export["bytes"]))
+            lod["object"].hide_render = True
+            lod["object"].hide_set(True)
+        lods_manifest = {
+            "schema": "gypsy.hero.lods/v1",
+            "generator": "scripts/hero/generate_wayfarer.py",
+            "blender": bpy.app.version_string,
+            "base": {"file": glb.name, "triangles": weight_stats["triangles"]},
+            "lods": [{key: value for key, value in lod.items() if key != "export"} for lod in lod_records],
+            "godotImport": {
+                "generate_lods": True,
+                "note": "LOD0 is integrated under Player; the Godot glTF import also generates renderer LODs "
+                        "(meshes/generate_lods=true) and the explicit LOD GLBs are tracked for the next LOD pass.",
+            },
+        }
+        with open(asset_dir / "wayfarer_lods.json", "w", encoding="utf-8", newline="\n") as handle:
+            handle.write(json.dumps(lods_manifest, indent=2) + "\n")
+        select_only([arm_obj, obj])
 
         renders = []
         if not args.skip_render:
@@ -1206,6 +1418,11 @@ def main() -> int:
         # Verify the exports by re-importing them into a clean scene.
         reimport_glb = count_imported(glb, "glb")
         reimport_fbx = count_imported(fbx, "fbx") if fbx.exists() else {"status": "skipped"}
+        reimport_lods = []
+        for record in lod_records:
+            imported = count_imported(asset_dir / record["file"], "glb")
+            imported["level"] = record["level"]
+            reimport_lods.append(imported)
         fbx_clean = (
             fbx.exists() and fbx_export["bytes"] > 0 and
             reimport_fbx.get("status") == "pass" and reimport_fbx.get("bones", 0) >= 15 and
@@ -1214,7 +1431,7 @@ def main() -> int:
         if fbx.exists() and not fbx_clean:
             report["warnings"].append("FBX round-trip was not clean; the FBX was removed")
             fbx.unlink()
-        report["reimport"] = {"glb": reimport_glb, "fbx": reimport_fbx, "fbxClean": fbx_clean}
+        report["reimport"] = {"glb": reimport_glb, "fbx": reimport_fbx, "fbxClean": fbx_clean, "lods": reimport_lods}
 
         game_glb = game_dir / "wayfarer.glb"
         report.update({            "finish": iso_now(),
@@ -1226,7 +1443,10 @@ def main() -> int:
                             "sha256": sha256(game_glb) if game_glb.exists() else None},
                 "fbx": {"path": str(fbx), "bytes": fbx.stat().st_size if fbx.exists() else 0,
                         "sha256": sha256(fbx) if fbx.exists() else None, "clean": fbx_clean},
-                "texture": texture,
+                "textures": {key: {field: value for field, value in meta.items() if field != "image"}
+                             for key, meta in textures["files"].items()},
+                "lods": lod_records,
+                "lodsManifest": str(asset_dir / "wayfarer_lods.json"),
                 "blend": str(blend_path),
             },
             "mesh": {
@@ -1244,7 +1464,8 @@ def main() -> int:
                 "deformBones": sum(1 for item in BONES if item[4]),
             },
             "actions": action_records,
-            "export": {"glb": glb_export, "fbx": fbx_export},
+            "shapeKey": shape_key,
+            "export": {"glb": glb_export, "fbx": fbx_export, "lods": [lod["export"] for lod in lod_records]},
             "renders": renders,
         })
         (art_dir / "generation-report.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
@@ -1262,6 +1483,29 @@ def main() -> int:
             failures.append("GLB re-import did not show mesh + armature + 3 actions")
         if not (1.70 <= (bounds_max.z - bounds_min.z) <= 2.00):
             failures.append("hero height outside 1.70-2.00 m")
+        base_triangles = weight_stats["triangles"]
+        lod_triangles = [record["triangles"] for record in lod_records]
+        if len(lod_records) < 2:
+            failures.append("explicit LOD chain missing (need LOD1 and LOD2)")
+        previous = base_triangles
+        for level, triangles in zip([record["level"] for record in lod_records], lod_triangles):
+            if triangles >= previous:
+                failures.append("LOD " + level + " is not lighter than the previous level")
+            previous = triangles
+        if lod_triangles and min(lod_triangles) < 150:
+            failures.append("LOD2 triangle count is below the 150-triangle floor")
+        if shape_key["movedVertices"] < 4:
+            failures.append("Smile shape key moved fewer than 4 vertices")
+        if reimport_glb.get("morphTargets", 0) < 1:
+            failures.append("GLB re-import did not show the Smile morph target")
+        if reimport_glb.get("bones", 0) < len(BONES):
+            failures.append("GLB re-import bone count is below the rig spec")
+        if len(reimport_glb.get("images", [])) < 3:
+            failures.append("GLB does not carry the base/normal/roughness texture set")
+        for record in reimport_lods:
+            if (record.get("status") != "pass" or record.get("bones", 0) < 20
+                    or record.get("actions", 0) < 3):
+                failures.append("LOD " + record["level"] + " re-import is incomplete")
         for failure in failures:
             report["errors"].append(failure)
         (art_dir / "generation-report.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
@@ -1271,7 +1515,8 @@ def main() -> int:
             return 1
         print("WAYFARER_GEN_OK glb=" + str(glb) + " bytes=" + str(glb.stat().st_size) +
               " bones=" + str(len(BONES)) + " actions=" + str(len(actions)) +
-              " tris=" + str(weight_stats["triangles"]))
+              " tris=" + str(weight_stats["triangles"]) + " lods=" + str(len(lod_records)) +
+              " morph=" + shape_key["name"] + " maps=" + str(len(textures["files"])))
         return 0
     except Exception as exc:
         traceback.print_exc()

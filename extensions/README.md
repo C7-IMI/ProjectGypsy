@@ -21,7 +21,7 @@ modified.
   Shell interpreter names and shell control operators in any argv token are rejected.
 - Timeout: each action declares a timeout (greater than 0 and at most 300 seconds;
   default 60). The CLI can shorten it with --timeout but not extend it. A timed-out action
-  is a failure.
+  is a failure. Opt-in process containment (below) kills the whole job on timeout.
 - Dry run: extension run --action NAME --dry-run resolves and prints argv, cwd and timeout
   without executing anything. extension register --accept --dry-run shows the review without
   writing the lockfile.
@@ -34,6 +34,32 @@ modified.
 - No core modification: registration writes only the lockfile in the extension root; run
   state goes to extensions/.state/; removal with --delete is confined to the extension
   directory. Nothing writes into workstream/.
+
+## Process containment (opt-in, Windows)
+
+Extension execution can be additionally contained with a Windows Job Object. It is opt-in:
+
+- API: run_extension(..., contain=True) and test_extension(..., contain=True).
+- CLI: set GYPSY_EXTENSION_CONTAIN=1 before gypsy extension run or test (there is no
+  --contain flag yet; the environment switch is the exposed operator control).
+- extensions.containment_support() reports availability, backend, default limits and
+  explicit non-claims.
+
+When applied, the job is created with kill-on-job-close, an active-process limit (8) and
+memory limits (process 2048 MB, job 4096 MB). A timeout terminates the whole job, so the
+process tree is killed; closing the job after a normal exit also kills surviving
+grandchildren. A per-process CPU user-time limit is supported by the job layer but off by
+default, because the wall timeout is already the bound. Output is captured through temporary
+files, so a grandchild holding an inherited pipe cannot turn a fast action into a false
+timeout.
+
+The child is assigned to the job immediately after it is created. That spawn-to-assign window
+is microseconds wide but real: containment is a cleanup/resource-control mechanism, not a
+security boundary. On non-Windows, or if the Job Object API is unavailable, the run falls back
+to uncontained execution and reports containment.applied = false with the reason. This is
+resource containment, not a filesystem/network sandbox and not a security boundary against
+code that acts within its OS rights. The CLI output and the run state file record the
+containment decision.
 
 ## Commands
 
@@ -65,6 +91,11 @@ python workstream/gypsy.py extension run example.hello --action fail
 The last command exits nonzero by design: the fail action is the negative case. To turn an
 extension off use disable; to unregister but keep the files use remove; to delete after
 review use remove --delete.
+On Windows, opt into Job Object containment for run and test with:
+
+```text
+$env:GYPSY_EXTENSION_CONTAIN = "1"
+```
 
 ## Manifest (gypsy.extension/v1)
 
@@ -141,7 +172,9 @@ acceptedAt, enabled and a compact review. It is committed: it is the review reco
 - network and the read/write declarations are review metadata, not enforced. An extension
   must not mutate its own registered source tree during a run; write outputs below
   GYPSY_EXTENSION_STATE (extensions/.state/) or into the caller's project instead.
-- A timeout terminates the direct child. A grandchild process tree is not guaranteed to be
-  killed by the Python standard library here.
+- Without containment, a timeout terminates the direct child only. Opt-in Windows Job Object
+  containment terminates the job's process tree on timeout and at job close and applies job
+  resource limits, but it is still not an OS sandbox and does not mediate filesystem or
+  network syscalls.
 - No dependency installation, package manager, signing or remote registry is involved.
 - Extensions are not hot-reloaded while running; reload is an explicit re-review of files.
