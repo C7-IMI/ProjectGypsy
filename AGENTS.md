@@ -59,7 +59,7 @@ In this order:
   projects are peers. A prompt asked here is logged here; nothing crosses without explicit instruction.
 - **Nothing fake in the build** (Part 11.6): no dead controls, no pretend features; unavailable behaviour says so.
   An engine capability that is hardware-gated or licence-blocked is reported as such, not tested halfway
-  (`engine.ue5.build` is `blocked`; Unity batchmode is blocked until activation).
+  (`engine.ue5.build` is `blocked`; Unity licence is proven but its adapter/build is still planned).
 - **Generated media is prototype-only until licensed.** MusicGen-small weights are CC-BY-NC 4.0; every generated
   asset needs provenance and human approval (ADR-004). Never ship it as a commercial asset.
 - **Background agents are evidence only after they are read** (§10.8). A dispatch is not progress; read the status

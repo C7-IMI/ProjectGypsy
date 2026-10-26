@@ -9,7 +9,7 @@ the registry and the reference adapter, and record the others honestly instead o
 | Engine | Version found | Smoke result | Evidence |
 | --- | --- | --- | --- |
 | **Godot** | 4.7.2 | **PASS** — headless project boots, prints the marker, exits 0 | `gypsy engines smoke godot` → exit 0, 0.209 s, marker `GYPSY_SMOKE_OK`; export templates: **none installed** |
-| **Unity** | 6000.6.7f1 | **BLOCKED — licence** | no `Unity_lic.ulf`; batchmode log: `No valid Unity Editor license found. Please activate your license.` exit code 198 |
+| **Unity** | 6000.6.7f1 | **PASS — licence + batchmode smoke** | batchmode exit 0, resolved entitlements, `GYPSY_UNITY_SMOKE_OK version=6000.6.7f1`, 50.891 s; no game adapter/build yet |
 | **Unreal Engine 5** | 5.8.4 | **NOT RUN — hardware gate** | gate: 4.0 GB VRAM < 8 GB, D: 52.6 GB free < 60 GB; capability `engine.ue5.build` is `blocked` |
 | **Flax** | 1.13 | **NOT RUN — experimental** | editor and `Flax.Build.exe` detected; no headless build/run path demonstrated, so no adapter claim |
 
@@ -21,6 +21,7 @@ Command:
 
 ```text
 python workstream/gypsy.py engines smoke godot
+python workstream/gypsy.py engines smoke unity
 PASS godot smoke | exit 0 | 0.209s | marker=True
 export templates: none installed
 ```
@@ -37,16 +38,15 @@ visual-evidence path (windowed run + OBS, or Godot movie-maker mode) is a separa
 **Export/build** is not proven: no Godot export templates are installed. Headless export will fail until the 4.7.2
 templates are installed. This is registered (PG-D14).
 
-## Unity — installed, not pipeline-capable yet
+## Unity — licence proven, adapter not built yet
 
 - Editor found at `C:\Program Files\Unity 6000.6.7f1\Editor\Unity.exe`.
-- No `C:\ProgramData\Unity\Unity_lic.ulf`; the licensing client reported
-  `Found 0 entitlement groups and 0 free entitlements` and then `No valid Unity Editor license found`.
-- The first batchmode attempt failed on an argument-quoting error in the smoke harness (project path became
-  `Temp/C:/Users/...`); the second attempt used quoted `-createProject` and produced the licence verdict above. That
-  first failure is recorded rather than hidden.
-- Consequence: the Unity adapter is **partial**. Editor detection works; batchmode build/playmode claims are blocked
-  until the operator activates a licence. Do not report a Unity build as working before that.
+- **2026-10-26:** the licensing client resolved entitlements and a batchmode smoke exited **0**. The smoke creates a
+  temporary Unity project with `Assets/Editor/GypsySmoke.cs`, runs `-executeMethod GypsySmoke.Run`, and asserts
+  `GYPSY_UNITY_SMOKE_OK version=6000.6.7f1`; evidence is `workstream/state/smoke-unity.json` (gitignored).
+- `gypsy project init --engine unity` is now allowed because `licence.proven` is true (read from that evidence).
+- **What is still not proven:** a Unity build of the ProjectGypsy slice, playmode demo, rendering, and the second-engine
+  gate. Those need a real `unity/` project and adapter, not just a licence. Do not report a Unity slice as working.
 
 ## Unreal Engine 5 — gated, not attempted
 
@@ -85,7 +85,7 @@ and the licence error above was read from that log.
 ## What Phase 0 does and does not prove
 
 **Proven:** engine discovery by binary probe; Godot headless project boot; hardware gate; stale-registry rejection;
-Unity licence absence; capability/project manifests and their checks.
+Unity licence + batchmode execution; capability/project manifests and their checks.
 
 **Not proven:** rendered capture for any engine; Godot export; Unity batchmode; UE5 build; Flax build; playtest
 automation. Those are Phase 1+ work, written down in [DEFERRED.md](../DEFERRED.md) instead of assumed.

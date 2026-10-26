@@ -260,5 +260,15 @@ Each entry has:
 
 ---
 
-Next prompt number: 26. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 26 - 2026-10-26
+
+- Request: Check Unity now that a licence is present.
+- Status: Completed — licence and batchmode smoke PASS; Unity slice adapter not built.
+- Version: 2026.10.25.021
+- Commit/evidence: engines smoke unity exit 0, GYPSY_UNITY_SMOKE_OK in 50.891 s; licence.proven true from state;
+  import matrix regenerated; 181 tests/44 capabilities. No second-engine claim.
+
+---
+
+Next prompt number: 27. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

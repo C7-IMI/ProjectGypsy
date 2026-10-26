@@ -18,6 +18,8 @@
    `art.character.retopo`, `art.character.rig`, `art.character.validate`, `art.animation.retarget`,
    `art.lookdev.turntable` — and `art.import.matrix` is `partial`. No orchestrator or console exists (PG-D15), and
    the hero character and art direction do not exist (PG-D17); the Phase-1 engine is chosen (Godot 4.7.2, ADR-009).
+   **Amendment 2026-10-26:** Unity licence is now proven via batchmode smoke; no Unity import/character pipeline is claimed
+   yet.
 4. **Hardware:** T600 **4 GB VRAM**, 64 GB RAM, C: 242.3 GB / D: **51.5 GB** free (re-checked). 4 GB is workable for
    game-scale sculpt/retopo/animation, but high-poly sculpting, large textures and production renders must be bounded.
    No mocap or capture hardware, and no drawing tablet, is recorded in [TOOL-INVENTORY.md](../TOOL-INVENTORY.md).

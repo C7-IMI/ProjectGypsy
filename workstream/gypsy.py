@@ -7,7 +7,7 @@ what it finds, and never invents a capability.
 
 Usage:
     python workstream/gypsy.py engines probe [--json] [--save]
-    python workstream/gypsy.py engines smoke godot [--json] [--keep]
+    python workstream/gypsy.py engines smoke godot|unity [--json] [--keep]
     python workstream/gypsy.py tools probe [--json]
     python workstream/gypsy.py capabilities list|check [--json]
     python workstream/gypsy.py project init --path DIR --engine ID --version VER [--targets pc,mobile] [--force]
@@ -263,6 +263,14 @@ def detect_unity():
         Path(os.environ.get("PROGRAMDATA", "C:/ProgramData")) / "Unity" / "Unity_lic.ulf",
     ]
     licensed = any(p.exists() for p in set(license_files))
+    licence_note = "batchmode still needs activation; prove it before claiming builds"
+    try:
+        evidence = json.loads((STATE_DIR / "smoke-unity.json").read_text(encoding="utf-8"))
+        if evidence.get("passed"):
+            licensed = True
+            licence_note = "batchmode smoke evidence: passed " + str(evidence.get("checkedAt", "?"))
+    except (OSError, json.JSONDecodeError):
+        pass
     return {
         "id": "unity",
         "name": "Unity",
@@ -272,7 +280,7 @@ def detect_unity():
         "folder": str(folder),
         "editor": str(editor),
         "cli": str(editor),
-        "licence": {"proven": licensed, "note": "batchmode still needs activation; prove it before claiming builds"},
+        "licence": {"proven": licensed, "note": licence_note},
         "notes": [] if licensed else ["no licence file found; batchmode may refuse to run"],
     }
 
@@ -548,6 +556,59 @@ def smoke_godot(keep: bool = False) -> dict:
             shutil.rmtree(temp, ignore_errors=True)
 
 
+def smoke_unity(keep: bool = False) -> dict:
+    record = detect_unity()
+    if not record.get("installed"):
+        raise GypsyError("Unity is not installed")
+    temp = Path(tempfile.mkdtemp(prefix="gypsy-unity-smoke-"))
+    try:
+        (temp / "Assets" / "Editor").mkdir(parents=True)
+        (temp / "ProjectSettings").mkdir(parents=True)
+        (temp / "ProjectSettings" / "ProjectVersion.txt").write_text(
+            "m_EditorVersion: " + str(record.get("version")) + "\n", encoding="utf-8"
+        )
+        (temp / "Assets" / "Editor" / "GypsySmoke.cs").write_text(
+            "using UnityEditor;\nusing UnityEngine;\n\npublic static class GypsySmoke\n{\n"
+            "    public static void Run()\n    {\n"
+            "        Debug.Log(\"GYPSY_UNITY_SMOKE_OK version=\" + Application.unityVersion);\n"
+            "        EditorApplication.Exit(0);\n    }\n}\n",
+            encoding="utf-8",
+        )
+        log_path = temp / "unity.log"
+        result = run(
+            [record["cli"], "-batchmode", "-quit", "-nographics", "-projectPath", str(temp),
+             "-executeMethod", "GypsySmoke.Run", "-logFile", str(log_path)],
+            timeout=300,
+            cwd=temp,
+        )
+        log_text = log_path.read_text(encoding="utf-8", errors="replace") if log_path.exists() else ""
+        combined = result["stdout"] + "\n" + result["stderr"] + "\n" + log_text
+        marker = "GYPSY_UNITY_SMOKE_OK" in combined
+        licensed = "Exiting batchmode successfully" in combined or result["exit"] == 0
+        evidence = {
+            "engine": "unity",
+            "version": record.get("version"),
+            "checkedAt": datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds"),
+            "exit": result["exit"],
+            "seconds": result["seconds"],
+            "marker": marker,
+            "licence": licensed,
+            "stdout": result["stdout"][-3000:],
+            "stderr": result["stderr"][-3000:],
+            "logTail": log_text[-5000:],
+            "tempDir": str(temp) if keep else None,
+            "passed": result["exit"] == 0 and marker,
+        }
+        STATE_DIR.mkdir(parents=True, exist_ok=True)
+        (STATE_DIR / "smoke-unity.json").write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
+        if not evidence["passed"]:
+            raise GypsyError("Unity smoke failed: " + json.dumps(evidence, indent=2)[:2500])
+        return evidence
+    finally:
+        if not keep:
+            shutil.rmtree(temp, ignore_errors=True)
+
+
 def check_all(project_path=None) -> dict:
     errors = []
     warnings = []
@@ -632,7 +693,7 @@ def main(argv=None) -> int:
     probe_parser.add_argument("--json", action="store_true")
     probe_parser.add_argument("--save", action="store_true")
     smoke_parser = engines_sub.add_parser("smoke", help="run an engine smoke test")
-    smoke_parser.add_argument("engine", choices=["godot"])
+    smoke_parser.add_argument("engine", choices=["godot", "unity"])
     smoke_parser.add_argument("--json", action="store_true")
     smoke_parser.add_argument("--keep", action="store_true")
 
@@ -745,6 +806,14 @@ def main(argv=None) -> int:
                     print_human_engines(probe)
                 return 0 if probe["engines"]["godot"].get("usable") else 1
             if args.engines_command == "smoke":
+                if args.engine == "unity":
+                    evidence = smoke_unity(keep=args.keep)
+                    if args.json:
+                        print(json.dumps(evidence, indent=2))
+                    else:
+                        print(f"PASS unity smoke | exit {evidence['exit']} | {evidence['seconds']}s | marker={evidence['marker']}")
+                        print(f"licence: {'proven' if evidence.get('licence') else 'not proven'}")
+                    return 0
                 evidence = smoke_godot(keep=args.keep)
                 if args.json:
                     print(json.dumps(evidence, indent=2))

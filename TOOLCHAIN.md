@@ -47,7 +47,7 @@ python workstream/gypsy.py engines probe
 | Engine | Version | Path | Status |
 | --- | --- | --- | --- |
 | Godot | 4.7.2 | `%LOCALAPPDATA%\Microsoft\WinGet\Links\godot.exe` | reference adapter; headless smoke, export, exported-binary demo and windowed capture all pass |
-| Unity | 6000.6.7f1 | `C:\Program Files\Unity 6000.6.7f1\Editor\Unity.exe` | installed; **licence not proven**, batchmode blocked |
+| Unity | 6000.6.7f1 | `C:\Program Files\Unity 6000.6.7f1\Editor\Unity.exe` | installed; **licence proven** via batchmode smoke (2026-10-26); adapter/build not built |
 | Unreal Engine 5 | 5.8.4 | `D:\UnrealEngine\UE_5.8\Engine\Binaries\Win64\UnrealEditor-Cmd.exe` | detected; hardware gate fails (4 GB VRAM, 51.5 GB free on D) |
 | Flax | 1.13 | `C:\Program Files (x86)\Flax\Flax_1.13\Binaries\Editor\Win64\Release\FlaxEditor.exe` | experimental; no headless path demonstrated |
 
@@ -143,7 +143,8 @@ python workstream/gypsy.py dashboard                      # local dark GUI at 12
 
 ```text
 python workstream/gypsy.py engines probe [--json] [--save]   # --save writes workstream/state/engines.json
-python workstream/gypsy.py engines smoke godot [--json]
+python workstream/gypsy.py engines smoke godot
+python workstream/gypsy.py engines smoke unity [--json]
 python workstream/gypsy.py tools probe [--json]
 python workstream/gypsy.py capabilities list|check [--json]
 python workstream/gypsy.py project init --path <dir> --engine <godot|unity|ue5|flax> --version <ver> --targets pc,mobile
@@ -163,8 +164,8 @@ python scripts/import_matrix.py --skip-generate # reuse the last generated kit
   static+material, rigged+3 animations, morph face, LOD/collision set; GLB and FBX.
 - Evidence: `docs/IMPORT-MATRIX.md`; machine-readable `workstream/state/import-matrix.json`.
 - Current result: Blender round-trip pass, glTF validator no errors (one expected `NODE_SKINNED_MESH_NON_ROOT`
-  warning), **Godot 4.7.2 headless import pass** (3 animations on the rigged asset, 4 LOD meshes). Unity blocked
-  (no licence), UE5 blocked (hardware gate), Flax not tested — recorded, not faked.
+  warning), **Godot 4.7.2 headless import pass** (3 animations on the rigged asset, 4 LOD meshes). Unity licence is
+  proven, but its import adapter is not run; UE5 is hardware-blocked; Flax not tested — recorded, not faked.
 - Add-on smoke tests (Rigify, retopo/UV/bake) are policy in ADR-006; not yet automated.
 
 ## Languages (ADR-007)

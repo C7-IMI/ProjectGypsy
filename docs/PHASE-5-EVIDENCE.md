@@ -13,7 +13,7 @@ Recorded 2026-10-26. Phase-5 proof for [ADR-013](ADR-013-phase5-mobile-live-perf
 | Live watcher | PASS — 34 tests; real --once demo run 2.726 s, exit 0 |
 | Performance | PASS — 3 demos: 2.612/2.602/2.605 s, median 2.605 s, p95 2.605 s, frames=143, GPU render 0.56 ms/frame |
 | Budgets | PASS — median <=5 s, p95 <=8 s, GPU <=16.67 ms/frame |
-| Second engine | BLOCKED — see below |
+| Second engine | PARTIAL — Unity licence PASS; no Unity slice/build yet; UE5/Flax still blocked |
 | Tests / capabilities | 172 tests; 42 capability manifests |
 
 ## Mobile toolchain
@@ -44,7 +44,7 @@ not gameplay FPS.
 
 | Engine | Evidence | Verdict |
 | --- | --- | --- |
-| Unity 6000.6.7f1 | batchmode on a minimal project: "No valid Unity Editor license found. Please activate your license." exit 198 | BLOCKED (licence) |
+| Unity 6000.6.7f1 | batchmode exit 0, entitlements resolved, `GYPSY_UNITY_SMOKE_OK` in 50.891 s (2026-10-26) | LICENCE PASS; adapter/slice NOT BUILT |
 | Unreal Engine 5.8.4 | probe gate: GPU VRAM 4.0 GB below the 8 GB minimum (free D: 60.0 GB meets 60) | BLOCKED (hardware) |
 | Flax 1.13 | probe notes: experimental adapter; no headless build/run demonstrated | BLOCKED (no proven path) |
 
@@ -65,4 +65,4 @@ Mobile package gate and live/perf gates are met; device launch is unverified.
 - Debug keystore only; no release signing.
 - Watcher is not hot reload; .godot churn can retrigger it.
 - Benchmark is prototype-scale and machine-specific.
-- Unity/UE5/Flax gates remain blocked; Phase 6 is recorded in PHASE-6-GATE.md.
+- Unity licence is proven but the Unity slice adapter is not built; UE5 and Flax remain blocked. Phase 6 is recorded in PHASE-6-GATE.md.

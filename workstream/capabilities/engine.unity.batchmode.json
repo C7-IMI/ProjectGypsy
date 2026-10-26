@@ -1,0 +1,43 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "engine.unity.batchmode",
+  "layer": "engine",
+  "engine": "unity",
+  "kind": "smoke",
+  "maturity": "stable",
+  "description": "Unity 6000.6.7f1 batchmode licence and C# execution smoke: temp project, -executeMethod GypsySmoke.Run, marker check.",
+  "requires": [
+    "unity.installed"
+  ],
+  "inputs": [
+    {
+      "name": "keep",
+      "type": "boolean"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "evidence",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "batchmode exit 0",
+    "GYPSY_UNITY_SMOKE_OK marker",
+    "entitlements resolved",
+    "evidence state written"
+  ],
+  "provenance": {
+    "record": [
+      "engine.version",
+      "checkedAt",
+      "command",
+      "exit",
+      "seconds",
+      "marker"
+    ]
+  },
+  "notes": [
+    "2026-10-26: 50.891 s PASS; licence proven. Adapter/slice is not built."
+  ]
+}

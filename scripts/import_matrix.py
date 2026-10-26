@@ -168,7 +168,10 @@ def engine_matrix(probe: dict):
             if engine_id == "unity":
                 if not (record.get("licence") or {}).get("proven"):
                     status = "blocked: no licence"
-                    reason = "batchmode exited 198: No valid Unity Editor license found (docs/ENGINE-SMOKE.md)"
+                    reason = "licence not proven (docs/ENGINE-SMOKE.md)"
+                else:
+                    status = "not run: adapter pending"
+                    reason = "Unity licence is proven (batchmode smoke); no Unity import/build adapter is implemented"
             if engine_id == "ue5":
                 gate = record.get("gate") or {}
                 if not gate.get("ok"):
@@ -291,13 +294,13 @@ def markdown(report: dict) -> str:
     lines.append("| glTF export | GLB, apply modifiers, Y-up, animations, morphs, skins, NLA strips, force sampling |")
     lines.append("| FBX export | FBX 7400, -Z forward / Y up, apply scale all, no leaf bones, bake animation via NLA strips |")
     lines.append("| Godot | 4.7.2, headless import + scripted scene assertions |")
-    lines.append("| Unity | installed, no licence -> blocked |")
+    lines.append("| Unity | licence proven; import adapter not run |")
     lines.append("| Unreal | 5.8.4, hardware gate fails (4 GB VRAM / free disk) -> blocked |")
     lines.append("| Flax | 1.13, experimental -> not tested |")
     lines.append("")
     lines.append("## Not tested / next")
     lines.append("")
-    lines.append("- Unity and UE5 FBX/glTF import on this machine: blocked by licence/hardware; re-run on an activated/higher-spec machine.")
+    lines.append("- Unity import: licence is proven, but no adapter was run; UE5 remains hardware-blocked; re-run after adapters exist.")
     lines.append("- Flax import: no demonstrated headless path.")
     lines.append("- Add-on smoke tests (Rigify, retopo/UV add-ons): not yet automated; ADR-006 records the policy.")
     lines.append("- Material/texture channel round-trip: the golden assets use simple Principled materials; a texture-embedded case is next.")

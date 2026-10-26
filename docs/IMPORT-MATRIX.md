@@ -1,6 +1,6 @@
 # IMPORT-MATRIX.md — Blender 5.2 golden-asset import matrix
 
-Generated 2026-10-26T01:46:35-05:00 by scripts/import_matrix.py. This is Phase-0 evidence for
+Generated 2026-10-26T03:16:43-05:00 by scripts/import_matrix.py. This is Phase-0 evidence for
 [ADR-006](ADR-006-blender-import-matrix.md); it is not an art-quality claim.
 
 ## Result
@@ -8,7 +8,7 @@ Generated 2026-10-26T01:46:35-05:00 by scripts/import_matrix.py. This is Phase-0
 | Engine | Version | glTF/GLB | FBX | Status | Evidence / reason |
 | --- | --- | --- | --- | --- | --- |
 | Godot | 4.7.2 | PASS | not supported natively | PASS | headless --import + scene assertions: {"lod_set": {"animations": 0, "loaded": true, "meshes": 4}, "morph_face": {"animations": 0, "loaded": true, "meshes": 1}, "rigged_character": {"animations": 3, "loaded": true, "meshes": 1}, "static_cube": {"animations": 0, "loaded": true, "meshes": 1}} |
-| Unity | 6000.6.7f1 | blocked | blocked | blocked: no licence | batchmode exited 198: No valid Unity Editor license found (docs/ENGINE-SMOKE.md) |
+| Unity | 6000.6.7f1 | blocked | blocked | not run: adapter pending | Unity licence is proven (batchmode smoke); no Unity import/build adapter is implemented |
 | UE5 | 5.8.4 | blocked | blocked | blocked: hardware gate | GPU VRAM 4.0 GB is below the 8 GB declared minimum |
 | Flax | 1.13 | not tested | not tested | experimental: not tested | experimental adapter; no headless build/run demonstrated |
 
@@ -57,13 +57,13 @@ checked by the engine import test rather than treated as a pass by itself.
 | glTF export | GLB, apply modifiers, Y-up, animations, morphs, skins, NLA strips, force sampling |
 | FBX export | FBX 7400, -Z forward / Y up, apply scale all, no leaf bones, bake animation via NLA strips |
 | Godot | 4.7.2, headless import + scripted scene assertions |
-| Unity | installed, no licence -> blocked |
+| Unity | licence proven; import adapter not run |
 | Unreal | 5.8.4, hardware gate fails (4 GB VRAM / free disk) -> blocked |
 | Flax | 1.13, experimental -> not tested |
 
 ## Not tested / next
 
-- Unity and UE5 FBX/glTF import on this machine: blocked by licence/hardware; re-run on an activated/higher-spec machine.
+- Unity import: licence is proven, but no adapter was run; UE5 remains hardware-blocked; re-run after adapters exist.
 - Flax import: no demonstrated headless path.
 - Add-on smoke tests (Rigify, retopo/UV add-ons): not yet automated; ADR-006 records the policy.
 - Material/texture channel round-trip: the golden assets use simple Principled materials; a texture-embedded case is next.

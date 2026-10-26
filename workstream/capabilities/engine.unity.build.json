@@ -4,8 +4,8 @@
   "layer": "engine",
   "engine": "unity",
   "kind": "build",
-  "maturity": "blocked",
-  "description": "Unity batchmode build. Gated on a proven licence; activation is not automated.",
+  "maturity": "planned",
+  "description": "Unity batchmode build. Licence is proven via smoke; the project adapter/build harness is not yet built.",
   "requires": [
     "unity.installed",
     "unity.licence"

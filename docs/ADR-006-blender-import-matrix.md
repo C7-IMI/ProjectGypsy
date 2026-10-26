@@ -1,6 +1,6 @@
 # ADR-006 — Blender 5.2.3 LTS to engine import matrix and golden assets
 
-**Status:** Accepted, 2026-10-25 · **Decision owner:** operator (activation/hardware decisions) · **Reviewer:** Lead
+**Status:** Accepted, 2026-10-25; **amended 2026-10-26** (Unity licence proven; import not run) · **Decision owner:** operator · **Reviewer:** Lead
 **Scope:** how Blender-exported assets are proven importable by the engines this workstream targets.
 **Related:** [ADR-001](ADR-001-engines.md) (engine adapters) · [ADR-002](ADR-002-art-pipeline.md) (export contract,
 provenance) · [ADR-003](ADR-003-workstream-architecture.md) (capability bus) · [ADR-005](ADR-005-character-animation-automation.md)

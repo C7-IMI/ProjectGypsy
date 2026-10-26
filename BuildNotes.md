@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.25.020
+Current version: 2026.10.25.021
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,20 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.25.021
+
+**Unity licence verified: batchmode smoke passes; adapter not yet built.**
+
+- Date: 2026-10-26
+- Commit: this change.
+- Change: engines smoke unity (temp project, C# editor smoke, licence evidence in state); detect_unity reads the smoke
+  evidence for licence.proven; CLI accepts unity; capability engine.unity.batchmode; engine.unity.build moved from
+  blocked to planned; ENGINE-SMOKE/TOOLCHAIN/TOOL-INVENTORY/DEFERRED/ADR-005/006/013 updated; import matrix regenerated
+  with Unity marked "licence proven, adapter not run"; dashboard gate text updated.
+- Verification: Unity batchmode exit 0, entitlements resolved, GYPSY_UNITY_SMOKE_OK version=6000.6.7f1 in 50.891 s;
+  gypsy engines probe --save reports unity licence.proven true; import matrix PASS godot; 181 tests; 44 capabilities.
+  No Unity slice/build is claimed.
 
 ## 2026.10.25.020
 

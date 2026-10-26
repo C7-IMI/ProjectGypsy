@@ -9,7 +9,7 @@
 ## Context
 
 Phase 5 asks for live iteration, mobile export and a second engine. The machine has Godot 4.7.2 with Android export
-templates, but no Android SDK/JDK at the start; Unity is installed with no licence; UE5 fails its VRAM gate; Flax has no
+templates, but no Android SDK/JDK at the start; Unity's licence is now proven (batchmode smoke); UE5 fails its VRAM gate; Flax has no
 proven headless path. The honest outcome must distinguish a proven mobile package from an unverified device launch and a
 blocked second engine.
 
@@ -26,7 +26,7 @@ blocked second engine.
 4. **Performance baseline has declared budgets:** three headless demos, median <= 5 s, p95 <= 8 s, frames=143 each, plus
    a windowed movie-maker capture with GPU render <= 16.67 ms/frame. The result is a baseline, not a promise across
    hardware.
-5. **Second engine is blocked, not faked:** Unity batchmode exits 198 with "No valid Unity Editor license found"; UE5
+5. **Second engine is not faked:** Unity licence is now proven via batchmode smoke, but no Unity slice exists; UE5
    fails the 8 GB VRAM gate (4 GB actual); Flax has no demonstrated headless build/run. The Phase-5 gate "same slice on
    two engines" is therefore blocked, while the mobile package gate and live/perf work pass.
 6. **Phase 6 remains gated:** the UE5 adapter is not built because the hardware gate fails; it needs a machine that

@@ -155,7 +155,7 @@ It is not a YuE2 substitute (no vocals, 32 kHz, lower quality) and its weights a
 | Build tools work | `cmake --version` → 4.4.4; `ninja --version` → 1.13.2 |
 | glTF tooling works | `gltf-transform --version` → 4.5.1; `gltfpack` runs |
 | MusicGen works | `facebook/musicgen-small` generated a 5.94 s clip at 32 kHz on CUDA; RMS 0.146, peak 0.427; fp16 NaN detected and retried in fp32; metadata sidecar written |
-| Unity/licence and UE5 gates | Unity batchmode: "No valid Unity Editor license found" (exit 198); UE5 hardware gate fails (4 GB VRAM, 51.5 GB free) — see `docs/ENGINE-SMOKE.md` |
+| Unity licence and UE5 gates | Unity batchmode: exit 0, entitlements resolved, `GYPSY_UNITY_SMOKE_OK` in 50.891 s (2026-10-26); UE5 hardware gate fails (4 GB VRAM, 60 GB free) — see `docs/ENGINE-SMOKE.md` |
 | ComfyUI works | 512×512 SD1.5, 20 steps, seed 42 → PNG (304 KB, mean 0.526) in 28.2 s on the T600 with `--lowvram`; provenance sidecar written |
 | MCP bridge works | `tools/mcp/mcp_call.py list --server godot` lists tools; `get_godot_version` returned `4.7.2.stable.official.ed1daf0bf`; Blender server lists tools with the addon installed |
 | Android APK works | `scripts/build_android.ps1` produced a 28,305,095-byte signed arm64 debug APK; aapt2 package com.c7imi.projectgypsy; apksigner cert SHA-256 140c76ff... |
