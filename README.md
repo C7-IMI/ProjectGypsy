@@ -15,6 +15,7 @@ software work — copied from C7NTRY's pack (revision 2.5) on 2026-10-25 and app
 - [`ProjectPack-ADDENDUM-Interface.md`](./ProjectPack-ADDENDUM-Interface.md) — the interface design and redesign
   rules, **parked and not in force** because this is a game, not a website. It can be restored deliberately.
 - [`DEFERRED.md`](./DEFERRED.md) — the work deliberately not done, and what unblocks it.
+- [`TOOL-INVENTORY.md`](./TOOL-INVENTORY.md) — installed engines, art/audio/build tools, open-source replacements and hardware limits.
 
 ## Status
 
