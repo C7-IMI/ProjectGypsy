@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>ProjectGypsy — Workspace overview</title>
+<link rel="stylesheet" href="mockups.css"></head>
+<body><div class="app">
+  <header class="top">
+    <div class="brand"><span class="mark"></span><div><b>ProjectGypsy</b><small>operations console</small></div></div>
+    <div class="crumbs"><span>Workspace</span><span class="slash">/</span><b>main</b><span class="pill"><span class="dot"></span>clean</span><span class="pill"><b>Godot</b> 4.7.2</span><span class="pill"><b>Unity</b> 6</span></div>
+    <div class="search"><span>⌕</span><span>Search runs, slices, artifacts…</span><span class="key">Ctrl K</span></div>
+    <button class="btn ghost small">Refresh</button>
+    <button class="btn primary">▶ Run all gates</button>
+    <div class="avatar">SS</div>
+  </header>
+  <div class="body">
+    <aside class="rail">
+      <div class="label">Workspace</div>
+      <button class="nav active"><span class="i"></span>Overview</button>
+      <button class="nav"><span class="i"></span>Runs<span class="count">8</span></button>
+      <button class="nav"><span class="i"></span>Slices<span class="count">5</span></button>
+      <button class="nav"><span class="i"></span>Artifacts<span class="count">7</span></button>
+      <div class="label">Quality</div>
+      <button class="nav"><span class="i"></span>Gates<span class="count">2</span></button>
+      <button class="nav"><span class="i"></span>Toolpacks<span class="count">4</span></button>
+      <button class="nav"><span class="i"></span>Evidence</button>
+      <div class="spacer"></div>
+      <div class="palette"><div class="k"><span>COMMAND PALETTE</span><span>⌘ K</span></div><div class="v">slices run --all</div></div>
+      <div style="font-size:9px;color:#526a77;line-height:1.5;padding:8px 4px 0">The CLI is the source of truth.<br>Every UI action is a named command.</div>
+    </aside>
+    <main class="main">
+      <div class="head"><div><h1>Workspace overview</h1><p>5 slices · last full run passed · 2 gates need attention</p></div><div class="actions"><button class="btn ghost">View last run</button><button class="btn primary">Run all</button></div></div>
+      <div class="next"><div class="icon">!</div><div class="txt"><div class="eyebrow">Next best action</div><h3>Device launch is still untested</h3><p>The Android APK is built and signed. No emulator or device has launched it; this is the only remaining product gate.</p></div><div class="actions"><button class="btn small ghost">How to unblock</button><button class="btn small">Connect device</button></div></div>
+      <div class="metrics">
+        <div class="metric"><div class="top"><span>Slices passed</span><span class="status pass">● PASS</span></div><div class="v">5 / 5</div><div class="s">last task 103.8 s</div></div>
+        <div class="metric"><div class="top"><span>Tests</span><span class="status pass">● PASS</span></div><div class="v">181</div><div class="s">workstream suite</div></div>
+        <div class="metric"><div class="top"><span>Capabilities</span><span class="status dim">46</span></div><div class="v">46</div><div class="s">manifests valid</div></div>
+        <div class="metric"><div class="top"><span>Blocking defects</span><span class="status warn">2 gates</span></div><div class="v">0</div><div class="s">recorded, not hidden</div></div>
+      </div>
+      <div class="section"><div class="section-h"><h2>Pipeline</h2><span class="sub">left to right · click a slice to inspect</span><span class="right">All declared slices passed</span></div>
+        <div class="pipeline">
+          <div class="stage"><div class="r"><span class="dot"></span><span class="n">phase1</span><span class="time">12.8s</span></div><div class="sub">demo → build → capture</div><div class="bar"><i></i></div><div class="foot"><span>3/3 steps</span><span>3 artifacts</span></div></div>
+          <div class="stage"><div class="r"><span class="dot"></span><span class="n">quality</span><span class="time">21.5s</span></div><div class="sub">check → tests → records</div><div class="bar"><i></i></div><div class="foot"><span>3/3 steps</span><span>6/6 checks</span></div></div>
+          <div class="stage"><div class="r"><span class="dot"></span><span class="n">toolpacks</span><span class="time">45.6s</span></div><div class="sub">golden import → audio</div><div class="bar"><i></i></div><div class="foot"><span>2/2 steps</span><span>seeded</span></div></div>
+          <div class="stage"><div class="r"><span class="dot"></span><span class="n">leftbehind</span><span class="time">22.9s</span></div><div class="sub">Unity build → demo → capture</div><div class="bar"><i></i></div><div class="foot"><span>1 action</span><span>marker pass</span></div></div>
+          <div class="stage"><div class="r"><span class="dot"></span><span class="n">mobile</span><span class="time">11.6s</span></div><div class="sub">Android debug APK</div><div class="bar"><i></i></div><div class="foot"><span>1 action</span><span>signed</span></div></div>
+        </div>
+      </div>
+      <div class="runs"><div class="runs-h"><b>Recent runs</b><span>last 8</span><div class="run-filters"><span class="filter on">All</span><span class="filter">Passed</span><span class="filter">Failed</span><span class="filter">LeftBehind</span></div></div>
+        <table><thead><tr><th>Run</th><th>Scope</th><th>Status</th><th>Duration</th><th>Started</th><th>Artifacts</th><th></th></tr></thead><tbody>
+          <tr><td class="runname">task-09-…-9db6</td><td>all gates</td><td><span class="status pass">● PASS</span></td><td class="t-mono">103.8s</td><td class="t-mono">today 04:02</td><td class="t-mono">3</td><td class="rowactions">Open →</td></tr>
+          <tr><td class="runname">leftbehind-09-…</td><td>Unity 6</td><td><span class="status pass">● PASS</span></td><td class="t-mono">22.9s</td><td class="t-mono">today 04:00</td><td class="t-mono">2</td><td class="rowactions">Open →</td></tr>
+          <tr><td class="runname">mobile-09-…</td><td>APK</td><td><span class="status pass">● PASS</span></td><td class="t-mono">11.6s</td><td class="t-mono">today 03:54</td><td class="t-mono">1</td><td class="rowactions">Open →</td></tr>
+          <tr><td class="runname">toolpacks-09-…</td><td>art + audio</td><td><span class="status pass">● PASS</span></td><td class="t-mono">45.6s</td><td class="t-mono">today 03:53</td><td class="t-mono">2</td><td class="rowactions">Open →</td></tr>
+          <tr><td class="runname">quality-09-…</td><td>checks</td><td><span class="status pass">● PASS</span></td><td class="t-mono">21.5s</td><td class="t-mono">today 03:52</td><td class="t-mono">0</td><td class="rowactions">Open →</td></tr>
+        </tbody></table>
+      </div>
+      <div class="bottomgrid">
+        <div class="runs"><div class="runs-h"><b>Recent artifacts</b><span>hashed · local</span><div class="run-filters" style="margin-left:auto"><span class="filter on">All</span><span class="filter">Images</span><span class="filter">Audio</span></div></div>
+          <div class="evidence-grid">
+            <div class="ev"><div class="thumb"><img src="../../artifacts/game/frame.png" alt=""></div><div class="n">frame.png</div><div class="s">1280×720 · 33 KB</div></div>
+            <div class="ev"><div class="thumb"><img src="../../artifacts/leftbehind/frame.png" alt=""></div><div class="n">leftbehind frame.png</div><div class="s">1280×720 · 28 KB</div></div>
+            <div class="ev"><div class="thumb">APK</div><div class="n">ProjectGypsy.apk</div><div class="s">28.3 MB · signed</div></div>
+            <div class="ev"><div class="thumb">WAV</div><div class="n">musicgen.wav</div><div class="s">3.94 s · seeded</div></div>
+          </div>
+        </div>
+        <div class="runs"><div class="runs-h"><b>Readiness checklist</b><span>6 checks</span></div><div class="checklist">
+          <div class="check"><span class="d"></span><span class="k">Workstream checks</span><span class="v">6/6 PASS</span></div>
+          <div class="check"><span class="d"></span><span class="k">Windows build and capture</span><span class="v">PASS</span></div>
+          <div class="check"><span class="d"></span><span class="k">Android debug package</span><span class="v">PASS</span></div>
+          <div class="check"><span class="d"></span><span class="k">Second engine · LeftBehind</span><span class="v">PASS</span></div>
+          <div class="check"><span class="d amber"></span><span class="k">Device launch</span><span class="v">UNTESTED</span></div>
+          <div class="check"><span class="d red"></span><span class="k">Phase 6 · UE5</span><span class="v">BLOCKED</span></div>
+        </div></div>
+      </div>
+    </main>
+    <aside class="right">
+      <div class="rpanel"><div class="rpanel-h"><b>Selected artifact</b><span class="right">LIVE HASH</span></div><div class="rpad"><div class="art"><img src="../../artifacts/game/frame.png" alt="Selected frame"></div><div class="kv"><div class="k">path</div><div class="v">artifacts/game/frame.png</div><div class="k">size</div><div class="v">33,187 B</div><div class="k">sha256</div><div class="v">89d0d329…5864d</div><div class="k">source</div><div class="v">phase1 · capture</div></div><div class="artfoot"><button class="btn small ghost">Open</button><button class="btn small">Copy hash</button></div></div></div>
+      <div class="rpanel"><div class="rpanel-h"><b>Gates</b><span class="right">PASS 3 · ATTENTION 1 · BLOCKED 1</span></div><div class="rpad">
+        <div class="gsep">Passing</div>
+        <div class="gates">
+          <div class="gate"><span class="d" style="background:var(--green)"></span><div class="g"><b>Windows build</b><p>109,127,680 B · phase1</p></div><span class="badge p">PASS</span></div>
+          <div class="gate"><span class="d" style="background:var(--green)"></span><div class="g"><b>Android package</b><p>signed arm64 debug APK</p></div><span class="badge p">PASS</span></div>
+          <div class="gate"><span class="d" style="background:var(--green)"></span><div class="g"><b>Second engine</b><p>LeftBehind Unity 6 build/demo/capture</p></div><span class="badge p">PASS</span></div>
+          <div class="gate"><span class="d" style="background:var(--green)"></span><div class="g"><b>Quality + records</b><p>6/6 checks · 181 tests</p></div><span class="badge p">PASS</span></div>
+        </div>
+        <div class="gsep">Needs attention</div><div class="gate"><span class="d" style="background:var(--amber)"></span><div class="g"><b>Device launch</b><p>No device or emulator has run the APK.</p></div><span class="badge u">UNTESTED</span></div>
+        <div class="gsep">Blocked</div><div class="gate"><span class="d" style="background:var(--red)"></span><div class="g"><b>Phase 6 · UE5</b><p>4 GB VRAM &lt; 8 GB minimum. Needs hardware or remote builder.</p></div><span class="badge b">BLOCKED</span></div>
+        <div style="margin-top:7px;font-size:8.5px;color:#627986;line-height:1.45">No approval queue. Gates are automated; evidence is the review surface.</div>
+      </div></div>
+    </aside>
+  </div>
+  <footer class="foot"><span>LOCAL ONLY</span><span>127.0.0.1:8765</span><span class="grow"></span><span>CLI source of truth</span><span class="cmd">python workstream/gypsy.py slices run --all</span><span>v0.22</span></footer>
+</div></body></html>

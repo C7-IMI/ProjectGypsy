@@ -280,5 +280,15 @@ Each entry has:
 
 ---
 
-Next prompt number: 28. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 28 - 2026-10-26
+
+- Request: Mock a more intuitive, user-friendly and robust dashboard.
+- Status: Completed — two redesign mockups plus rationale; not implemented.
+- Version: 2026.10.25.023
+- Commit/evidence: design/dashboard-v2/overview.png, run-detail.png, HTML/CSS source and README; 1600x1000 Chromium
+  renders; 181 tests/46 capabilities unchanged.
+
+---
+
+Next prompt number: 29. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

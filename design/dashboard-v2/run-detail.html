@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>ProjectGypsy — Run detail</title>
+<link rel="stylesheet" href="mockups.css"></head>
+<body><div class="app">
+  <header class="top">
+    <div class="brand"><span class="mark"></span><div><b>ProjectGypsy</b><small>operations console</small></div></div>
+    <div class="crumbs"><span>Runs</span><span class="slash">/</span><b>leftbehind</b><span class="pill"><span class="dot"></span>PASS</span><span class="pill">unity · 6.7f1</span></div>
+    <div class="search"><span>⌕</span><span>Search this run…</span><span class="key">Ctrl K</span></div>
+    <button class="btn ghost small">← Back to runs</button>
+    <button class="btn small">Open evidence</button>
+    <button class="btn primary">↻ Re-run</button>
+    <div class="avatar">SS</div>
+  </header>
+  <div class="body detail-body">
+    <aside class="steprail">
+      <div class="runmeta"><div class="k">Run</div><div class="v">leftbehind-20261026T0900</div><div style="height:6px"></div><div class="k">started / duration</div><div class="v">04:00:36 · 22.9 s</div><div style="height:6px"></div><div class="k">trigger</div><div class="v">manual · slices run leftbehind</div></div>
+      <div class="label" style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#546b79;margin:2px 2px 0">Steps</div>
+      <div class="steps">
+        <div class="step active"><div class="track"><span class="circle">✓</span><span class="line"></span></div><div class="sbody"><b>Build</b><div class="s">Unity batchmode · Windows player</div><div class="time">10.4 s · PASS</div></div></div>
+        <div class="step"><div class="track"><span class="circle">✓</span><span class="line"></span></div><div class="sbody"><b>Demo</b><div class="s">headless · three collectibles</div><div class="time">4.5 s · PASS</div></div></div>
+        <div class="step"><div class="track"><span class="circle">✓</span></div><div class="sbody"><b>Capture</b><div class="s">windowed · 1280×720</div><div class="time">7.6 s · PASS</div></div></div>
+      </div>
+      <div style="margin-top:auto;border-top:1px solid #1a2c36;padding-top:9px;font-size:8.5px;color:#5d7481;line-height:1.5">A failed step stops later steps. Retry only the failed step from the run inspector.</div>
+    </aside>
+    <main class="detailmain">
+      <div class="detailhead"><div><h1>LeftBehind Unity 6</h1><p>Second-engine proof · build, headless demo and rendered capture</p></div><div class="actions"><button class="btn small ghost">Copy command</button><button class="btn small">Retry step</button></div></div>
+      <div class="runsummary"><div class="sum"><div class="k">Status</div><div class="v" style="color:var(--green)">PASS</div><div class="s">exit 0</div></div><div class="sum"><div class="k">Marker</div><div class="v" style="font:9px var(--mono);padding-top:4px">GYPSY_DEMO_OK</div><div class="s">collected=3 frames=74</div></div><div class="sum"><div class="k">Artifacts</div><div class="v">4</div><div class="s">exe · logs · frame</div></div><div class="sum"><div class="k">Checks</div><div class="v" style="color:var(--green)">4/4</div><div class="s">all validators pass</div></div></div>
+      <div class="tabs"><b>Logs</b><span>Overview</span><span>Artifacts</span><span>Environment</span></div>
+      <div class="logbox"><div class="loghead"><span style="color:var(--green)">●</span> leftbehind · player.log <span class="right">LIVE CAPTURE · READ ONLY</span></div><div class="log"><span class="t">[04:00:36]</span> <span class="c">$ python workstream/gypsy.py toolpacks run leftbehind.unity</span>
+<span class="t">[04:00:36]</span> action build · unity.exe -batchmode -executeMethod BuildLeftBehind.Build
+<span class="t">[04:00:46]</span> <span class="o">PASS</span> build · LEFTBEHIND_BUILD Succeeded · exe 667,136 B
+<span class="t">[04:00:47]</span> action demo · LeftBehind.exe -batchmode -nographics --demo
+<span class="t">[04:00:50]</span> LEFTBEHIND_START demo=True crystals=3
+<span class="t">[04:00:51]</span> <span class="o">PASS</span> demo · GYPSY_DEMO_OK collected=3 frames=74 · exit 0
+<span class="t">[04:00:52]</span> action capture · LeftBehind.exe --demo --capture=…
+<span class="t">[04:00:59]</span> <span class="o">PASS</span> capture · frame.png 1280×720 · 27,596 B
+<span class="t">[04:01:00]</span> <span class="o">ALL VALIDATORS PASS</span> · exe, build log, demo marker, PNG
+<span class="t">[04:01:00]</span> state written · workstream/state/toolpacks/leftbehind.unity-…json</div></div>
+      <div class="recovery"><div class="recover"><b>If a step fails</b><p>Open the failed step, read the last 200 log lines, then retry only that step. Later steps are skipped, not silently passed.</p><button class="btn small ghost">Open failure playbook</button></div><div class="recover"><b>Reproduce locally</b><p>Every action shows its argv before running. Copy the command or run it from the terminal.</p><button class="btn small ghost">Copy build command</button></div></div>
+      <div class="runs validators"><div class="runs-h"><b>Validator evidence</b><span>4/4 PASS</span><div class="run-filters" style="margin-left:auto"><span class="filter on">This run</span></div></div>
+        <table><thead><tr><th>Check</th><th>Artifact</th><th>Result</th><th>Detail</th></tr></thead><tbody>
+          <tr><td class="runname">exe</td><td>Build/LeftBehind.exe</td><td><span class="status pass">● PASS</span></td><td class="t-mono">667,136 B</td></tr>
+          <tr><td class="runname">build-ok</td><td>build.log</td><td><span class="status pass">● PASS</span></td><td class="t-mono">LEFTBEHIND_BUILD Succeeded</td></tr>
+          <tr><td class="runname">demo-ok</td><td>player.log</td><td><span class="status pass">● PASS</span></td><td class="t-mono">collected=3 frames=74</td></tr>
+          <tr><td class="runname">frame</td><td>frame.png</td><td><span class="status pass">● PASS</span></td><td class="t-mono">1280×720</td></tr>
+        </tbody></table></div>
+    </main>
+    <aside class="detailright">
+      <div class="rpanel"><div class="rpanel-h"><b>Step artifacts</b><span class="right">HASHED</span></div><div class="rpad"><div class="art" style="height:112px"><img src="../../artifacts/leftbehind/frame.png" alt="LeftBehind frame"></div><div class="kv"><div class="k">frame</div><div class="v">1280×720 · 27,596 B</div><div class="k">sha256</div><div class="v">6da0cd85…04010d</div><div class="k">exe</div><div class="v">667,136 B</div><div class="k">log</div><div class="v">player.log · 2,247 B</div></div><div class="artfoot"><button class="btn small">Open frame</button><button class="btn small ghost">Copy hash</button></div></div></div>
+      <div class="rpanel"><div class="rpanel-h"><b>Step actions</b><span class="right">SAFE TO RETRY</span></div><div class="rpad" style="display:flex;flex-direction:column;gap:5px"><button class="btn small">Retry demo</button><button class="btn small ghost">Re-run full slice</button><button class="btn small ghost">Copy demo command</button><div style="font-size:8.5px;color:#627986;line-height:1.45;margin-top:3px">Actions are whitelisted. Re-running writes a new state record; it never edits the old one.</div></div></div>
+      <div class="rpanel"><div class="rpanel-h"><b>Diagnostics</b><span class="right">PASS</span></div><div class="rpad" style="font-size:8.5px;color:#758c98;line-height:1.55"><div style="display:flex;justify-content:space-between"><span>Unity</span><span class="t-mono">6000.6.7f1</span></div><div style="display:flex;justify-content:space-between;margin-top:4px"><span>Licence</span><span style="color:var(--green)">proven</span></div><div style="display:flex;justify-content:space-between;margin-top:4px"><span>Visual capture</span><span style="color:var(--green)">visible window</span></div><div style="display:flex;justify-content:space-between;margin-top:4px"><span>Device launch</span><span style="color:var(--amber)">untested</span></div></div></div>
+    </aside>
+  </div>
+  <footer class="foot"><span>RUN DETAIL</span><span class="grow"></span><span>Evidence is immutable; a retry creates a new run.</span><span class="cmd">python workstream/gypsy.py slices run leftbehind</span><span>v0.22</span></footer>
+</div></body></html>

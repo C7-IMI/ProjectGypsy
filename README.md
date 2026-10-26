@@ -25,6 +25,7 @@ A game. Phase 1 is a playable **Godot 4.7.2 PC** slice; the interface standard a
 - [`TOOL-INVENTORY.md`](TOOL-INVENTORY.md) — full installed-tool inventory, open-source replacements, hardware limits.
 - [`design/control-panel/README.md`](design/control-panel/README.md) — four control-panel directions; the implemented local GUI is [docs/DASHBOARD.md](docs/DASHBOARD.md).
 - [`docs/DASHBOARD.md`](docs/DASHBOARD.md) — launch and use the local dark dashboard.
+- [`design/dashboard-v2/README.md`](design/dashboard-v2/README.md) — operations-console redesign mockups (proposal; not implemented).
 
 ## Status
 

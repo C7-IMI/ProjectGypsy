@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.25.022
+Current version: 2026.10.25.023
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,17 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.25.023
+
+**Dashboard redesign mockups: operations console with run detail.**
+
+- Date: 2026-10-26
+- Commit: this change.
+- Change: design/dashboard-v2/ with overview.html/png and run-detail.html/png, shared mockups.css and README rationale;
+  next-action overview, pipeline strip, runs table, recent artifacts, grouped gates, and a run-detail view with step
+  timeline, logs, validator evidence and retry/copy controls; root README link. Mockups only; current app unchanged.
+- Verification: both 1600x1000 PNGs rendered in Chromium; check_all links/encoding; 181 tests/46 capabilities unchanged.
 
 ## 2026.10.25.022
 
