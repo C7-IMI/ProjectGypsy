@@ -7,11 +7,11 @@ A game. Phase 1 is a playable **Godot 4.7.2 PC** slice; the interface standard a
 
 - [`AGENTS.md`](AGENTS.md) — read first; entry point for any model working here.
 - [`TOOLCHAIN.md`](TOOLCHAIN.md) — installed engines, art/audio/build tools, paths and the PATH loader.
-- [`docs/README.md`](docs/README.md) — all ten ADRs (engines, art pipeline, workstream architecture, generative
-  media, character/animation automation, Blender import matrix, language boundaries, MCP/local tools, vertical slice,
-  slice orchestrator) and the generated evidence.
-- [`workstream/README.md`](workstream/README.md) — the Phase-0-2 CLI: engine registry, hardware gates, manifests,
-  checks, Godot smoke/slice commands, and the phase-2 slices orchestrator.
+- [`docs/README.md`](docs/README.md) — all thirteen ADRs (001-013: engines, art pipeline, workstream architecture, generative media, character/animation,
+  Blender import, language boundaries, MCP/local tools, vertical slice, orchestrator, toolpacks, console, Phase-5) and
+  the generated evidence.
+- [`workstream/README.md`](workstream/README.md) — the Phase-0-5 CLI: engine registry, hardware gates, manifests,
+  checks, Godot slice, slices/orchestrator, toolpacks, console, live watcher and performance bench.
 
 ## Rules and decisions
 

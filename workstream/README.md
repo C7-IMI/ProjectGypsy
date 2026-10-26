@@ -1,8 +1,8 @@
-# Workstream (Phase 0-2)
+# Workstream (Phase 0-5)
 
 The studio harness described in [docs/ADR-003-workstream-architecture.md](../docs/ADR-003-workstream-architecture.md):
-engine/tool detection, manifests and checks (Phase 0), a playable Godot slice (Phase 1), and a manifest-driven slice
-orchestrator with state and artifact hashes (Phase 2).
+engine/tool detection, manifests and checks (Phase 0), a playable Godot slice (Phase 1), a manifest-driven orchestrator
+(Phase 2), toolpacks (Phase 3), a read-only console (Phase 4), and live/performance/mobile gates (Phase 5).
 
 ## Commands
 
@@ -46,6 +46,6 @@ python -m unittest discover -s workstream/tests -v
 
 ## What is not built yet
 
-Engine adapters beyond Godot, console/TUI, live editing and self-extension. Those are registered as deferred work
-(DEFERRED.md) rather than claimed. See
+Engine adapters beyond Godot (Unity licence/UE5 VRAM/Flax headless are blocked), true hot reload, self-extension
+and a tested Android device launch. Those are registered as deferred work (DEFERRED.md) rather than claimed. See
 [docs/ADR-003-workstream-architecture.md](../docs/ADR-003-workstream-architecture.md) for the phase plan.

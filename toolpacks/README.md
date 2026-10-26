@@ -18,8 +18,8 @@ A toolpack step can also be declared in a slice:
 
 | Manifest | Action | Artifacts | Validators |
 | --- | --- | --- | --- |
-| art.import.golden.json | python scripts/import_matrix.py | workstream/state/import-matrix.json, docs/IMPORT-MATRIX.md | Godot status pass, rigged character animations >= 3, LOD meshes >= 4, doc contains 4.7.2 |
-| audio.musicgen.json | tools/musicgen/musicgen.ps1 | artifacts/toolpacks/musicgen.wav | 16-bit PCM WAV, >= 3 s, RMS >= 0.01 |
+| art.import.golden.json | python scripts/import_matrix.py --no-doc | workstream/state/import-matrix.json | Godot status pass, rigged character animations >= 3, LOD meshes >= 4 |
+| audio.musicgen.json | tools/musicgen/musicgen.ps1 --seed 1234 | artifacts/toolpacks/musicgen.wav | 16-bit PCM WAV, >= 3 s, RMS >= 0.01; seeded runs are byte-identical |
 | mobile.android.json | powershell scripts/build_android.ps1 | build/ProjectGypsy.apk | file >= 20 MB; script asserts package/ABI/signature |
 
 The art pack regenerates the Blender golden kit, round-trips GLB/FBX, validates glTF and imports

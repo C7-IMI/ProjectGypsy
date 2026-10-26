@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.25.015
+Current version: 2026.10.25.016
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,20 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.25.016
+
+**Phase-3/5 audit fixes: deterministic audio, read-only import toolpack, status counts.**
+
+- Date: 2026-10-26
+- Commit: this change.
+- Change: MusicGen wrapper accepts -Seed and audio.musicgen uses Seed 1234 (two runs byte-identical); import_matrix
+  accepts --no-doc and art.import.golden uses it, so the art toolpack (and slices run --all) no longer rewrites tracked
+  docs/IMPORT-MATRIX.md; removed the doc-text validator; corrected ADR/PHASE-3/PHASE-5/toolpacks/slices/README/workstream
+  status, ADR counts and APK-hash reproducibility note; AGENTS status remains Phase 0-5.
+- Verification: art toolpack PASS with doc unchanged; seeded audio twice identical SHA-256
+  fe1f4038c69fc3abf452c683f796f0df1db78bf85a06e632514273e72d460533, RMS 0.2018; 172 tests; scripts/check_all.py 6/6;
+  42 capabilities.
 
 ## 2026.10.25.015
 

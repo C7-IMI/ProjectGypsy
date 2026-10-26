@@ -14,16 +14,16 @@
       "id": "import",
       "argv": [
         "python",
-        "scripts/import_matrix.py"
+        "scripts/import_matrix.py",
+        "--no-doc"
       ],
       "cwd": ".",
       "timeout": 900,
       "artifacts": [
-        "workstream/state/import-matrix.json",
-        "docs/IMPORT-MATRIX.md"
+        "workstream/state/import-matrix.json"
       ],
       "args": {
-        "note": "regenerates the golden kit, round-trips GLB/FBX, validates glTF and imports into Godot"
+        "note": "regenerates the golden kit, round-trips GLB/FBX, validates glTF and imports into Godot; --no-doc keeps tracked docs untouched"
       }
     }
   ],
@@ -46,12 +46,6 @@
           "gte": 4
         }
       ]
-    },
-    {
-      "id": "matrix-doc",
-      "kind": "text",
-      "artifact": "docs/IMPORT-MATRIX.md",
-      "contains": "4.7.2"
     }
   ]
 }

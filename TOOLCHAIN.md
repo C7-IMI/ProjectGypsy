@@ -114,7 +114,7 @@ python workstream/gypsy.py game build     # exports build/ProjectGypsy.exe (109,
 python workstream/gypsy.py game capture   # windowed movie -> artifacts/game/demo.mp4 + frame.png
 python workstream/gypsy.py game verify    # demo + build + exported-binary demo + capture
 python workstream/gypsy.py slices list|plan   # slice manifests and dependency order
-python workstream/gypsy.py slices run --all   # phase1 + quality + toolpacks, one report
+python workstream/gypsy.py slices run --all   # phase1 + quality + toolpacks + mobile, one report
 python workstream/gypsy.py slices status      # latest task state
 python workstream/gypsy.py toolpacks list|check
 python workstream/gypsy.py toolpacks run art.import.golden   # Blender->Godot import + validators

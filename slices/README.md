@@ -15,9 +15,10 @@ Godot; the CLI surface in ADR-010 is a thin wrapper on top of their functions.
 | [toolpacks.json](toolpacks.json) | toolpacks (project: repository root) | art import -> audio | toolpack state ledgers under workstream/state/toolpacks (gitignored) |
 | [mobile.json](mobile.json) | mobile (project: repository root) | Android APK toolpack | build/ProjectGypsy.apk |
 
-The two slices are independent manifests: phase1 proves the game vertical slice again from a clean state; quality
-proves the pack check list, the workstream unit tests and the records guard. A task runs them in manifest order and
-stops at the first failing slice; quality does not require Godot, only Python and git.
+The four slices are independent manifests: phase1 proves the game vertical slice again from a clean state; quality
+proves the pack check list, the workstream unit tests and the records guard; toolpacks proves golden import + audio;
+mobile builds the Android APK. A task runs them in manifest order and stops at the first failing slice; quality does
+not require Godot, only Python and git.
 
 ## Schema: gypsy.slice/v1
 

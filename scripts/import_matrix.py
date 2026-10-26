@@ -311,6 +311,7 @@ def main() -> int:
     parser.add_argument("--blender", default=os.environ.get("GYPSY_BLENDER", DEFAULT_BLENDER))
     parser.add_argument("--json", default=str(REPO / "workstream" / "state" / "import-matrix.json"))
     parser.add_argument("--report", default=str(REPO / "docs" / "IMPORT-MATRIX.md"))
+    parser.add_argument("--no-doc", action="store_true", help="write only the JSON state; leave the tracked report untouched")
     args = parser.parse_args()
 
     report = {"generated": datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds"), "script": "scripts/import_matrix.py"}
@@ -354,9 +355,10 @@ def main() -> int:
     json_path.parent.mkdir(parents=True, exist_ok=True)
     with open(json_path, "w", encoding="utf-8", newline="\n") as handle:
         handle.write(json.dumps(report, indent=2) + "\n")
-    report_path = Path(args.report)
-    with open(report_path, "w", encoding="utf-8", newline="\n") as handle:
-        handle.write(markdown(report))
+    report_path = None if args.no_doc else Path(args.report)
+    if report_path is not None:
+        with open(report_path, "w", encoding="utf-8", newline="\n") as handle:
+            handle.write(markdown(report))
     failures = []
     if not all(asset.get("roundtrip", {}).get("glb", {}).get("status") == "pass" and asset.get("roundtrip", {}).get("fbx", {}).get("status") == "pass" for asset in golden.get("assets", [])):
         failures.append("Blender round-trip failed")
@@ -365,7 +367,8 @@ def main() -> int:
     if report["godot"].get("status") != "pass":
         failures.append("Godot import failed: " + "; ".join(report["godot"].get("failures", []) or [report["godot"].get("error", "?")]))
     print("IMPORT_MATRIX " + ("PASS" if not failures else "FAIL") + " godot=" + str(report["godot"].get("status")))
-    print("report: " + str(report_path))
+    if report_path is not None:
+        print("report: " + str(report_path))
     for failure in failures:
         print("FAIL " + failure, file=sys.stderr)
     return 0 if not failures else 1

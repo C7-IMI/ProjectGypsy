@@ -7,23 +7,22 @@ workstream/state/toolpacks/ (gitignored); this file and the manifests are the co
 
 | Gate | Result |
 | --- | --- |
-| Toolpack manifests | PASS — toolpacks check: 2 valid (art.import.golden, audio.musicgen) |
-| Art/import action | PASS — Blender golden kit -> glTF validation -> Godot 4.7.2 import, 10.045 s in the slice |
+| Toolpack manifests | PASS — toolpacks check: 3 valid at current tree (art.import.golden, audio.musicgen, mobile.android) |
+| Art/import action | PASS — Blender golden kit -> glTF validation -> Godot 4.7.2 import, 9.7 s with --no-doc |
 | Art JSON validators | PASS — godot.status=pass; rigged_character.animations=3 (>=3); lod_set.meshes=4 (>=4) |
-| Art text validator | PASS after a real fail-closed catch: an initial "Godot 4.7.2" string did not exist as a contiguous string; validator failed, the check was corrected to "4.7.2", rerun passed |
-| Audio action | PASS — local MusicGen 3.94 s clip, 252,204 bytes, 32 kHz mono PCM; RMS 0.034003 (min 0.01) |
+| Tracked docs | PASS — art toolpack uses --no-doc, so slices run --all does not rewrite tracked docs/IMPORT-MATRIX.md |
+| Audio action | PASS — local MusicGen 3.94 s clip, 252,204 bytes, 32 kHz mono PCM; seeded (Seed 1234) RMS 0.2018 (min 0.01); two seeded runs produced identical SHA-256 |
 | Toolpack slice | PASS — slices run toolpacks: 2/2 steps, 45.233 s, one state/ledger path |
 | Provenance | PASS — run id, manifest SHA-256, argv, exit, timings, tools, licence, artifact hashes, validator results |
-| Tests | PASS — 98 tests OK (44 new toolpack tests); no Godot/network needed by the tests |
-| Capabilities | PASS — 38 capability manifests parse |
+| Tests | PASS — 98 tests at Phase-3 close (44 new toolpack tests); current full suite 172 |
+| Capabilities | PASS — 42 capability manifests at current tree |
 
 ## Artifact hashes (from the slice run toolpacks-20261026T064400Z-0ab7ee)
 
 | Artifact | Bytes | SHA-256 |
 | --- | --- | --- |
-| workstream/state/import-matrix.json | 48,274 | 024b2da2807fe5f423dcebbaca3b11af7017183263dd5d4d317b5ef260094e54 |
-| docs/IMPORT-MATRIX.md | 3,721 | 9098d5ac68bf2a35a6516554f1ff8f8bd4b43d868c0dba4d96bf32e1ec3b533b |
-| artifacts/toolpacks/musicgen.wav | 252,204 | ae55d84aa8a3e361d2605e439bee914d5fc03b0e82de69f0899be87d32acab29 |
+| workstream/state/import-matrix.json | 48,274 | b4d7cbebf4d1463f58615004047900e8416b54809585003825c9fcbf953493f0 |
+| artifacts/toolpacks/musicgen.wav | 252,204 | fe1f4038c69fc3abf452c683f796f0df1db78bf85a06e632514273e72d460533 |
 
 The toolpack state files also carry per-validator details (JSON check count, WAV seconds/channels/framerate/frames/RMS)
 and the declared licence and tools.
@@ -49,8 +48,8 @@ and the declared licence and tools.
 
 - This proves structure/import/provenance, not art quality. The golden kit is test geometry; MusicGen is
   CC-BY-NC 4.0 prototype audio.
-- The art action regenerates the tracked docs/IMPORT-MATRIX.md (timestamp/hash); that is expected evidence, not a
-  hand edit.
+- The art action now writes only the JSON state (--no-doc); tracked docs/IMPORT-MATRIX.md is left untouched by the
+toolpack and by slices run --all.
 - There is no ComfyUI toolpack yet: a ComfyUI server has a start/stop lifecycle and is already exercised directly in
   ADR-008. A future pack can own that lifecycle explicitly.
 - No retries, no model call, no arbitrary shell; state is local and gitignored.

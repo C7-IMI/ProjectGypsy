@@ -26,7 +26,7 @@ not evidence. The result needs declared artifacts, a machine check and a durable
    clips, timing, artifact SHA-256/bytes, validator results, declared tools/licence, run id and manifest SHA-256.
 5. **Two real packs prove the gate:**
    - art.import.golden — regenerates the Blender golden kit, round-trips GLB/FBX, validates glTF and imports into
-     Godot; validators assert Godot status pass, rigged character animations >= 3 and LOD meshes >= 4.
+     Godot with --no-doc; validators assert Godot status pass, rigged character animations >= 3 and LOD meshes >= 4.
    - audio.musicgen — local MusicGen-small 4 s menu clip; validator asserts 16-bit PCM, >= 3 s and RMS >= 0.01.
 6. **Toolpacks are orchestrator steps.** The toolpack step kind runs a pack/action; slices/toolpacks.json chains the
    art import then audio generation.

@@ -23,7 +23,9 @@
         "-Seconds",
         "4",
         "-Out",
-        "artifacts/toolpacks/musicgen.wav"
+        "artifacts/toolpacks/musicgen.wav",
+        "-Seed",
+        "1234"
       ],
       "cwd": ".",
       "timeout": 240,
@@ -31,7 +33,7 @@
         "artifacts/toolpacks/musicgen.wav"
       ],
       "args": {
-        "note": "local GPU generation; fp16 NaN guard falls back to float32"
+        "note": "local GPU generation with fixed seed; fp16 NaN guard falls back to float32"
       }
     }
   ],

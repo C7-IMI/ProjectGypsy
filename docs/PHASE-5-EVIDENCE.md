@@ -6,7 +6,7 @@ Recorded 2026-10-26. Phase-5 proof for [ADR-013](ADR-013-phase5-mobile-live-perf
 
 | Gate | Result |
 | --- | --- |
-| Android APK export | PASS — build/ProjectGypsy.apk, 28,305,095 bytes, SHA-256 f48e40d936cdba73434198e63e067b27f737b9bf0e64b18a3095d8f2b2f822fd |
+| Android APK export | PASS — build/ProjectGypsy.apk, 28,305,095 bytes, SHA-256 f48e40d936cdba73434198e63e067b27f737b9bf0e64b18a3095d8f2b2f822fd (this build; debug APK bytes are build-instance/timestamp specific, package/cert stable) |
 | APK package | PASS — com.c7imi.projectgypsy, versionName 0.1.0, native-code arm64-v8a |
 | APK signature | PASS — CN=Android Debug, cert SHA-256 140c76ffd9cedc7192a80967a1cd47b93b082c9638a1f590f8539fddc559d581 |
 | On-device launch | NOT TESTED — no Android device/emulator used; not claimed |

@@ -211,5 +211,15 @@ Each entry has:
 
 ---
 
-Next prompt number: 21. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 21 - 2026-10-26
+
+- Request: Audit Phases 3-5 and fix the findings.
+- Status: Completed.
+- Version: 2026.10.25.016
+- Commit/evidence: seeded MusicGen (identical SHA-256 across two runs), --no-doc art import (tracked docs unchanged),
+  status/count/APK reproducibility corrections; 172 tests; check_all 6/6; 42 capabilities.
+
+---
+
+Next prompt number: 22. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).
