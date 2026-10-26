@@ -1,0 +1,58 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "audio.musicgen.generate",
+  "layer": "audio",
+  "tool": "musicgen",
+  "kind": "generate",
+  "maturity": "partial",
+  "description": "Local MusicGen-small generation for prototyping. Non-commercial model licence: outputs are blocked from shipping until licence review.",
+  "requires": [
+    "musicgen.installed",
+    "gpu.vram>=4"
+  ],
+  "inputs": [
+    {
+      "name": "prompt",
+      "type": "string"
+    },
+    {
+      "name": "seconds",
+      "type": "number"
+    },
+    {
+      "name": "seed",
+      "type": "number"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "wav",
+      "type": "file"
+    },
+    {
+      "name": "metadata",
+      "type": "file"
+    }
+  ],
+  "checks": [
+    "wav duration within tolerance",
+    "non-silent RMS",
+    "metadata sidecar complete",
+    "licence note present"
+  ],
+  "provenance": {
+    "record": [
+      "model",
+      "prompt",
+      "seed",
+      "device",
+      "torchVersion",
+      "modelLicense",
+      "artefactHash"
+    ]
+  },
+  "notes": [
+    "CC-BY-NC 4.0 model: prototype only, not for commercial shipping without licence review.",
+    "Installed 2026-10-25 in a Python 3.10 venv (torch 2.11.0+cu128, transformers 5.20.2). Measured: 6 s clip at 32 kHz in 35.5 s on the T600; float16 produced NaNs and the generator detected the silence and retried float32."
+  ]
+}

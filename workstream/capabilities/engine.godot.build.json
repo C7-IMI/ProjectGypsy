@@ -1,0 +1,42 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "engine.godot.build",
+  "layer": "engine",
+  "engine": "godot",
+  "kind": "build",
+  "maturity": "stable",
+  "description": "Headless Godot export/build for a pinned target; requires the matching export templates to be installed.",
+  "requires": [
+    "godot.installed",
+    "godot.export_templates"
+  ],
+  "inputs": [
+    {
+      "name": "project",
+      "type": "path"
+    },
+    {
+      "name": "preset",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "build",
+      "type": "directory"
+    }
+  ],
+  "checks": [
+    "export process exits 0",
+    "output artefact exists",
+    "export template version matches engine version"
+  ],
+  "provenance": {
+    "record": [
+      "engine.version",
+      "preset",
+      "command",
+      "artefactHash"
+    ]
+  }
+}

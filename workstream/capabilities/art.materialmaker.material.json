@@ -1,0 +1,45 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "art.materialmaker.material",
+  "layer": "art",
+  "tool": "material_maker",
+  "kind": "material",
+  "maturity": "partial",
+  "description": "Procedural PBR material authoring in Material Maker; export maps and record the parameter set. GUI-first tool, so automation is partial.",
+  "requires": [
+    "material_maker.installed"
+  ],
+  "inputs": [
+    {
+      "name": "graph",
+      "type": "path"
+    },
+    {
+      "name": "resolution",
+      "type": "number"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "channels",
+      "type": "directory"
+    },
+    {
+      "name": "descriptor",
+      "type": "file"
+    }
+  ],
+  "checks": [
+    "declared channels exist",
+    "albedo/normal/roughness/metallic present",
+    "resolution matches"
+  ],
+  "provenance": {
+    "record": [
+      "material_maker.version",
+      "graphHash",
+      "parameters",
+      "artefactHash"
+    ]
+  }
+}

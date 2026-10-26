@@ -1,0 +1,47 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "engine.unity.build",
+  "layer": "engine",
+  "engine": "unity",
+  "kind": "build",
+  "maturity": "partial",
+  "description": "Unity batchmode build. Gated on a proven licence; activation is not automated.",
+  "requires": [
+    "unity.installed",
+    "unity.licence"
+  ],
+  "inputs": [
+    {
+      "name": "project",
+      "type": "path"
+    },
+    {
+      "name": "target",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "build",
+      "type": "directory"
+    },
+    {
+      "name": "log",
+      "type": "file"
+    }
+  ],
+  "checks": [
+    "batchmode exits 0",
+    "licence was proven before the run",
+    "output exists"
+  ],
+  "provenance": {
+    "record": [
+      "engine.version",
+      "target",
+      "command",
+      "exitCode",
+      "logHash"
+    ]
+  }
+}

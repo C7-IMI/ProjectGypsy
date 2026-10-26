@@ -1,0 +1,41 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "audio.audacity.edit",
+  "layer": "audio",
+  "tool": "audacity",
+  "kind": "edit",
+  "maturity": "partial",
+  "description": "Human-in-the-loop audio editing in Audacity; batch processing via FFmpeg where deterministic.",
+  "requires": [
+    "audacity.installed"
+  ],
+  "inputs": [
+    {
+      "name": "audio",
+      "type": "path"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "audio",
+      "type": "path"
+    },
+    {
+      "name": "loudnessReport",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "human edit steps recorded",
+    "loudness/peak checked",
+    "source preserved"
+  ],
+  "provenance": {
+    "record": [
+      "audacity.version",
+      "humanSteps",
+      "parameters",
+      "artefactHash"
+    ]
+  }
+}

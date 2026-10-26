@@ -1,0 +1,46 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "media.ffmpeg.capture",
+  "layer": "media",
+  "tool": "ffmpeg",
+  "kind": "capture",
+  "maturity": "stable",
+  "description": "Capture/encode playtest evidence with FFmpeg/OBS: video, frames, GIFs and contact sheets for review.",
+  "requires": [
+    "ffmpeg.installed"
+  ],
+  "inputs": [
+    {
+      "name": "source",
+      "type": "string"
+    },
+    {
+      "name": "seconds",
+      "type": "number"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "video",
+      "type": "file"
+    },
+    {
+      "name": "frames",
+      "type": "directory"
+    }
+  ],
+  "checks": [
+    "duration within tolerance",
+    "frame count matches",
+    "streams are playable",
+    "no dropped-frame spike"
+  ],
+  "provenance": {
+    "record": [
+      "ffmpeg.version",
+      "command",
+      "sourceHash",
+      "artefactHash"
+    ]
+  }
+}

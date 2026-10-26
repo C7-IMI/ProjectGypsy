@@ -1,0 +1,47 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "art.blender.export",
+  "layer": "art",
+  "tool": "blender",
+  "kind": "export",
+  "maturity": "stable",
+  "description": "Headless Blender export: .blend source to glTF/GLB or FBX plus a JSON descriptor; no hand-editing of derived files.",
+  "requires": [
+    "blender.installed"
+  ],
+  "inputs": [
+    {
+      "name": "blend",
+      "type": "path"
+    },
+    {
+      "name": "format",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "mesh",
+      "type": "file"
+    },
+    {
+      "name": "descriptor",
+      "type": "file"
+    }
+  ],
+  "checks": [
+    "blender --background exits 0",
+    "glTF validates",
+    "units/pivots/scale match the descriptor",
+    "material names stable"
+  ],
+  "provenance": {
+    "record": [
+      "blender.version",
+      "blendHash",
+      "format",
+      "exportSettings",
+      "artefactHash"
+    ]
+  }
+}

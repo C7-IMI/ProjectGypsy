@@ -1,0 +1,46 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "engine.godot.capture",
+  "layer": "engine",
+  "engine": "godot",
+  "kind": "capture",
+  "maturity": "partial",
+  "description": "Capture rendered evidence from a windowed run or Godot movie-maker mode. Headless mode cannot render, so this is not a headless capability.",
+  "requires": [
+    "godot.installed",
+    "display"
+  ],
+  "inputs": [
+    {
+      "name": "project",
+      "type": "path"
+    },
+    {
+      "name": "seconds",
+      "type": "number"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "frames",
+      "type": "directory"
+    },
+    {
+      "name": "video",
+      "type": "file"
+    }
+  ],
+  "checks": [
+    "capture contains N frames",
+    "frame dimensions match the target",
+    "no blank frames"
+  ],
+  "provenance": {
+    "record": [
+      "engine.version",
+      "captureMode",
+      "frameCount",
+      "artefactHash"
+    ]
+  }
+}

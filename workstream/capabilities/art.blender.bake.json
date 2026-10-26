@@ -1,0 +1,48 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "art.blender.bake",
+  "layer": "art",
+  "tool": "blender",
+  "kind": "bake",
+  "maturity": "partial",
+  "description": "Bake procedural/height material into normal, AO, roughness and position maps; 4 GB VRAM caps resolution.",
+  "requires": [
+    "blender.installed",
+    "gpu.vram>=2"
+  ],
+  "inputs": [
+    {
+      "name": "blend",
+      "type": "path"
+    },
+    {
+      "name": "resolution",
+      "type": "number"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "channels",
+      "type": "directory"
+    },
+    {
+      "name": "descriptor",
+      "type": "file"
+    }
+  ],
+  "checks": [
+    "all declared channels exist",
+    "resolution matches",
+    "linear/sRGB flags match the descriptor",
+    "no NaN pixels"
+  ],
+  "provenance": {
+    "record": [
+      "blender.version",
+      "seed",
+      "resolution",
+      "bakeSettings",
+      "artefactHash"
+    ]
+  }
+}

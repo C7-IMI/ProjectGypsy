@@ -1,0 +1,51 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "engine.ue5.build",
+  "layer": "engine",
+  "engine": "ue5",
+  "kind": "build",
+  "maturity": "blocked",
+  "description": "UE5 build/cook via UnrealEditor-Cmd/AutomationTool. Blocked on this machine by the hardware gate (4 GB VRAM, 52.6 GB free on D) and not yet implemented.",
+  "requires": [
+    "ue5.installed",
+    "gpu.vram>=8",
+    "disk.free>=60"
+  ],
+  "inputs": [
+    {
+      "name": "uproject",
+      "type": "path"
+    },
+    {
+      "name": "target",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "build",
+      "type": "directory"
+    },
+    {
+      "name": "log",
+      "type": "file"
+    }
+  ],
+  "checks": [
+    "hardware gate passes",
+    "AutomationTool exits 0",
+    "cooked content exists"
+  ],
+  "provenance": {
+    "record": [
+      "engine.version",
+      "target",
+      "command",
+      "exitCode"
+    ]
+  },
+  "notes": [
+    "Refuse while the gate fails; do not fake a build.",
+    "UE 5.4 registry entry is stale and ignored."
+  ]
+}

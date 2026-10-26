@@ -123,8 +123,10 @@ records infrastructure. That state is why most of the pack is conduct rather tha
   permissions, sweeps and secrets; §2.17–§2.19 reproducibility, evidence and budget; §2.20 scale-and-move; §2.22–§2.30
   operations (when a build exists); §2.31 itself; §2.32 text and encoding; §2.33/§2.34 peer separation and context
   limits; Part 10 (operator's rules); Part 12; and Part 11 in this copy.
-- **Mechanised today:** nothing. There is no script that enforces a pack rule; the only enforcement is the report
-  discipline in Part 11.2 and the review of the change that added this file.
+- **Mechanised today (Phase 0):** the workstream's own checks — `python -m unittest discover -s workstream/tests`
+  (13 tests) and `python workstream/gypsy.py check` (capability schemas, tool paths, engine/project manifests, hardware
+  gate) — plus the manifest files themselves. These are not the pack-wide check list (§2.22/§2.23) and they do not
+  guard records: PG-D1 and PG-D2 remain open. The report discipline in Part 11.2 is still the main enforcement.
 - **Parked — not in force:** every interface design and redesign rule, plus the browser-verification rule. The full
   list is in the addendum and in the table above. They are not to be applied, quoted as requirements, or partially
   restored without the recorded decision the addendum asks for.
@@ -135,7 +137,8 @@ records infrastructure. That state is why most of the pack is conduct rather tha
 
 ## §8.2 — the inventory of check kinds, filled or declined
 
-No check exists yet. The table names the first ones the build should produce; the pack's §9 list is the full menu.
+The pack-wide check list is not built (PG-D2). Phase 0 has the workstream checks above; the table below names the pack
+checks the first game build should produce, and the pack's §9 list is the full menu.
 
 | Check kind | Status | What compares / why not |
 | --- | --- | --- |
@@ -152,13 +155,18 @@ No check exists yet. The table names the first ones the build should produce; th
 
 ## How the pack is enforced here
 
-There is no enforcement mechanism yet — no `scripts/checks.mjs`, no hook, no CI. What exists is the discipline:
-Part 11.2 (verify before reporting), §2.28 (the register), and honest reporting of what is not built. The first code
-creates the one check list and both callers (§2.22–§2.23) together, not one at a time.
+There is no pack-wide enforcement yet — no `scripts/checks.mjs`, no hook, no CI. Phase 0 does have the workstream's
+own checks:
 
 ```text
-git status                     # the only "check" this repository currently has
+git status
+python -m unittest discover -s workstream/tests -v
+python workstream/gypsy.py check
 ```
+
+They validate the workstream's manifests, tool paths, engine detection and hardware gates; they do not enforce §2.1
+records or the pack's check list. The first game build creates the one pack check list and both callers (§2.22–§2.23)
+together, not one at a time.
 
 ## How this application of the pack was verified
 

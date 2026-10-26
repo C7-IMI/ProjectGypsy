@@ -54,12 +54,13 @@ Python libraries installed into `C:\Python\python.exe`: `scipy`, `trimesh`, `pyg
 | GIMP | 3.2.6 | raster fallback and format bridge |
 | Godot | 4.7.2 | engine — headless build/run (best agent loop) |
 | Unity | 6000.6.7f1 | engine — mobile strength; batchmode needs licence check |
-| Unreal Engine | 5.8 (5.4 registry entry is stale) | engine — limited by 4 GB VRAM and free disk |
+| Unreal Engine | 5.8.4 (5.4 registry entry is stale) | engine — limited by 4 GB VRAM and free disk |
 | Flax | 1.13 | engine — experimental |
 | OBS Studio | 32.2.2 | playtest/demo capture |
 | ScreenToGif / Greenshot | 2.43.2 / 1.3.328 | bug clips and screenshots |
 | Kdenlive / Shotcut / OpenShot / HandBrake | current | trailer and capture processing |
 | LMMS | 1.2.2 | music/SFX production |
+| MusicGen-small (venv) | torch 2.11.0+cu128 / transformers 5.20.2 | local prototype music generation; **CC-BY-NC weights, non-commercial** (ADR-004) |
 | Ollama / LM Studio | 0.40.11 / current | local LLMs (small models practical on 4 GB VRAM) |
 | Docker Desktop, VirtualBox, WSL | current | tool isolation / build sandboxes |
 | Git + Git LFS, GitHub CLI/Desktop | current | version control, binary assets |
@@ -84,6 +85,7 @@ Python libraries installed into `C:\Python\python.exe`: `scipy`, `trimesh`, `pyg
 | Audacity / Reaper | **Audacity** (installed); **Ardour** is the open-source DAW alternative if needed | installed |
 | FMOD / Wwise | Godot audio; **SoLoud** (zlib) as an embeddable engine | not installed — middleware needs accounts/licences; decide when audio integration starts |
 | YuE2 (music generation) | **cannot run on this hardware** — see below | blocked |
+| MusicGen-small | **installed** as the local prototype fallback; CC-BY-NC weights, non-commercial | installed (prototype only) |
 | Local image generation (SD/ComfyUI) | ComfyUI (MIT) is the open-source route, but 4 GB VRAM is the limit | not installed; cloud generation + provenance is the practical path now |
 
 ## Blocked by hardware: YuE2
@@ -93,15 +95,28 @@ and an NVIDIA GPU with BF16 support and 24 GB VRAM**, producing 48 kHz stereo au
 4 GB T600 (no BF16 class of Ampere+ support), so a local install would be a multi-gigabyte download that cannot run.
 
 Practical routes, in order: (1) the free hosted demo the project links; (2) the official ComfyUI YuE2 workflow on a
-cloud GPU with 24 GB+; (3) a rented GPU instance (RunPod/Lambda/AWS) with the repository's `examples/generate.py`;
-(4) a smaller local model such as MusicGen-small for prototyping, with clearly lower quality. Downloading YuE2 weights
-(7B stage + 1.5B stage + vocoder) is only worth doing once one of those paths exists.
+cloud GPU with 24 GB+; (3) a rented GPU instance (RunPod/Lambda/AWS) with the repository's `examples/generate.py`.
+Downloading YuE2 weights (7B stage + 1.5B stage + vocoder) is only worth doing once one of those paths exists.
+
+**Local fallback installed:** MusicGen-small (below) generates short instrumental clips on the T600 for prototyping.
+It is not a YuE2 substitute (no vocals, 32 kHz, lower quality) and its weights are CC-BY-NC 4.0 — prototype only.
+
+## MusicGen-small (local prototype music)
+
+- Venv: `%LOCALAPPDATA%\Programs\GameTools\MusicGen\venv` (Python 3.10, torch 2.11.0+cu128, transformers 5.20.2).
+- Model cache: `...\MusicGen\hf-cache`; outputs: `...\MusicGen\outputs` or `artifacts/musicgen/` (gitignored).
+- Use: `tools/musicgen/musicgen.ps1 -Prompt "calm menu loop" -Seconds 6`, or `python tools/musicgen/generate.py ...`.
+- Measured on the T600: 6 s clip, 32 kHz mono, RMS 0.146, peak 0.427, 35.5 s wall time. float16 produced NaNs on this
+  GPU; the generator detects that, retries float32, and refuses to save silence.
+- **Licence: weights CC-BY-NC 4.0 (non-commercial). Prototype only; not for shipping audio.** See
+  `docs/ADR-004-generative-media.md`.
 
 ## Not installed, deliberately
 
 - **ArmorPaint** binary (paid; source is GPL) — Krita/Blender cover painting.
 - **Spine/Rive** (paid/account) — Godot's Skeleton2D/AnimationPlayer covers basic 2D rigs.
 - **FMOD/Wwise** (account/licence) — deferred until audio integration.
+- **YuE2 weights** — hardware gate (Linux/Python 3.12/24 GB BF16); MusicGen-small is the installed prototype fallback.
 - **ComfyUI/SD models** — 4 GB VRAM; use cloud generation with asset provenance.
 - **Substance/Quixel/Adobe CC/Houdini/Maya/ZBrush** — paid; see the replacement table.
 - Hardware: **external NVMe** (D: has 52.6 GB free) and a **stronger GPU/eGPU or desktop** are the only real fixes for
@@ -115,6 +130,8 @@ cloud GPU with 24 GB+; (3) a rented GPU instance (RunPod/Lambda/AWS) with the re
 | FFmpeg works | `ffmpeg -version` → 9.0.2-essentials; generated a 1 s 320x240 H.264 MP4; `ffprobe` reported duration 1.000000; extracted a frame |
 | Build tools work | `cmake --version` → 4.4.4; `ninja --version` → 1.13.2 |
 | glTF tooling works | `gltf-transform --version` → 4.5.1; `gltfpack` runs |
+| MusicGen works | `facebook/musicgen-small` generated a 5.94 s clip at 32 kHz on CUDA; RMS 0.146, peak 0.427; fp16 NaN detected and retried in fp32; metadata sidecar written |
+| Unity/licence and UE5 gates | Unity batchmode: "No valid Unity Editor license found" (exit 198); UE5 hardware gate fails (4 GB VRAM, 52.6 GB free) — see `docs/ENGINE-SMOKE.md` |
 | Python tooling works | imports of scipy, trimesh, pygltflib, imageio, cv2, matplotlib all succeed under `C:\Python\python.exe` |
 | All new commands resolve | `Get-Command magick,ffmpeg,ffprobe,cmake,ninja,gltfpack,gltf-transform,texconv,renderdoccmd,tiled,material_maker,LDtk,libresprite,meshlab,audacity` all found on the refreshed user PATH |
 | No admin needed | everything is portable under the user profile; no elevation was used |

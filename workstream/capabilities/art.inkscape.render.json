@@ -1,0 +1,41 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "art.inkscape.render",
+  "layer": "art",
+  "tool": "inkscape",
+  "kind": "render",
+  "maturity": "stable",
+  "description": "Deterministic SVG rendering and size variants via Inkscape CLI.",
+  "requires": [
+    "inkscape.installed"
+  ],
+  "inputs": [
+    {
+      "name": "svg",
+      "type": "path"
+    },
+    {
+      "name": "sizes",
+      "type": "array"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "pngs",
+      "type": "directory"
+    }
+  ],
+  "checks": [
+    "inkscape exits 0",
+    "every size exists with exact dimensions",
+    "alpha present where expected"
+  ],
+  "provenance": {
+    "record": [
+      "inkscape.version",
+      "svgHash",
+      "sizes",
+      "artefactHash"
+    ]
+  }
+}

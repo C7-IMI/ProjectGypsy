@@ -1,0 +1,44 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "art.texture.validate",
+  "layer": "art",
+  "tool": "imagemagick",
+  "kind": "validate",
+  "maturity": "stable",
+  "description": "Validate texture sets with ImageMagick and DirectXTex: channels, dimensions, colour space, alpha, tiling seam check, compression.",
+  "requires": [
+    "imagemagick.installed",
+    "texconv.installed"
+  ],
+  "inputs": [
+    {
+      "name": "textures",
+      "type": "directory"
+    },
+    {
+      "name": "spec",
+      "type": "json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "report",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "dimensions match spec",
+    "power-of-two/mip policy",
+    "linear vs sRGB flags",
+    "tiling seam metric under threshold",
+    "channel presence"
+  ],
+  "provenance": {
+    "record": [
+      "imagemagick.version",
+      "texconv.version",
+      "inputHashes",
+      "reportHash"
+    ]
+  }
+}

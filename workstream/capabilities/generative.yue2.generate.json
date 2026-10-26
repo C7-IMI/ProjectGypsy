@@ -1,0 +1,46 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "generative.yue2.generate",
+  "layer": "generative",
+  "tool": "yue2",
+  "kind": "generate",
+  "maturity": "blocked",
+  "description": "YuE2 full-song generation. Requires Linux, Python 3.12 and an NVIDIA GPU with BF16 and 24 GB VRAM; blocked on this machine (Windows, 4 GB T600).",
+  "requires": [
+    "linux",
+    "gpu.vram>=24",
+    "gpu.bf16",
+    "python>=3.12"
+  ],
+  "inputs": [
+    {
+      "name": "lyrics",
+      "type": "string"
+    },
+    {
+      "name": "style",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "audio",
+      "type": "file"
+    }
+  ],
+  "checks": [
+    "refuse when the hardware gate fails"
+  ],
+  "provenance": {
+    "record": [
+      "model",
+      "prompt",
+      "gpu",
+      "runtimeVersion"
+    ]
+  },
+  "notes": [
+    "Source: https://github.com/multimodal-art-projection/YuE",
+    "Use the hosted demo, cloud GPU (24 GB+) or the MusicGen fallback; do not install locally on this machine."
+  ]
+}

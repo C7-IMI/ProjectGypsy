@@ -1,0 +1,49 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "engine.godot.run",
+  "layer": "engine",
+  "engine": "godot",
+  "kind": "run",
+  "maturity": "stable",
+  "description": "Run a Godot project headlessly (logic, scripted assertions, exit codes). Headless has no renderer.",
+  "requires": [
+    "godot.installed"
+  ],
+  "inputs": [
+    {
+      "name": "project",
+      "type": "path"
+    },
+    {
+      "name": "timeoutSeconds",
+      "type": "number"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "stdout",
+      "type": "text"
+    },
+    {
+      "name": "stderr",
+      "type": "text"
+    },
+    {
+      "name": "exitCode",
+      "type": "number"
+    }
+  ],
+  "checks": [
+    "exit code is 0",
+    "expected marker is present in stdout",
+    "no engine error lines"
+  ],
+  "provenance": {
+    "record": [
+      "engine.version",
+      "command",
+      "exitCode",
+      "duration"
+    ]
+  }
+}

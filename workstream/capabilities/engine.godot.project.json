@@ -1,0 +1,44 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "engine.godot.project",
+  "layer": "engine",
+  "engine": "godot",
+  "kind": "create",
+  "maturity": "stable",
+  "description": "Create a Godot project from the workstream template and write the project.gypsy.json manifest.",
+  "requires": [
+    "godot.installed"
+  ],
+  "inputs": [
+    {
+      "name": "template",
+      "type": "string"
+    },
+    {
+      "name": "path",
+      "type": "path"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "project.godot",
+      "type": "file"
+    },
+    {
+      "name": "project.gypsy.json",
+      "type": "file"
+    }
+  ],
+  "checks": [
+    "godot --headless loads the project",
+    "manifest engine/version matches the probed engine"
+  ],
+  "provenance": {
+    "record": [
+      "engine.version",
+      "template",
+      "command",
+      "generatedAt"
+    ]
+  }
+}

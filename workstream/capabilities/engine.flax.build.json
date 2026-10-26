@@ -1,0 +1,35 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "engine.flax.build",
+  "layer": "engine",
+  "engine": "flax",
+  "kind": "build",
+  "maturity": "experimental",
+  "description": "Flax build via Flax.Build.exe; automation path not yet demonstrated.",
+  "requires": [
+    "flax.installed"
+  ],
+  "inputs": [
+    {
+      "name": "project",
+      "type": "path"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "build",
+      "type": "directory"
+    }
+  ],
+  "checks": [
+    "Flax.Build exits 0",
+    "output exists"
+  ],
+  "provenance": {
+    "record": [
+      "engine.version",
+      "command",
+      "exitCode"
+    ]
+  }
+}

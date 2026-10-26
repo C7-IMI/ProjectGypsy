@@ -1,0 +1,16 @@
+# Runtime state and generated artifacts
+workstream/state/
+artifacts/
+
+# Engine caches
+.godot/
+game/.godot/
+*.godot.import
+
+# Python
+__pycache__/
+*.pyc
+
+# Logs and temp
+*.log
+*.tmp
