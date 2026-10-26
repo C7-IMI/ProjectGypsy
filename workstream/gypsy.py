@@ -13,7 +13,7 @@ Usage:
     python workstream/gypsy.py toolkit list|show|probe|capabilities [--json]
     python workstream/gypsy.py toolkit actionforge catalog|fetch [--json]
     python workstream/gypsy.py extension list|show|validate|test|register|disable|remove|run|reload [--json]
-    python workstream/gypsy.py project init --path DIR --engine ID --version VER [--targets pc,mobile] [--force]
+    python workstream/gypsy.py project init --path DIR [--engine ID] [--version VER] [--targets pc,mobile] [--force]
     python workstream/gypsy.py project show [--path DIR] [--json]
     python workstream/gypsy.py check [--project DIR] [--json]
 """
@@ -785,8 +785,8 @@ def main(argv=None) -> int:
     project_sub = project.add_subparsers(dest="project_command", required=True)
     project_init = project_sub.add_parser("init")
     project_init.add_argument("--path", required=True)
-    project_init.add_argument("--engine", required=True, choices=sorted(ENGINE_NAMES))
-    project_init.add_argument("--version", required=True)
+    project_init.add_argument("--engine", default="unity", choices=sorted(ENGINE_NAMES), help="default: unity (new projects)")
+    project_init.add_argument("--version", default="6000.6.7f1", help="default: 6000.6.7f1 for Unity; pass the installed version explicitly if different")
     project_init.add_argument("--targets", default="pc", help="comma list, e.g. pc,mobile")
     project_init.add_argument("--force", action="store_true")
     project_init.add_argument("--json", action="store_true")

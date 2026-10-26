@@ -40,10 +40,13 @@ If Gypsy is not found, stop and report the block. Do not silently use ad-hoc she
 
 ## New project
 
-    python "$GYPSY_HOME\workstream\gypsy.py" project init \
-      --path "<PROJECT_DIR>" --engine <godot|unity|ue5|flax> --version <version> --targets <targets>
+New Gypsy projects default to Unity 6000.6.7f1 / PC. Use explicitly:
 
-Then inspect `project.gypsy.json` and run:
+    python "$GYPSY_HOME\workstream\gypsy.py" project init \
+      --path "<PROJECT_DIR>" --engine unity --version 6000.6.7f1 --targets pc
+
+Omit engine/version for the default, or pass another installed engine/version explicitly. Then inspect
+`project.gypsy.json` and run:
 
     python "$GYPSY_HOME\workstream\gypsy.py" check --project "<PROJECT_DIR>"
 

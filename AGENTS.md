@@ -9,7 +9,9 @@ This repository's Phase 1 game runs on **Godot 4.7.2, PC** ([ADR-009](./docs/ADR
 platforms and the game's interface standard remain open (PG-D4). The checkout directory and Python/manifest identifiers
 still say `ProjectGypsy` / `gypsy`; do not rename them as a branding change. The engine-selection mechanism is built
 ([`docs/ADR-001-engines.md`](./docs/ADR-001-engines.md), `workstream/gypsy.py`); the Phase-1 choice can be overridden by
-a new project manifest, but an engine change is a port, not a toggle. Do not describe Gypsy Studio as a website, a web application or a console, and do not apply web interface
+a new project manifest, but an engine change is a port, not a toggle. **New projects default to Unity 6000.6.7f1/PC**
+([ADR-018](./docs/ADR-018-unity-default.md)); this existing Godot game is the legacy/reference implementation until the
+separate UltraBlade 2 Stage B migration is verified. Do not relabel the current game. Do not describe Gypsy Studio as a website, a web application or a console, and do not apply web interface
 rules to it.
 
 ## Use Gypsy Studio in every project
@@ -81,6 +83,7 @@ In this order:
    [`docs/DASHBOARD.md`](./docs/DASHBOARD.md), [`docs/GYPSY-AGENT-GUIDE.md`](./docs/GYPSY-AGENT-GUIDE.md),
    [`docs/ADR-016-self-extension.md`](./docs/ADR-016-self-extension.md),
    [`docs/ADR-017-hero-character-pipeline.md`](./docs/ADR-017-hero-character-pipeline.md),
+   [`docs/ADR-018-unity-default.md`](./docs/ADR-018-unity-default.md),
    [`docs/UNITY-SLICE.md`](./docs/UNITY-SLICE.md),
    [`docs/ENGINE-SMOKE.md`](./docs/ENGINE-SMOKE.md), [`docs/IMPORT-MATRIX.md`](./docs/IMPORT-MATRIX.md),
    the PHASE-1..5 evidence files and [`docs/PHASE-6-GATE.md`](./docs/PHASE-6-GATE.md).

@@ -31,7 +31,8 @@ python workstream/gypsy.py capabilities list|check [--json]
 python workstream/gypsy.py toolkit list|show|probe|capabilities [--json]
 python workstream/gypsy.py toolkit actionforge catalog [--json]
 python workstream/gypsy.py toolkit actionforge fetch --project <dir> --clips idle_loop,walk_loop --rig
-python workstream/gypsy.py project init --path game --engine godot --version 4.7.2 --targets pc
+python workstream/gypsy.py project init --path <dir>              # default: Unity 6000.6.7f1 / PC
+python workstream/gypsy.py project init --path game --engine godot --version 4.7.2 --targets pc  # legacy Godot
 python workstream/gypsy.py project show [--path game]
 python workstream/gypsy.py check [--project .] [--json]
 python workstream/gypsy.py game demo|build|capture|verify [--path game]

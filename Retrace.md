@@ -394,5 +394,15 @@ Each entry has:
 
 ---
 
-Next prompt number: 39. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 39 - 2026-10-26
+
+- Request: Do Stage A now (Unity default for new projects) and provide port instructions for the UltraBlade 2 session.
+- Status: Completed; current Godot game intentionally remains legacy until Stage B.
+- Version: 2026.10.26.005
+- Commit/evidence: project init defaults to Unity 6000.6.7f1/PC; ADR-018; docs/UNITY-PORT-INSTRUCTIONS.md; copy-paste
+  templates/UNITY-MIGRATION-PROMPT.md; 282 tests; check_all 6/6.
+
+---
+
+Next prompt number: 40. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

@@ -17,6 +17,7 @@
 | [ADR-013-phase5-mobile-live-perf.md](ADR-013-phase5-mobile-live-perf.md) | Phase-5 mobile package, live watcher, performance baseline, second-engine gate |
 | [ADR-014-local-dashboard.md](ADR-014-local-dashboard.md) | local operations console: overview/run detail/mission/commands/review/slices/artifacts; classic four views; token actions, localhost safety |
 | [ADR-016-self-extension.md](ADR-016-self-extension.md) | safe isolated self-extension: manifest/capability validation, dry-run, review gate, lockfile, disable/remove/reload, negative tests |
+| [ADR-018-unity-default.md](ADR-018-unity-default.md) | Stage A: Unity 6000.6.7f1/PC is the default for new projects; current Godot game remains legacy until Stage B |
 | [ADR-017-hero-character-pipeline.md](ADR-017-hero-character-pipeline.md) | first hero character: art direction, Blender generator, 20-joint rig, idle/run/reach, atlas, GLB/FBX, Godot integration and validation |
 | [ART-DIRECTION.md](ART-DIRECTION.md) | Wayfarer art direction, palette, silhouette, rig/animation set and validation contract |
 | [ADR-015-actionforge-toolkit.md](ADR-015-actionforge-toolkit.md) | reusable toolkit/plugin registry, ActionForge CC0 rig/animation fetch, licence/provenance, network and path safety, what stays manual |
@@ -30,6 +31,7 @@
 | [PHASE-6-GATE.md](PHASE-6-GATE.md) | UE5 hardware gate: blocked, no adapter claimed |
 | [UNITY-SLICE.md](UNITY-SLICE.md) | LeftBehind Unity 6 second-engine build/demo/capture evidence |
 | [DEVICE-LAUNCH.md](DEVICE-LAUNCH.md) | Android emulator attempt, exact host block and retry path |
+| [UNITY-PORT-INSTRUCTIONS.md](UNITY-PORT-INSTRUCTIONS.md) | Stage B Unity migration/port instructions for UltraBlade 2 |
 | [DASHBOARD.md](DASHBOARD.md) | launch/use guide for the operations console and classic views |
 | [GYPSY-AGENT-GUIDE.md](GYPSY-AGENT-GUIDE.md) | instructions for coding agents using Gypsy on new or existing projects |
 | [../extensions/README.md](../extensions/README.md) | extension schema, commands, safety model and limitations |

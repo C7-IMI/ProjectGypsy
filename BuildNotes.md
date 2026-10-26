@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.26.004
+Current version: 2026.10.26.005
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,19 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.26.005
+
+**Stage A: Unity is the default for new projects; UltraBlade 2 port brief added.**
+
+- Date: 2026-10-26
+- Commit: this change.
+- Change: gypsy project init now defaults to Unity 6000.6.7f1 / PC (overridable); ADR-018 records Stage A while the
+  current Godot game remains legacy until Stage B; docs/UNITY-PORT-INSTRUCTIONS.md and
+  templates/UNITY-MIGRATION-PROMPT.md provide the copy-paste migration brief; agent guide, template, README, docs index,
+  workstream README and TOOLCHAIN updated; default-init test added.
+- Verification: project init with only --path writes unity 6000.6.7f1 (unity-6) / pc; ProjectTests default test passes;
+  full suite 282 tests OK (2 skipped); check_all 6/6.
 
 ## 2026.10.26.004
 

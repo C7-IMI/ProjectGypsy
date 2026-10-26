@@ -62,3 +62,9 @@ Generated evidence lives in [PHASE-1-EVIDENCE.md](PHASE-1-EVIDENCE.md), and mach
 - Art direction and content scope for the next slice (ADR-005 / PG-D17).
 - Whether to keep PC-only for Phase 2 or add a mobile gate (ADR-001).
 - Whether the renderer/capture path should use movie-maker or OBS for future evidence.
+
+## Amendment 2026-10-26
+
+[ADR-018](ADR-018-unity-default.md) makes Unity 6000.6.7f1/PC the default for newly initialized projects.
+This ADR's Godot Phase-1 choice still describes the current ProjectGypsy game until the separate UltraBlade 2 Stage B
+migration is verified; it is not silently relabelled.

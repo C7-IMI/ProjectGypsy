@@ -47,7 +47,7 @@ python workstream/gypsy.py engines probe
 | Engine | Version | Path | Status |
 | --- | --- | --- | --- |
 | Godot | 4.7.2 | `%LOCALAPPDATA%\Microsoft\WinGet\Links\godot.exe` | reference adapter; headless smoke, export, exported-binary demo and windowed capture all pass |
-| Unity | 6000.6.7f1 | `C:\Program Files\Unity 6000.6.7f1\Editor\Unity.exe` | installed; licence + LeftBehind Windows build/demo/capture pass; asset import not run |
+| Unity | 6000.6.7f1 | `C:\Program Files\Unity 6000.6.7f1\Editor\Unity.exe` | installed; licence + LeftBehind Windows build/demo/capture pass; **new-project default (ADR-018)**; Android Build Support not installed; asset import not run |
 | Unreal Engine 5 | 5.8.4 | `D:\UnrealEngine\UE_5.8\Engine\Binaries\Win64\UnrealEditor-Cmd.exe` | detected; hardware gate fails (4 GB VRAM, 51.5 GB free on D) |
 | Flax | 1.13 | `C:\Program Files (x86)\Flax\Flax_1.13\Binaries\Editor\Win64\Release\FlaxEditor.exe` | experimental; no headless path demonstrated |
 

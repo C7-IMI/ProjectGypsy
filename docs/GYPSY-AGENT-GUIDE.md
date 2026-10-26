@@ -52,16 +52,19 @@ record the block; do not claim probes, builds or evidence.
 
 ## 4. New project bootstrap
 
-For a new game project, initialize the target directory from the Gypsy checkout:
+For a new game project, initialize the target directory from the Gypsy checkout. **New projects default to Unity
+6000.6.7f1 / PC** (ADR-018):
 
     python "$env:GYPSY_HOME\workstream\gypsy.py" project init \
       --path "<NEW_PROJECT_DIR>" \
-      --engine godot \
-      --version 4.7.2 \
+      --engine unity \
+      --version 6000.6.7f1 \
       --targets pc
 
-Use the installed engine and version the operator actually selected. Allowed engine ids are `godot`, `unity`,
-`ue5`, `flax`; do not pretend an engine is available. The command writes `project.gypsy.json` and a hardware gate.
+You may omit engine/version to use the Unity/PC default, but pass them explicitly when the installed version differs.
+Allowed engine ids are `godot`, `unity`, `ue5`, `flax`; do not pretend an engine is available. The command writes
+`project.gypsy.json` and a hardware gate. Unity Android is **not installed**; install Android Build Support before
+claiming a mobile target.
 
 Then verify:
 

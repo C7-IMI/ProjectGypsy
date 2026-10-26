@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -97,6 +98,20 @@ class ProjectTests(unittest.TestCase):
             with self.assertRaises(gypsy.GypsyError):
                 gypsy.init_project(path, "godot", version, ["pc"])
             gypsy.init_project(path, "godot", version, ["pc"], force=True)
+
+    def test_cli_project_init_defaults_to_unity(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            proc = subprocess.run(
+                [sys.executable, str(WORKSTREAM / "gypsy.py"), "project", "init", "--path", tmp],
+                cwd=str(WORKSTREAM.parent),
+                capture_output=True,
+                text=True,
+                timeout=60,
+            )
+            self.assertEqual(proc.returncode, 0, proc.stderr[-2000:])
+            manifest = json.loads((Path(tmp) / "project.gypsy.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["engine"]["id"], "unity")
+            self.assertEqual(manifest["targets"], ["pc"])
 
     def test_unknown_engine_is_refused(self):
         with tempfile.TemporaryDirectory() as tmp:

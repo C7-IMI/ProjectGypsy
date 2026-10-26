@@ -2,7 +2,8 @@
 
 **Gypsy Studio** (short: **Gypsy**) is the local workstream, orchestration and evidence tool for game projects. It is
 not itself the game: Phase 1 of this repository is a playable **Godot 4.7.2 PC** slice; the interface standard and other
-platforms remain open (PG-D4). The workstream selects and pins an engine per project.
+platforms remain open (PG-D4). New projects default to **Unity 6000.6.7f1 / PC** (ADR-018); the existing ProjectGypsy game remains Godot until the
+separate UltraBlade 2 migration is verified. The workstream selects and pins an engine per project.
 
 > **Name:** the product/application is **Gypsy Studio / Gypsy**. The checkout directory, Python package and manifest
 > schema retain `ProjectGypsy` / `gypsy` identifiers; do not rename those as a branding change.
@@ -20,6 +21,8 @@ Gypsy”: read [the agent guide](docs/GYPSY-AGENT-GUIDE.md) and the target proje
 
 - [`AGENTS.md`](AGENTS.md) — read first; entry point for any model working here.
 - [`docs/GYPSY-AGENT-GUIDE.md`](docs/GYPSY-AGENT-GUIDE.md) — how an agent uses Gypsy on a new or existing project.
+- [`docs/UNITY-PORT-INSTRUCTIONS.md`](docs/UNITY-PORT-INSTRUCTIONS.md) — Stage B Unity migration instructions for UltraBlade 2.
+- [`templates/UNITY-MIGRATION-PROMPT.md`](templates/UNITY-MIGRATION-PROMPT.md) — copy-paste prompt for the new session.
 - [`templates/AGENTS.gypsy.md`](templates/AGENTS.gypsy.md) — copy-paste instruction block for a target project's `AGENTS.md`.
 - [`TOOLCHAIN.md`](TOOLCHAIN.md) — installed engines, art/audio/build tools, paths and the PATH loader.
 - [`docs/README.md`](docs/README.md) — all ADRs (001-015: engines, art pipeline, workstream architecture, generative media, character/animation,
