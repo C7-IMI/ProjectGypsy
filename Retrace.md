@@ -339,5 +339,15 @@ Each entry has:
 
 ---
 
-Next prompt number: 34. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 34 - 2026-10-26
+
+- Request: Make any invocation command followed by “Gypsy” trigger it.
+- Status: Completed.
+- Version: 2026.10.25.029
+- Commit/evidence: generalized trigger in AGENTS/guide/template/README; examples and negations documented; 182 tests;
+  check_all 6/6.
+
+---
+
+Next prompt number: 35. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

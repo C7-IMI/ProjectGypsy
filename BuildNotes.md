@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.25.028
+Current version: 2026.10.25.029
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,18 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.25.029
+
+**Generalize the Gypsy invocation trigger to any invocation verb + Gypsy.**
+
+- Date: 2026-10-26
+- Commit: this change.
+- Change: AGENTS, docs/GYPSY-AGENT-GUIDE.md, templates/AGENTS.gypsy.md and README now treat any imperative invocation
+  verb followed by Gypsy (Open, Load, Use, Invoke, Launch, Start, Call, Run, Show, Import, Activate, Bring up, Pull up,
+  Summon, etc.) as load/use Gypsy. Negations do not trigger. Open/launch/show bring up the dashboard; load/import read the
+  guide/template; use/run/invoke/call route the task through the CLI starting with check.
+- Verification: docs links resolve; 182 tests; check_all 6/6; dashboard state 200.
 
 ## 2026.10.25.028
 

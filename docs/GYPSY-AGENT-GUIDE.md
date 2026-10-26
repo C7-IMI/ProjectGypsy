@@ -15,18 +15,20 @@ Gypsy, the agent must call Gypsy rather than reimplementing probes, builds, chec
 The product name is **Gypsy Studio / Gypsy**. The checkout directory, Python package and manifest schema still use the
 legacy `ProjectGypsy` / `gypsy` identifiers; do not rename repository paths or schema keys as a branding change.
 
-## 2. Trigger phrases: “Open Gypsy”, “Load Gypsy”, “Use Gypsy”
+## 2. Invocation trigger: any invocation verb + “Gypsy”
 
-When the operator says **Open Gypsy**, **Load Gypsy** or **Use Gypsy** (case-insensitive, including lower-case), do not
-ask for clarification. Treat all three as:
+Treat **any imperative invocation verb followed by Gypsy** as a request to load/use Gypsy. This is not a fixed phrase.
+Examples: **Open**, **Load**, **Use**, **Invoke**, **Launch**, **Start**, **Call**, **Run**, **Show**, **Import**,
+**Activate**, **Bring up**, **Pull up**, **Summon**. Case-insensitive. Do not trigger on negated requests (e.g. “do not
+open Gypsy”) or when merely discussing Gypsy.
 
-| Phrase | What to do |
+| Request kind | What to do |
 | --- | --- |
-| **Open Gypsy** | Load/verify Gypsy, ensure the dashboard is up, open or report `http://127.0.0.1:8765/`, and summarize state. |
-| **Load Gypsy** | Load/verify Gypsy and import the guide/template into the current project; also bring up the dashboard/state if available. |
-| **Use Gypsy** | Load/verify Gypsy and route the current task through the Gypsy CLI; start with `gypsy check --project <dir>` (or `gypsy check` here), then use the relevant probes/slices/toolpacks/game commands. |
+| **Open / Launch / Show / Bring up Gypsy** | Load/verify Gypsy, ensure the dashboard is up, open or report `http://127.0.0.1:8765/`, and summarize state. |
+| **Load / Import Gypsy** | Load/verify Gypsy and import the guide/template into the current project; bring up the dashboard/state if available. |
+| **Use / Run / Invoke / Call Gypsy** | Load/verify Gypsy and route the current task through the Gypsy CLI; start with `gypsy check --project <dir>` (or `gypsy check` here), then use the relevant probes/slices/toolpacks/game commands. |
 
-All three:
+All invocations:
 
 1. Read this guide and verify the CLI with `python "$env:GYPSY_HOME\workstream\gypsy.py" version`.
 2. Check `http://127.0.0.1:8765/api/state`; if the dashboard is down, start

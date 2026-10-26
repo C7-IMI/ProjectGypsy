@@ -3,17 +3,20 @@
 This project is developed with **Gypsy Studio** (short: **Gypsy**), the local workstream/orchestration tool. Do not
 reimplement its probes, checks, slices, toolpacks or evidence by hand.
 
-## Trigger phrases: “Open Gypsy”, “Load Gypsy”, “Use Gypsy”
+## Invocation trigger: any invocation verb + “Gypsy”
 
-If the operator says any of these (case-insensitive), do not ask what they mean:
+Treat **any imperative invocation verb followed by Gypsy** as a request to load/use Gypsy. Examples: **Open**,
+**Load**, **Use**, **Invoke**, **Launch**, **Start**, **Call**, **Run**, **Show**, **Import**, **Activate**,
+**Bring up**, **Pull up**, **Summon**. Case-insensitive. Do not trigger on negated requests or when merely discussing
+Gypsy.
 
-| Phrase | What to do |
+| Request kind | What to do |
 | --- | --- |
-| **Open Gypsy** | Load/verify Gypsy, ensure the dashboard is up, report/open the URL, summarize state. |
-| **Load Gypsy** | Load/verify Gypsy and import the guide/template; bring up the dashboard/state if available. |
-| **Use Gypsy** | Load/verify Gypsy and route the current task through the Gypsy CLI; start with `gypsy check --project <dir>` (or `gypsy check`). |
+| **Open / Launch / Show / Bring up Gypsy** | Load/verify Gypsy, ensure the dashboard is up, report/open the URL, summarize state. |
+| **Load / Import Gypsy** | Load/verify Gypsy and import the guide/template; bring up the dashboard/state if available. |
+| **Use / Run / Invoke / Call Gypsy** | Load/verify Gypsy and route the current task through the Gypsy CLI; start with `gypsy check --project <dir>` (or `gypsy check`). |
 
-All three:
+All invocations:
 
 1. Verify `python "$GYPSY_HOME\workstream\gypsy.py" version`.
 2. Check `http://127.0.0.1:8765/api/state`; if down, run
