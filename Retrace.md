@@ -189,5 +189,16 @@ Each entry has:
 
 ---
 
-Next prompt number: 19. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 19 - 2026-10-26
+
+- Request: Continue through the remaining phases; Phase 4 next.
+- Status: Completed (Phase 4).
+- Version: 2026.10.25.014
+- Commit/evidence: read-only terminal console (board/preview/diff), 40 tests, CLI wiring, ADR-012/PHASE-4-EVIDENCE;
+  board 8/8 steps, preview frame 1280x720 with live SHA-256, diff read-only, no writes; 138 tests; check_all 6/6;
+  39 capabilities.
+
+---
+
+Next prompt number: 20. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

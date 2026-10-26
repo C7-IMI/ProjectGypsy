@@ -117,12 +117,15 @@ python workstream/gypsy.py slices status      # latest task state
 python workstream/gypsy.py toolpacks list|check
 python workstream/gypsy.py toolpacks run art.import.golden   # Blender->Godot import + validators
 python workstream/gypsy.py toolpacks run audio.musicgen      # local MusicGen WAV + validator
+python workstream/gypsy.py console board                    # read-only task board
+python workstream/gypsy.py console preview artifacts/game/frame.png
+python workstream/gypsy.py console diff                     # read-only git diff
 ~~~
 
 - Engine: Godot 4.7.2, PC; export templates installed under `%APPDATA%\\Godot\\export_templates\\4.7.2.stable`.
-- Evidence: [docs/PHASE-1-EVIDENCE.md](docs/PHASE-1-EVIDENCE.md), [docs/PHASE-2-EVIDENCE.md](docs/PHASE-2-EVIDENCE.md) and
-  [docs/PHASE-3-EVIDENCE.md](docs/PHASE-3-EVIDENCE.md); state under `workstream/state/{game-*,slices,artifacts,toolpacks}/`
-  (gitignored).
+- Evidence: [docs/PHASE-1-EVIDENCE.md](docs/PHASE-1-EVIDENCE.md), [docs/PHASE-2-EVIDENCE.md](docs/PHASE-2-EVIDENCE.md),
+  [docs/PHASE-3-EVIDENCE.md](docs/PHASE-3-EVIDENCE.md) and [docs/PHASE-4-EVIDENCE.md](docs/PHASE-4-EVIDENCE.md); state under
+  `workstream/state/{game-*,slices,artifacts,toolpacks}/` (gitignored).
 - `build/` and `artifacts/` are gitignored; the slice source is `game/`.
 
 ## Workstream commands

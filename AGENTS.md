@@ -27,12 +27,12 @@ In this order:
    `tools/tool-env.ps1` PATH loader. Read it before claiming a tool exists.
 5. **[`docs/README.md`](./docs/README.md)** — the ADRs: engines (001), art pipeline (002), workstream architecture
    (003), generative media (004), character/animation automation (005), Blender import matrix (006), language
-   boundaries (007), MCP/free local tools (008), vertical slice (009), slice orchestrator (010), toolpacks (011), plus
-   [`docs/ENGINE-SMOKE.md`](./docs/ENGINE-SMOKE.md), [`docs/IMPORT-MATRIX.md`](./docs/IMPORT-MATRIX.md),
-   [`docs/PHASE-1-EVIDENCE.md`](./docs/PHASE-1-EVIDENCE.md), [`docs/PHASE-2-EVIDENCE.md`](./docs/PHASE-2-EVIDENCE.md) and
-   [`docs/PHASE-3-EVIDENCE.md`](./docs/PHASE-3-EVIDENCE.md).
+   boundaries (007), MCP/free local tools (008), vertical slice (009), slice orchestrator (010), toolpacks (011),
+   thin console (012), plus [`docs/ENGINE-SMOKE.md`](./docs/ENGINE-SMOKE.md), [`docs/IMPORT-MATRIX.md`](./docs/IMPORT-MATRIX.md),
+   and the PHASE-1..4 evidence files.
 6. **[`workstream/README.md`](./workstream/README.md)** — the CLI: `engines probe|smoke`, `tools probe`,
-   `capabilities`, `project`, `game demo|build|capture|verify`, `slices list|plan|run|status`, `toolpacks list|check|run`, `check`.
+   `capabilities`, `project`, `game demo|build|capture|verify`, `slices list|plan|run|status`, `toolpacks list|check|run`,
+   `console board|preview|diff`, `check`.
 7. **[`DEFERRED.md`](./DEFERRED.md)** — the work deliberately not done. Read the entry covering an area before you
    change that area, and do not quietly close a deferred item by implementing it halfway.
 8. **[`README.md`](./README.md)** — the repository entry point and index.
@@ -47,7 +47,7 @@ In this order:
   operator's — do not invent one.
 - **Verify by running** the build or the test that proves the change, and read back what you captured (§2.18). If no
   build exists yet, say so rather than implying a verification. Evidence lives in `docs/ENGINE-SMOKE.md`,
-  `docs/IMPORT-MATRIX.md`, `docs/PHASE-1-EVIDENCE.md`, `docs/PHASE-2-EVIDENCE.md` and `docs/PHASE-3-EVIDENCE.md`.
+  `docs/IMPORT-MATRIX.md`, and the PHASE-1..4 evidence files.
 - **Record the work.** A change is not finished until its [Retrace.md](./Retrace.md) and [BuildNotes.md](./BuildNotes.md)
   entries exist, with a version from [`scripts/next-version.py`](./scripts/next-version.py) (§2.1).
   [`scripts/check_all.py`](./scripts/check_all.py) guards the records.
@@ -77,8 +77,9 @@ In this order:
 
 ## What has been built (do not overstate it)
 
-Phase 0, 1, 2 and 3 exist: engine/tool probes, hardware gates, manifests, a Godot headless smoke, a playable Godot
+Phase 0, 1, 2, 3 and 4 exist: engine/tool probes, hardware gates, manifests, a Godot headless smoke, a playable Godot
 4.7.2 PC slice with demo/export/capture, a manifest-driven slice orchestrator with state and artifact hashes, toolpacks
-with validators/provenance for Blender->Godot import and MusicGen audio, records and the one pack check list, the ADRs,
-a golden Blender import matrix, MCP/ComfyUI/Poly Haven tooling. There is still **no hero art/character pipeline, UI,
-console/live editing, mobile build or performance budget**. See `docs/PHASE-3-EVIDENCE.md` and `DEFERRED.md`.
+with validators/provenance for Blender->Godot import and MusicGen audio, a read-only terminal console (board/preview/diff),
+records and the one pack check list, the ADRs, a golden Blender import matrix, MCP/ComfyUI/Poly Haven tooling. There is
+still **no hero art/character pipeline, live editing, self-extension, mobile build or performance budget**. See
+`docs/PHASE-4-EVIDENCE.md` and `DEFERRED.md`.

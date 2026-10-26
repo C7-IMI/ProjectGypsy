@@ -1,0 +1,48 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "workstream.console",
+  "layer": "workstream",
+  "kind": "view",
+  "maturity": "stable",
+  "description": "Read-only terminal console over slice state, artifacts and git: task board, artifact preview and diff.",
+  "requires": [
+    "python>=3.10"
+  ],
+  "inputs": [
+    {
+      "name": "view",
+      "type": "string"
+    },
+    {
+      "name": "path",
+      "type": "path"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "text",
+      "type": "text"
+    },
+    {
+      "name": "json",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "no writes",
+    "board from latest state",
+    "preview hashes live artifact",
+    "diff uses read-only git",
+    "missing state handled"
+  ],
+  "provenance": {
+    "record": [
+      "statePath",
+      "artifactHash",
+      "gitHead"
+    ]
+  },
+  "notes": [
+    "Phase 4, ADR-012; presentation only, no separate server/browser."
+  ]
+}

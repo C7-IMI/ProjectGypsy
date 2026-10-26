@@ -698,6 +698,19 @@ def main(argv=None) -> int:
             toolpack_cmd.add_argument("toolpack_id")
             toolpack_cmd.add_argument("--action", default=None)
 
+    console_parser = sub.add_parser("console", help="read-only Phase-4 terminal console")
+    console_sub = console_parser.add_subparsers(dest="console_command", required=True)
+    console_board = console_sub.add_parser("board")
+    console_board.add_argument("--state-dir", default=None)
+    console_board.add_argument("--json", action="store_true")
+    console_preview = console_sub.add_parser("preview")
+    console_preview.add_argument("path")
+    console_preview.add_argument("--json", action="store_true")
+    console_diff = console_sub.add_parser("diff")
+    console_diff.add_argument("--staged", action="store_true")
+    console_diff.add_argument("--commit", default=None)
+    console_diff.add_argument("--json", action="store_true")
+
     check_parser = sub.add_parser("check", help="run the Phase-0 checks")
     check_parser.add_argument("--project")
     check_parser.add_argument("--json", action="store_true")
@@ -793,6 +806,24 @@ def main(argv=None) -> int:
                 evidence = game_verify(Path(args.path))
                 print(json.dumps(evidence, indent=2) if args.json else f"game verify | demo={evidence['demo']['passed']} build={evidence['build']['passed']} capture={evidence['capturePassed']}")
                 return 0 if evidence["passed"] else 1
+        if args.command == "console":
+            import console as console_mod
+            from pathlib import Path as _Path
+
+            if args.console_command == "board":
+                state_dir = _Path(args.state_dir) if args.state_dir else STATE_DIR
+                data = console_mod.collect_board(state_dir, REPO_ROOT)
+                print(json.dumps(data, indent=2) if args.json else console_mod.render_board(data))
+                return 0 if data.get("slices") else 1
+            if args.console_command == "preview":
+                data = console_mod.preview_artifact(_Path(args.path), REPO_ROOT)
+                print(json.dumps(data, indent=2) if args.json else console_mod.render_preview(data))
+                return 0 if data.get("exists") else 1
+            if args.console_command == "diff":
+                data = console_mod.diff_report(REPO_ROOT, staged=args.staged, commit=args.commit)
+                print(json.dumps(data, indent=2) if args.json else console_mod.render_diff(data))
+                return 0 if data.get("available") else 1
+
         if args.command == "toolpacks":
             import toolpacks as toolpack_spec
             from pathlib import Path as _Path

@@ -13,11 +13,13 @@
 | [ADR-009-vertical-slice.md](ADR-009-vertical-slice.md) | Phase-1 engine choice (Godot 4.7.2 PC), slice scope, acceptance gates |
 | [ADR-010-slice-orchestrator.md](ADR-010-slice-orchestrator.md) | Phase-2 slice schema, orchestrator, state, artifact ledger, multi-slice task |
 | [ADR-011-toolpacks.md](ADR-011-toolpacks.md) | Phase-3 toolpacks, validators (file/json/text/wav/png/glb) and provenance |
+| [ADR-012-thin-console.md](ADR-012-thin-console.md) | Phase-4 read-only terminal console (board/preview/diff), CLI parity |
 | [ENGINE-SMOKE.md](ENGINE-SMOKE.md) | Phase-0 evidence: Godot headless pass, Unity licence block, UE5 gate, Flax status |
 | [IMPORT-MATRIX.md](IMPORT-MATRIX.md) | generated evidence: Blender round-trip, glTF validation, Godot import, blocked engines |
 | [PHASE-1-EVIDENCE.md](PHASE-1-EVIDENCE.md) | generated evidence: headless demo, export, exported-binary demo, capture, checks |
 | [PHASE-2-EVIDENCE.md](PHASE-2-EVIDENCE.md) | generated evidence: multi-slice task, hashes, reproducibility, resume, tests |
 | [PHASE-3-EVIDENCE.md](PHASE-3-EVIDENCE.md) | generated evidence: golden import, MusicGen audio, validators, provenance |
+| [PHASE-4-EVIDENCE.md](PHASE-4-EVIDENCE.md) | generated evidence: console board, preview, diff, no-write audit |
 
 Related: [../TOOLCHAIN.md](../TOOLCHAIN.md), [../TOOL-INVENTORY.md](../TOOL-INVENTORY.md),
 [../DEFERRED.md](../DEFERRED.md), [../workstream/README.md](../workstream/README.md),
