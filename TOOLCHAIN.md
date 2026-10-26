@@ -46,7 +46,7 @@ python workstream/gypsy.py engines probe
 | --- | --- | --- | --- |
 | Godot | 4.7.2 | `%LOCALAPPDATA%\Microsoft\WinGet\Links\godot.exe` | reference adapter; headless smoke passes; export templates missing |
 | Unity | 6000.6.7f1 | `C:\Program Files\Unity 6000.6.7f1\Editor\Unity.exe` | installed; **licence not proven**, batchmode blocked |
-| Unreal Engine 5 | 5.8.4 | `D:\UnrealEngine\UE_5.8\Engine\Binaries\Win64\UnrealEditor-Cmd.exe` | detected; hardware gate fails (4 GB VRAM, 52.6 GB free on D) |
+| Unreal Engine 5 | 5.8.4 | `D:\UnrealEngine\UE_5.8\Engine\Binaries\Win64\UnrealEditor-Cmd.exe` | detected; hardware gate fails (4 GB VRAM, 51.5 GB free on D) |
 | Flax | 1.13 | `C:\Program Files (x86)\Flax\Flax_1.13\Binaries\Editor\Win64\Release\FlaxEditor.exe` | experimental; no headless path demonstrated |
 
 The stale UE 5.4/4.0 registry entries are reported and ignored. Phase-0 evidence: [docs/ENGINE-SMOKE.md](docs/ENGINE-SMOKE.md).
@@ -66,6 +66,43 @@ transformers 5.20.2), model cache under `...\MusicGen\hf-cache`, outputs under `
 - **Licence: model weights CC-BY-NC 4.0 — non-commercial. Prototype only; not for shipping audio.** See
   [docs/ADR-004-generative-media.md](docs/ADR-004-generative-media.md).
 - YuE2 is **not** installed: it requires Linux + Python 3.12 + a 24 GB BF16 GPU (PG-D10).
+
+## MCP bridge (ADR-008)
+
+MCP is a protocol, not a subscription. DSH does not speak MCP natively, so this CLI is the bridge:
+
+~~~powershell
+.\tools\mcp\mcp.ps1 servers
+.\tools\mcp\mcp.ps1 list -Server blender
+.\tools\mcp\mcp.ps1 list -Server godot
+.\tools\mcp\mcp.ps1 call -Server godot -Tool get_godot_version -Args '{}'
+~~~
+
+- **Blender**: [mcp-for-blender](https://github.com/ahujasid/mcp-for-blender) (MIT) addon installed and enabled in
+  Blender 5.2.3; its socket server runs when Blender is open. Tool calls require Blender running; optional Hyper3D/
+  Sketchfab/Poly Pizza providers are off unless keys are added. Telemetry disabled in `servers.json`.
+- **Godot**: [Coding-Solo/godot-mcp](https://github.com/Coding-Solo/godot-mcp) (MIT) built under
+  `GameTools\Mcp\godot-mcp`; `get_godot_version` returned `4.7.2.stable.official.ed1daf0bf`.
+- Other servers (Krita, FreeCAD, Unity, Unreal) are optional/planned or blocked by the engine gates; see ADR-008.
+
+## Local generation and assets (no API)
+
+~~~powershell
+# ComfyUI + SD1.5 (installed; 4 GB T600, --lowvram)
+.\tools\comfyui\start.ps1
+python tools/comfyui/generate.py --prompt "stylized sword icon, game asset" --steps 20
+.\tools\comfyui\stop.ps1
+
+# Poly Haven CC0 assets (public API, no key)
+python tools/polyhaven/polyhaven.py list --type textures --search brick
+python tools/polyhaven/polyhaven.py download brick_wall_02 --resolution 1k --slot Diffuse --dest artifacts/polyhaven
+~~~
+
+- ComfyUI 0.42.1 portable + `v1-5-pruned-emaonly-fp16.safetensors` (2.03 GB); measured 512×512, 20 steps, 28.2 s.
+  Outputs and sidecars under `artifacts/comfyui/`; SD1.5 is OpenRAIL-M (licence review before shipping).
+- Poly Haven downloads write CC0 + SHA-256 provenance records; no API key.
+- TripoSR (image-to-3D, MIT) is **not installed**: README states ~6 GB VRAM, above this machine (PG-D19). Use a cloud/
+  API provider only on the operator's decision (ADR-008 has the list).
 
 ## Workstream commands
 
@@ -104,6 +141,6 @@ behind a versioned CLI or C ABI, never as the gameplay language. See [docs/ADR-0
 ## Machine limits to respect
 
 - **4 GB VRAM**: no UE5 editor/Lumen work, no SDXL/FLUX local generation, MusicGen-small only for short clips.
-- **D: 52.6 GB free**: UE5 projects and DDC will not fit; use C: or external NVMe.
+- **D: 51.5 GB free**: UE5 projects and DDC will not fit; use C: or external NVMe.
 - **Licences**: UE5 EULA/royalty; Unity activation; MusicGen weights non-commercial; ArmorPaint binary is paid.
   Never ship a generated or commercial-model asset without the record and licence in ADR-002/ADR-004.

@@ -1,6 +1,6 @@
 # IMPORT-MATRIX.md — Blender 5.2 golden-asset import matrix
 
-Generated 2026-10-25T22:28:03-05:00 by scripts/import_matrix.py. This is Phase-0 evidence for
+Generated 2026-10-25T22:42:54-05:00 by scripts/import_matrix.py. This is Phase-0 evidence for
 [ADR-006](ADR-006-blender-import-matrix.md); it is not an art-quality claim.
 
 ## Result

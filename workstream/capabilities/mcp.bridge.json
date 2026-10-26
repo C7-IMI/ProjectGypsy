@@ -1,0 +1,48 @@
+{
+  "schema": "gypsy.capability/v1",
+  "file": "mcp.bridge.json",
+  "id": "mcp.bridge",
+  "layer": "tooling",
+  "tool": "python",
+  "kind": "call",
+  "maturity": "stable",
+  "description": "Start an MCP server over stdio, list tools or call one from the shell; the DSH integration path.",
+  "requires": [
+    "mcp.sdk",
+    "node.or.python"
+  ],
+  "inputs": [
+    {
+      "name": "server",
+      "type": "string"
+    },
+    {
+      "name": "tool",
+      "type": "string"
+    },
+    {
+      "name": "args",
+      "type": "json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "server list works",
+    "tools list works",
+    "call returns a result or a clear error"
+  ],
+  "provenance": {
+    "record": [
+      "server",
+      "tool",
+      "arguments",
+      "resultHash",
+      "timestamp"
+    ]
+  }
+}

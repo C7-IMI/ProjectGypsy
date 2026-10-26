@@ -1,0 +1,44 @@
+{
+  "schema": "gypsy.capability/v1",
+  "file": "gen.mesh.triposr.json",
+  "id": "gen.mesh.triposr",
+  "layer": "generative",
+  "tool": "triposr",
+  "kind": "generate",
+  "maturity": "blocked",
+  "description": "Local image-to-3D via TripoSR (MIT). README states ~6 GB VRAM; not installed on the 4 GB T600.",
+  "requires": [
+    "gpu.vram>=6",
+    "python>=3.8",
+    "torch"
+  ],
+  "inputs": [
+    {
+      "name": "image",
+      "type": "path"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "mesh",
+      "type": "file"
+    }
+  ],
+  "checks": [
+    "hardware gate passes",
+    "mesh loads and is manifold",
+    "provenance complete"
+  ],
+  "provenance": {
+    "record": [
+      "model",
+      "imageHash",
+      "gpu",
+      "parameters",
+      "artifactHash"
+    ]
+  },
+  "notes": [
+    "Blocked by hardware (PG-D19). API alternatives: Meshy/Tripo/Hyper3D Rodin, with keys."
+  ]
+}

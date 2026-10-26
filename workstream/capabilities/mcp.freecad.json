@@ -1,0 +1,35 @@
+{
+  "schema": "gypsy.capability/v1",
+  "file": "mcp.freecad.json",
+  "id": "mcp.freecad",
+  "layer": "tooling",
+  "tool": "freecad",
+  "kind": "control",
+  "maturity": "planned",
+  "description": "FreeCAD MCP is optional and requires FreeCAD installed; not relevant to the current vertical slice.",
+  "requires": [
+    "freecad.installed"
+  ],
+  "inputs": [
+    {
+      "name": "tool",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "FreeCAD addon loads",
+    "document round-trips"
+  ],
+  "provenance": {
+    "record": [
+      "freecad.version",
+      "tool"
+    ]
+  }
+}

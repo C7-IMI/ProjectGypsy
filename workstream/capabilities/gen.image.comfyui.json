@@ -1,0 +1,56 @@
+{
+  "schema": "gypsy.capability/v1",
+  "file": "gen.image.comfyui.json",
+  "id": "gen.image.comfyui",
+  "layer": "generative",
+  "tool": "comfyui",
+  "kind": "generate",
+  "maturity": "partial",
+  "description": "Local ComfyUI + SD1.5 image generation at 512 px with provenance sidecar; OpenRAIL-M licence review required.",
+  "requires": [
+    "comfyui.installed",
+    "sd15.checkpoint",
+    "gpu.vram>=4"
+  ],
+  "inputs": [
+    {
+      "name": "prompt",
+      "type": "string"
+    },
+    {
+      "name": "steps",
+      "type": "number"
+    },
+    {
+      "name": "seed",
+      "type": "number"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "png",
+      "type": "file"
+    },
+    {
+      "name": "metadata",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "image is 512x512",
+    "non-blank pixels",
+    "metadata complete",
+    "licence noted"
+  ],
+  "provenance": {
+    "record": [
+      "model",
+      "prompt",
+      "seed",
+      "steps",
+      "gpu",
+      "license",
+      "artifactHash"
+    ]
+  }
+}

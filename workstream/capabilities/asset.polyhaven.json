@@ -1,0 +1,51 @@
+{
+  "schema": "gypsy.capability/v1",
+  "file": "asset.polyhaven.json",
+  "id": "asset.polyhaven",
+  "layer": "art",
+  "tool": "polyhaven",
+  "kind": "download",
+  "maturity": "stable",
+  "description": "Search/download CC0 Poly Haven assets with SHA-256 and licence records; no API key.",
+  "requires": [
+    "network"
+  ],
+  "inputs": [
+    {
+      "name": "asset",
+      "type": "string"
+    },
+    {
+      "name": "resolution",
+      "type": "string"
+    },
+    {
+      "name": "slot",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "file",
+      "type": "file"
+    },
+    {
+      "name": "record",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "asset resolves",
+    "licence CC0 recorded",
+    "hash matches bytes"
+  ],
+  "provenance": {
+    "record": [
+      "asset",
+      "source",
+      "license",
+      "sha256",
+      "retrievedAt"
+    ]
+  }
+}

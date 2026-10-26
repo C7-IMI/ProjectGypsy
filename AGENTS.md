@@ -27,7 +27,7 @@ In this order:
    `tools/tool-env.ps1` PATH loader. Read it before claiming a tool exists.
 5. **[`docs/README.md`](./docs/README.md)** — the ADRs: engines (001), art pipeline (002), workstream architecture
    (003), generative media (004), character/animation automation (005), Blender import matrix (006), language
-   boundaries (007), plus [`docs/ENGINE-SMOKE.md`](./docs/ENGINE-SMOKE.md) and
+   boundaries (007), MCP/free local tools (008), plus [`docs/ENGINE-SMOKE.md`](./docs/ENGINE-SMOKE.md) and
    [`docs/IMPORT-MATRIX.md`](./docs/IMPORT-MATRIX.md) (Phase-0 evidence).
 6. **[`workstream/README.md`](./workstream/README.md)** — the Phase-0 CLI: `engines probe`, `engines smoke`,
    `tools probe`, `capabilities check`, `project init`, `check`.
@@ -73,6 +73,6 @@ In this order:
 ## What has been built (do not overstate it)
 
 Phase 0 of the workstream exists: engine/tool probes, hardware gates, capability and project manifests, a Godot
-headless smoke test, unit tests, the ADRs, the toolchain docs, a golden Blender→Godot import matrix, and a prototype
-MusicGen path. There is still **no game code, no chosen engine, no build/export adapter, no rendered capture, no
+headless smoke test, unit tests, the ADRs, the toolchain docs, a golden Blender→Godot import matrix, a local MCP bridge (Blender/Godot), ComfyUI+SD1.5 image generation, a Poly Haven
+CC0 downloader, and a prototype MusicGen path. There is still **no game code, no chosen engine, no build/export adapter, no rendered capture, no
 orchestrator, no console and no records infrastructure**. See `docs/ENGINE-SMOKE.md` and `DEFERRED.md` for the honest boundary.

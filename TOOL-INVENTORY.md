@@ -124,6 +124,18 @@ It is not a YuE2 substitute (no vocals, 32 kHz, lower quality) and its weights a
 - Hardware: **external NVMe** (D: has 52.6 GB free) and a **stronger GPU/eGPU or desktop** are the only real fixes for
   UE5 + AAA look and heavy local generative work. No software install substitutes for them.
 
+## MCP and local generation (ADR-008)
+
+| Item | Version | Notes |
+| --- | --- | --- |
+| ComfyUI portable | 0.42.1 (nvidia) | local image generation; `--lowvram` on the 4 GB T600 |
+| SD1.5 checkpoint | `v1-5-pruned-emaonly-fp16.safetensors` | 2.03 GB; OpenRAIL-M; licence review before shipping |
+| mcp-for-blender | 2.2.4 (server), addon protocol 15 | MIT; addon enabled in Blender 5.2.3; Blender must be open for tool calls; telemetry off |
+| godot-mcp | build from Coding-Solo/godot-mcp | MIT; `get_godot_version` returns 4.7.2 through the bridge |
+| MCP bridge | `tools/mcp/mcp_call.py` | stdio list/call; DSH integration path |
+| Poly Haven downloader | `tools/polyhaven/polyhaven.py` | CC0 assets, no API key, SHA-256 records |
+| TripoSR | **not installed** | MIT but ~6 GB VRAM (PG-D19) |
+
 ## Verification performed
 
 | Claim | Observation |
@@ -133,7 +145,10 @@ It is not a YuE2 substitute (no vocals, 32 kHz, lower quality) and its weights a
 | Build tools work | `cmake --version` → 4.4.4; `ninja --version` → 1.13.2 |
 | glTF tooling works | `gltf-transform --version` → 4.5.1; `gltfpack` runs |
 | MusicGen works | `facebook/musicgen-small` generated a 5.94 s clip at 32 kHz on CUDA; RMS 0.146, peak 0.427; fp16 NaN detected and retried in fp32; metadata sidecar written |
-| Unity/licence and UE5 gates | Unity batchmode: "No valid Unity Editor license found" (exit 198); UE5 hardware gate fails (4 GB VRAM, 52.6 GB free) — see `docs/ENGINE-SMOKE.md` |
+| Unity/licence and UE5 gates | Unity batchmode: "No valid Unity Editor license found" (exit 198); UE5 hardware gate fails (4 GB VRAM, 51.5 GB free) — see `docs/ENGINE-SMOKE.md` |
+| ComfyUI works | 512×512 SD1.5, 20 steps, seed 42 → PNG (304 KB, mean 0.526) in 28.2 s on the T600 with `--lowvram`; provenance sidecar written |
+| MCP bridge works | `tools/mcp/mcp_call.py list --server godot` lists tools; `get_godot_version` returned `4.7.2.stable.official.ed1daf0bf`; Blender server lists tools with the addon installed |
+| Poly Haven works | downloaded `brick_wall_02` Diffuse 1k (1,032,279 bytes, SHA-256 recorded, CC0) |
 | Python tooling works | imports of scipy, trimesh, pygltflib, imageio, cv2, matplotlib all succeed under `C:\Python\python.exe` |
 | All new commands resolve | `Get-Command magick,ffmpeg,ffprobe,cmake,ninja,gltfpack,gltf-transform,texconv,renderdoccmd,tiled,material_maker,LDtk,libresprite,meshlab,audacity` all found on the refreshed user PATH |
 | No admin needed | everything is portable under the user profile; no elevation was used |

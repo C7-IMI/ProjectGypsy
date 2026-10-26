@@ -1,0 +1,42 @@
+{
+  "schema": "gypsy.capability/v1",
+  "file": "mcp.godot.json",
+  "id": "mcp.godot",
+  "layer": "tooling",
+  "tool": "godot",
+  "kind": "control",
+  "maturity": "stable",
+  "description": "Godot MCP (MIT) built locally; bridge returns engine version and can launch/run projects.",
+  "requires": [
+    "godot.installed",
+    "node.installed"
+  ],
+  "inputs": [
+    {
+      "name": "tool",
+      "type": "string"
+    },
+    {
+      "name": "args",
+      "type": "json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "get_godot_version returns 4.7.2",
+    "project tools operate on an explicit path"
+  ],
+  "provenance": {
+    "record": [
+      "server.version",
+      "godot.version",
+      "tool",
+      "resultHash"
+    ]
+  }
+}

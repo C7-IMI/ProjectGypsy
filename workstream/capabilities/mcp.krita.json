@@ -1,0 +1,38 @@
+{
+  "schema": "gypsy.capability/v1",
+  "file": "mcp.krita.json",
+  "id": "mcp.krita",
+  "layer": "tooling",
+  "tool": "krita",
+  "kind": "control",
+  "maturity": "planned",
+  "description": "Krita MCP is optional; Krita's scripting/plugin lifecycle must be proven before integration.",
+  "requires": [
+    "krita.installed",
+    "plugin"
+  ],
+  "inputs": [
+    {
+      "name": "tool",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "plugin loads",
+    "canvas export round-trips",
+    "no file corruption"
+  ],
+  "provenance": {
+    "record": [
+      "krita.version",
+      "plugin.version",
+      "tool"
+    ]
+  }
+}

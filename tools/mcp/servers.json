@@ -1,0 +1,24 @@
+{
+  "servers": {
+    "blender": {
+      "description": "MCP for Blender (ahujasid/mcp-for-blender, MIT). Requires Blender open with the addon server running.",
+      "command": "uvx",
+      "args": [
+        "mcp-for-blender"
+      ],
+      "env": {
+        "DISABLE_TELEMETRY": "true"
+      }
+    },
+    "godot": {
+      "description": "Godot MCP (Coding-Solo/godot-mcp, MIT). Requires the Godot binary path.",
+      "command": "node",
+      "args": [
+        "%LOCALAPPDATA%\\Programs\\GameTools\\Mcp\\godot-mcp\\build\\index.js"
+      ],
+      "env": {
+        "GODOT_PATH": "%LOCALAPPDATA%\\Microsoft\\WinGet\\Links\\godot_console.exe"
+      }
+    }
+  }
+}

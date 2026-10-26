@@ -6,13 +6,15 @@
 | [ADR-002-art-pipeline.md](ADR-002-art-pipeline.md) | source-of-truth formats, engine-neutral export contract, validators, provenance/licensing |
 | [ADR-003-workstream-architecture.md](ADR-003-workstream-architecture.md) | studio-harness architecture, contracts, phases, self-extension safety, rejected alternatives |
 | [ADR-004-generative-media.md](ADR-004-generative-media.md) | YuE2 hardware block, MusicGen-small prototype fallback, cloud runbooks, image-generation route |
-| [ADR-005-character-animation-automation.md](ADR-005-character-animation-automation.md) | generate/evaluate/critique/tweak loop for characters, rigs and animation; human review gates; honest limits |
+| [ADR-005-character-animation-automation.md](ADR-005-character-animation-automation.md) | generate/evaluate/critique/tweak loop for characters, rigs and animation; human review gates |
 | [ADR-006-blender-import-matrix.md](ADR-006-blender-import-matrix.md) | Blender 5.2.3 golden-asset kit, pinned export settings, FBX quirks, per-engine import matrix |
 | [ADR-007-language-boundaries.md](ADR-007-language-boundaries.md) | engine-native gameplay, Python workstream, Rust optional/not installed, C ABI boundary rules |
+| [ADR-008-mcp-and-free-local-tools.md](ADR-008-mcp-and-free-local-tools.md) | MCP bridge, Blender/Godot MCP, ComfyUI+SD1.5, Poly Haven, no-API stack, API-provider list |
 | [ENGINE-SMOKE.md](ENGINE-SMOKE.md) | Phase-0 evidence: Godot headless pass, Unity licence block, UE5 gate, Flax status |
-| [IMPORT-MATRIX.md](IMPORT-MATRIX.md) | generated evidence: Blender round-trip, glTF validation, Godot import pass, blocked engines |
+| [IMPORT-MATRIX.md](IMPORT-MATRIX.md) | generated evidence: Blender round-trip, glTF validation, Godot import, blocked engines |
 
 Related: [../TOOLCHAIN.md](../TOOLCHAIN.md), [../TOOL-INVENTORY.md](../TOOL-INVENTORY.md),
 [../DEFERRED.md](../DEFERRED.md), [../workstream/README.md](../workstream/README.md),
+[../tools/mcp/README.md](../tools/mcp/README.md), [../tools/comfyui/README.md](../tools/comfyui/README.md),
 [../assets/test/golden/generate_golden.py](../assets/test/golden/generate_golden.py),
 [../scripts/import_matrix.py](../scripts/import_matrix.py).

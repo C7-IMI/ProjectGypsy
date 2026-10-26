@@ -1,0 +1,44 @@
+{
+  "schema": "gypsy.capability/v1",
+  "file": "mcp.blender.json",
+  "id": "mcp.blender",
+  "layer": "tooling",
+  "tool": "blender",
+  "kind": "control",
+  "maturity": "partial",
+  "description": "MCP for Blender (MIT) via bridge; addon installed and enabled, socket server starts when Blender opens. Optional providers off.",
+  "requires": [
+    "blender.installed",
+    "mcp.addon",
+    "blender.running"
+  ],
+  "inputs": [
+    {
+      "name": "tool",
+      "type": "string"
+    },
+    {
+      "name": "args",
+      "type": "json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "list tools succeeds",
+    "get_addon_status reaches Blender",
+    "no telemetry (DISABLE_TELEMETRY=true)"
+  ],
+  "provenance": {
+    "record": [
+      "server.version",
+      "tool",
+      "arguments",
+      "resultHash"
+    ]
+  }
+}
