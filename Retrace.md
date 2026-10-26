@@ -241,5 +241,14 @@ Each entry has:
 
 ---
 
-Next prompt number: 24. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 24 - 2026-10-26
+
+- Request: After the dashboard, finish remaining phases; attempt device validation.
+- Status: Device launch remains blocked — emulator install failed on a corrupt ZIP; dashboard complete.
+- Version: 2026.10.25.019
+- Commit/evidence: docs/PHASE-5-EVIDENCE emulator note; no code claim changed; 181 tests/43 capabilities remain.
+
+---
+
+Next prompt number: 25. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

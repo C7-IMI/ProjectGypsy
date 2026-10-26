@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.25.018
+Current version: 2026.10.25.019
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,16 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.25.019
+
+**Record the Android emulator attempt as blocked; keep the dashboard final.**
+
+- Date: 2026-10-26
+- Commit: this change.
+- Change: docs/PHASE-5-EVIDENCE records that the emulator package download produced a corrupt ZIP and no AVD/device
+  test was possible; no code or capability claim changed. Dashboard remains the local UI (ADR-014).
+- Verification: check_all at 181 tests/43 capabilities; no new tests; UI screenshots unchanged.
 
 ## 2026.10.25.018
 
