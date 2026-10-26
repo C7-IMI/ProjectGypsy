@@ -3,7 +3,7 @@
 A minimal Godot 4.7.2 PC slice that proves the game loop end to end: a 3D arena with a floor and
 four jumpable platforms, a WASD-driven player capsule, three collectible crystals and a third-person
 follow camera. The engine is pinned for this slice in [project.gypsy.json](project.gypsy.json); the
-final engine choice is still the operator's decision (PG-D3, ADR-001).
+Phase-1 engine choice is recorded in [ADR-009](../docs/ADR-009-vertical-slice.md); a different engine is a port, not a toggle.
 
 There is deliberately **no HUD or interface design**: interface work is parked (ProjectPack PG-D4),
 so the slice uses 3D primitives and materials only.
@@ -11,7 +11,7 @@ so the slice uses 3D primitives and materials only.
 ## Run it interactively
 
 ```powershell
-$env:LOCALAPPDATA\Microsoft\WinGet\Links\godot_console.exe --path game
+& "$env:LOCALAPPDATA\Microsoft\WinGet\Links\godot_console.exe" --path game
 ```
 
 Controls:
@@ -47,8 +47,9 @@ which sets a world-space direction toward the nearest uncollected crystal every 
 the same `Area3D` pickup code a human triggers. Given the fixed 60 Hz physics tick the frame count is
 deterministic, so the run can be repeated and compared.
 
-Headless Godot uses a dummy renderer (ADR-001): this proves game logic and the collection mechanic,
-not rendered output. Rendered capture is a separate deferred capability.
+Headless Godot uses a dummy renderer (ADR-001): this proves game logic and the collection mechanic, not rendered
+output. `python workstream/gypsy.py game capture` records a windowed 1280×720 movie (72 frames) and extracts a frame;
+see `docs/PHASE-1-EVIDENCE.md`.
 
 ## Layout
 
@@ -67,7 +68,7 @@ not rendered output. Rendered capture is a separate deferred capability.
 
 ## Known limitations
 
-- The Windows export preset is authored but **not verified**: building requires the 4.7.2 export
-  templates and writes outside `game/` (`build/`), which is the Lead's step.
-- Headless runs cannot render; no visual evidence is claimed from them.
+- The Windows export preset is **verified**: `game build` produced `build/ProjectGypsy.exe` (109,127,680 bytes) and
+the exported binary runs the headless demo; see `docs/PHASE-1-EVIDENCE.md`.
+- Headless runs cannot render; visual evidence comes from the windowed `game capture` path.
 - One mechanic only: walk/jump/collect. Enemies, scoring, audio, saving and UI are later slices.

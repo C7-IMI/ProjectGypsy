@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.25.009
+Current version: 2026.10.25.010
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -11,26 +11,39 @@ entries answer. Records are guarded by [scripts/records_check.py](scripts/record
 ## How versions 001-008 were assigned
 
 No changelog existed before this bootstrap, so the bootstrap assigned versions 2026.10.25.001-008 to the commits
-already in `git log`, oldest first; 2026.10.25.009 is the current Phase-1 build and is a placeholder the Lead
-finalizes after reading the slices and running their verification. From the next version on, the number is computed
-by the script.
+already in `git log`, oldest first; 2026.10.25.009 is the Phase-1 build and 2026.10.25.010 records its
+verification/audit fixes. From the next version on, the number is computed by the script.
 
 Verification recorded for the whole tree on 2026-10-25 at commit `534d801` - not per historical commit:
 `python -m unittest discover -s workstream/tests` -> 13 tests OK; `python workstream/gypsy.py check` -> PASS;
 `python scripts/check_all.py` -> PASS. Entries below cite the evidence that existed when the commit was made
 rather than claiming a re-run that did not happen.
 
-This changelog has **no generated copies yet**. There is no contract artefact or other derived record to generate
-(PG-D7 does not apply), and the pack's generated-copies requirement is reported to the Lead rather than claimed
-here. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
+This changelog has **no generated documentation copies yet**. There is no contract artefact or other derived record
+to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
+`artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.25.010
+
+**Phase-1 audit fixes: CI-safe tests, verified game gate, status/records corrections.**
+
+- Date: 2026-10-25
+- Commit: this change.
+- Change: environment-dependent workstream tests now skip on a clean CI runner while keeping local assertions; the CI
+  check list was proven in a simulated clean environment; `game verify` now requires capture to pass; subprocess
+  output is decoded as UTF-8; stale Phase-0/Phase-1 status text, engine-open references, capture timing and the
+  records closure note were corrected; BuildNotes/Retrace updated.
+- Verification: `scripts/check_all.py` 6/6 PASS (15 tests local; 7 skipped and PASS in the simulated CI environment);
+  `python workstream/gypsy.py game verify` demo/build/capture PASS; `game demo` marker `GYPSY_DEMO_OK collected=3
+  frames=143`; capture 72 frames at 1280x720.
 
 ## 2026.10.25.009
 
 **Phase-1 autonomous build - playable Godot 4.7.2 PC slice, workstream game adapter, records/checks bootstrap.**
 
 - Date: 2026-10-25
-- Commit: this change (the commit that adds this entry; evidence below).
+- Commit: `d3c4f7f` (Phase-1 slice/records/adapter; this entry records it).
 - Change: `game/` Godot 4.7.2 vertical slice (movement, three collectibles, camera, deterministic demo, Windows
   export preset); `workstream/game.py` plus `gypsy game demo|build|capture|verify`; ADR-009 and
   `docs/PHASE-1-EVIDENCE.md`; the records/check system (`Retrace.md`, this file,

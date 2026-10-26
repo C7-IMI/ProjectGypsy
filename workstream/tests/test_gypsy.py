@@ -27,18 +27,28 @@ class CapabilityTests(unittest.TestCase):
 
 
 class EngineTests(unittest.TestCase):
-    def test_probe_finds_installed_engines(self):
+    def test_probe_structure(self):
         probe = gypsy.probe_engines()
         self.assertIn("godot", probe["engines"])
-        self.assertTrue(probe["engines"]["godot"]["installed"])
+        self.assertIn("unity", probe["engines"])
+        self.assertIn("ue5", probe["engines"])
+        self.assertIn("flax", probe["engines"])
+        self.assertIsInstance(probe["machine"], dict)
+        self.assertIsInstance(probe["staleRegistry"], list)
+
+    def test_probe_finds_installed_engines(self):
+        probe = gypsy.probe_engines()
+        if not probe["engines"]["godot"].get("installed"):
+            self.skipTest("Godot is not installed on this machine")
         self.assertTrue(probe["engines"]["godot"]["usable"])
         self.assertEqual(probe["engines"]["godot"]["version"], "4.7.2")
-        self.assertTrue(probe["engines"]["ue5"]["installed"])
         self.assertIsNotNone(probe["machine"]["ram_gb"])
         self.assertIn("C", probe["machine"]["disks"])
 
     def test_ue5_is_hardware_gated_on_this_machine(self):
         probe = gypsy.probe_engines()
+        if not probe["engines"]["ue5"].get("installed"):
+            self.skipTest("UE5 is not installed on this machine")
         gate = probe["engines"]["ue5"]["gate"]
         self.assertFalse(gate["ok"])
         self.assertTrue(any("VRAM" in reason or "free space" in reason for reason in gate["reasons"]))
@@ -60,6 +70,8 @@ class EngineTests(unittest.TestCase):
 class ToolTests(unittest.TestCase):
     def test_tools_manifest(self):
         data = gypsy.load_tools()
+        if not data["exists"]:
+            self.skipTest("GameTools manifest is not installed on this machine")
         self.assertTrue(data["exists"], data["errors"])
         self.assertGreater(len(data["tools"]), 5)
         self.assertEqual(data["missing"], [])
@@ -67,7 +79,10 @@ class ToolTests(unittest.TestCase):
 
 class ProjectTests(unittest.TestCase):
     def test_init_show_and_overwrite_protection(self):
-        version = gypsy.detect_godot()["version"]
+        record = gypsy.detect_godot()
+        if not record.get("usable"):
+            self.skipTest("Godot is not installed on this machine")
+        version = record["version"]
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "demo"
             result = gypsy.init_project(path, "godot", version, ["pc"])
@@ -89,6 +104,8 @@ class ProjectTests(unittest.TestCase):
                 gypsy.init_project(Path(tmp) / "demo", "cryengine", "1.0", ["pc"])
 
     def test_version_mismatch_is_refused(self):
+        if not gypsy.detect_godot().get("usable"):
+            self.skipTest("Godot is not installed on this machine")
         with tempfile.TemporaryDirectory() as tmp:
             with self.assertRaises(gypsy.GypsyError):
                 gypsy.init_project(Path(tmp) / "demo", "godot", "0.0.0", ["pc"])
@@ -112,6 +129,8 @@ class ProjectTests(unittest.TestCase):
 
 class CheckTests(unittest.TestCase):
     def test_check_all_passes(self):
+        if not gypsy.load_tools()["exists"] or not gypsy.detect_godot().get("usable"):
+            self.skipTest("local engine/tool installation is required for the full check")
         result = gypsy.check_all()
         self.assertTrue(result["passed"], result["errors"])
         self.assertGreater(result["capabilities"], 10)

@@ -2,14 +2,14 @@
 
 **Status:** Accepted, 2026-10-25 · **Decision owner:** operator · **Reviewer:** Lead
 **Scope:** how game art and audio are authored, exported, imported and checked.
-**Related:** [TOOL-INVENTORY.md](../TOOL-INVENTORY.md) · [DEFERRED.md](../DEFERRED.md) PG-D3, PG-D10–PG-D12 ·
+**Related:** [TOOL-INVENTORY.md](../TOOL-INVENTORY.md) · [DEFERRED.md](../DEFERRED.md) PG-D10–PG-D12 · [ADR-009](ADR-009-vertical-slice.md) (Phase-1 engine) ·
 [ADR-001](ADR-001-engines.md) (engine adapters) · [ADR-003](ADR-003-workstream-architecture.md) (capability bus) ·
 [ADR-004](ADR-004-generative-media.md).
 **Out of scope:** interface/UI design and art direction — the interface rules are parked in
 [ProjectPack-ADDENDUM-Interface.md](../ProjectPack-ADDENDUM-Interface.md) and no game-side standard exists (PG-D4).
 
 ## Context
-1. **The engine is a per-project choice, not a global one** (ADR-001, PG-D3). An asset that can only exist inside
+1. **The engine is a per-project choice, not a global one** (ADR-001; Phase 1 chose Godot 4.7.2 PC, ADR-009). An asset that can only exist inside
    one engine is a bet on an undecided decision.
 2. **The machine is modest and nearly full.** T600 **4 GB VRAM**, 64 GB RAM, C: 252 GB and D: 52.6 GB free
    (inventory recorded 256 GB), UE 5.8 on D: (PG-D11); large generated intermediates are not affordable.
@@ -19,7 +19,8 @@
    Only open-source tools were newly installed, and the paid gaps are deferred (PG-D12).
 4. **The art pipeline itself does not exist.** ADR-003's studio harness and its capability manifests are a
    separate decision, and a Phase 0 skeleton exists under `workstream/`; there is still no `assets/` tree, no art
-   generator, no check list and no records infrastructure (PG-D1, PG-D2, PG-D5). No art check is claimed here.
+   generator. The pack-wide check list and records now exist (PG-D1/PG-D2/PG-D5 closed); the art-specific pipeline and
+   its checks do not. No art check is claimed here.
 5. **Two pack laws decide the shape.** §2.5: one source, one generator, one check; §1.4: a derived artefact
    comes from a script that fails loudly on missing input. Part 5 case 5 is a hand-edited generated file.
 
@@ -80,7 +81,7 @@ Sources live under `assets/src/` (LFS); derived files under `assets/export/`, ge
 
 ### D4 — Validators are a first-class capability
 Checks only move mistakes faster if they exist. Each check below is unimplemented; it must be **proven to fail**
-on a broken fixture (§1.5) and joins the one check list (§2.22) when that exists (PG-D2) — never a second list.
+on a broken fixture (§1.5) and joins `scripts/check_all.py` (§2.22) — never a second list.
 
 | Check | Compares | Fails when |
 | --- | --- | --- |
@@ -123,8 +124,8 @@ profiles/         # per-engine import profiles: godot.json, unity.json, ue.json,
 tools/art/        # art.probe, art.convert, art.validate, blender export/bake scripts
 ```
 
-None of the layout above exists yet. The docs index now exists at `docs/README.md`; the links guard PG-D5 requires is
-still owed. Art operations register in the ADR-003 capability bus (manifests
+None of the layout above exists yet. The docs index (`docs/README.md`) and the relative-links guard
+(`scripts/check_all.py`) exist. Art operations register in the ADR-003 capability bus (manifests
 `art.blender.export` and `art.texture.validate` exist; the operations are not implemented yet). Binaries use Git LFS.
 
 ### D7 — Phased delivery
@@ -148,7 +149,7 @@ still owed. Art operations register in the ADR-003 capability bus (manifests
 ## Alternatives rejected
 | Alternative | Why rejected |
 | --- | --- |
-| Engine-native assets as source (`.uasset`, prefab, `.tscn`) | locks the library to PG-D3; binary and unreviewable; cannot switch engine |
+| Engine-native assets as source (`.uasset`, prefab, `.tscn`) | locks the library to the current engine (ADR-009); binary and unreviewable; cannot switch engine |
 | FBX as the only exchange format | closed, heavier to inspect/validate; glTF is open and tooled here; FBX stays a fallback |
 | One texture pack for every engine | sRGB, compression and channel conventions differ; the profile exists because one pack cannot be right for all |
 | Hand-edited engine metadata (no adapter) | two sources that must agree with no mechanism — the §1.2 failure |
@@ -160,12 +161,12 @@ still owed. Art operations register in the ADR-003 capability bus (manifests
 - **O1** Canonical pixel editor: Pixelorama or LibreSprite. Choose one or the class has two sources.
 - **O2** Is FBX permitted at all? It brings Autodesk SDK/licence questions into a Blender export path.
 - **O3** Descriptor carriage: sidecar JSON only, or mirrored in glTF `extras`? A mirror is a second copy.
-- **O4** First adapter target (PG-D3). Godot 4.7.2 has the only verified headless loop here.
+- **O4** First adapter target: **resolved** — Godot 4.7.2, PC (ADR-009); it has the only verified headless/build/capture loop here.
 - **O5** Texel-density bands, poly budgets and LOD counts are art-direction decisions — none chosen; no style
   standard exists (PG-D4 covers interfaces, not art, but the operator-decides logic applies).
 - **O6** Does Material Maker 1.8 expose a usable export CLI? Unverified; if not, procedural materials stay manual.
 - **O7** Are exports committed or built by CI, and who approves an artefact's record — operator or Lead, stored
-  where? LFS storage against reproducibility; CI does not exist (PG-D2).
+  where? LFS storage against reproducibility; CI runs the same check list (PG-D2 closed).
 - **Risks:** validators that pass on wrong input (mitigate: break it first, §1.5); tool upgrades changing export
   hashes; disk exhaustion on D:; GUI steps drifting from the scripted path; UE5 import unverifiable until PG-D11.
 

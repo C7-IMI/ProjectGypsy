@@ -15,6 +15,8 @@ class GameTests(unittest.TestCase):
     def test_game_demo_contract(self):
         if not (gypsy.REPO_ROOT / "game" / "project.godot").exists():
             self.skipTest("game/ is not present")
+        if not gypsy.detect_godot().get("usable"):
+            self.skipTest("Godot is not installed on this machine")
         evidence = game.demo()
         self.assertTrue(evidence["passed"])
         self.assertEqual(evidence["collected"], 3)

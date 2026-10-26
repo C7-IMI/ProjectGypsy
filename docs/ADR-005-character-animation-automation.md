@@ -17,7 +17,7 @@
 3. **Nothing in this pipeline is built.** The capability manifests are `planned` — `art.character.blockout`,
    `art.character.retopo`, `art.character.rig`, `art.character.validate`, `art.animation.retarget`,
    `art.lookdev.turntable` — and `art.import.matrix` is `partial`. No orchestrator or console exists (PG-D15), and
-   the hero character, art direction and engine choice do not exist (PG-D3, PG-D17).
+   the hero character and art direction do not exist (PG-D17); the Phase-1 engine is chosen (Godot 4.7.2, ADR-009).
 4. **Hardware:** T600 **4 GB VRAM**, 64 GB RAM, C: 242.3 GB / D: **51.5 GB** free (re-checked). 4 GB is workable for
    game-scale sculpt/retopo/animation, but high-poly sculpting, large textures and production renders must be bounded.
    No mocap or capture hardware, and no drawing tablet, is recorded in [TOOL-INVENTORY.md](../TOOL-INVENTORY.md).
@@ -160,7 +160,7 @@ console will present**, so approval does not wait for UI:
 - **O1 Art direction and roster.** Style, character list, poly/texel/LOD budgets — operator decisions; PG-D4 covers
   interfaces, not art, so no standard exists.
 - **O2 Engine and humanoid mapping.** Unity Humanoid avatar, UE mannequin skeleton, Godot `Skeleton3D`: bone naming
-  and retarget policy follow the engine choice (PG-D3).
+  and retarget policy follow the engine choice (Phase 1: Godot 4.7.2, ADR-009).
 - **O3 Rig choice.** Rigify basic-human variant vs a custom game rig; bone budget; deform-only export default.
 - **O4 Human capacity.** Who sculpts, retopos and approves, and is a tablet available? Not verified.
 - **O5 AI character policy.** May generated concepts/meshes enter, and under which licence (ADR-004)?

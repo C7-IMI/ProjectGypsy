@@ -119,7 +119,7 @@ current boundary.
 
 ## Open questions
 
-- Which engine first? (ADR-001 / PG-D3; recommendation: Godot for the proof, Unity if mobile.)
+- **Resolved for Phase 1:** Godot 4.7.2, PC (ADR-009). Later ports/mobile remain operator decisions.
 - Where does the artifact store live long-term (local vs server) once assets grow?
 - How much of the art pipeline is human-finish vs agent-driven? (ADR-002.)
 - Which generation providers are acceptable and under what licence policy? (ADR-004.)

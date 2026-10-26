@@ -76,13 +76,13 @@ The "declined" entries are in Part 11.13 of the pack and in `DEFERRED.md` only w
 
 | Placeholder | In this repository |
 | --- | --- |
-| `<PROMPT_LOG>` | not created yet — **PG-D1** |
-| `<CHANGELOG>` | not created yet — **PG-D1** |
-| version script | none yet — **PG-D1** |
-| `<GUARD_LIST>` | none yet — **PG-D2**; Phase 0 has workstream unit tests and `gypsy check`, which are not the pack-wide list |
+| `<PROMPT_LOG>` | [`Retrace.md`](./Retrace.md) (**PG-D1** closed) |
+| `<CHANGELOG>` | [`BuildNotes.md`](./BuildNotes.md) (**PG-D1** closed) |
+| version script | [`scripts/next-version.py`](./scripts/next-version.py) (**PG-D1** closed) |
+| `<GUARD_LIST>` | [`scripts/check_all.py`](./scripts/check_all.py) — the pack-wide list, run by hook and CI (**PG-D2** closed) |
 | `<CONTRACT_ARTEFACT>` | none yet — no published API (**PG-D7** if one appears) |
 | `<CONTRACT_GUIDE>` | the same |
-| `<PRODUCT_DOCS>` | [`README.md`](./README.md), [`docs/README.md`](./docs/README.md), this file, `ProjectPack.md`, `TOOLCHAIN.md` and `DEFERRED.md`; the links guard is still owed (**PG-D5**) |
+| `<PRODUCT_DOCS>` | [`README.md`](./README.md), [`docs/README.md`](./docs/README.md), this file, `ProjectPack.md`, `TOOLCHAIN.md` and `DEFERRED.md`; the relative-links guard runs in `scripts/check_all.py` (**PG-D5** closed) |
 | `<DEFERRED_REGISTER>` | [`DEFERRED.md`](./DEFERRED.md) |
 | `<HEALTH_COMMAND>` | `python workstream/gypsy.py game demo` (headless slice); `python scripts/check_all.py` for the pack checks |
 | `<SWEEP_COMMAND>` | none — no test rig writes state yet |
@@ -94,7 +94,7 @@ The "declined" entries are in Part 11.13 of the pack and in `DEFERRED.md` only w
 | The decision | This repository's answer |
 | --- | --- |
 | Where the prompt log and changelog live, and how the version is computed | [`Retrace.md`](./Retrace.md), [`BuildNotes.md`](./BuildNotes.md) and [`scripts/next-version.py`](./scripts/next-version.py); guarded by [`scripts/records_check.py`](./scripts/records_check.py) (**PG-D1** closed) |
-| Which generated copies exist, and who regenerates them | None — nothing generated yet |
+| Which generated copies exist, and who regenerates them | No generated **documentation** copies; the game export (`build/`) and captures (`artifacts/`) are generated and gitignored. No contract artefact exists (PG-D7 not applicable) |
 | The single check list, and how the hook and CI are kept in step | [`scripts/check_all.py`](./scripts/check_all.py) is the one list; [`.githooks/pre-commit`](./.githooks/pre-commit) and [`.github/workflows/checks.yml`](./.github/workflows/checks.yml) both run it, and its caller-coverage guard compares them (**PG-D2** closed) |
 | The published contract artefact and what checks it | Not applicable yet; if the game exposes an API this becomes **PG-D7** |
 | Where the product's own documentation lives, and what keeps it reachable | README, [`docs/README.md`](./docs/README.md) and the ADRs; `scripts/check_all.py` checks every relative Markdown link (**PG-D5** closed) |
@@ -105,7 +105,7 @@ The "declined" entries are in Part 11.13 of the pack and in `DEFERRED.md` only w
 | Where the scratch rigs live, and how they are reaped | None started by this repository's work |
 | Whether anything commits on somebody's behalf | No. Commits are made by a person or a session; no auto-publisher exists |
 | Which layers need a rollback document | None yet (**PG-D8**); `ProjectPack.md` §2.13 and Part 11.9 state what each will need |
-| The token and context budget, and which loop is the expensive one | Not measured at scale; Phase 1's expensive steps are Godot export (~2.6 s), windowed capture (~8 s) and the test suite (~6 s). Asset builds remain future work |
+| The token and context budget, and which loop is the expensive one | Not measured at scale; Phase 1's expensive steps are Godot export (~2.6 s), windowed capture (~4.5 s) and the test suite (~7 s). Asset builds remain future work |
 | The register of deliberately deferred work | [`DEFERRED.md`](./DEFERRED.md) |
 | Which artefacts are stamped, and who bumps the stamp | None — nothing is distributed |
 | What is checked before a deploy, without a subscription | Nothing deployed, no templates, no infrastructure |
@@ -123,7 +123,7 @@ machinery is in place; remaining work is asset authorship, adapters and phases 2
   permissions, sweeps and secrets; §2.17–§2.19 reproducibility, evidence and budget; §2.20 scale-and-move; §2.22–§2.30
   operations (when a build exists); §2.31 itself; §2.32 text and encoding; §2.33/§2.34 peer separation and context
   limits; Part 10 (operator's rules); Part 12; and Part 11 in this copy.
-- **Mechanised today:** `python scripts/check_all.py` (records, encoding, links, capability JSON, 14 tests, hook/CI
+- **Mechanised today:** `python scripts/check_all.py` (records, encoding, links, capability JSON, 15 tests, hook/CI
   caller coverage), `python workstream/gypsy.py check` (engine/project manifests, hardware gate), and `python
   workstream/gypsy.py game verify` (demo, export, exported-binary demo, capture). The pre-commit hook runs the same
   list. The report discipline in Part 11.2 remains the human half.
@@ -163,7 +163,7 @@ python workstream/gypsy.py check
 python workstream/gypsy.py game verify
 ```
 
-`check_all.py` covers records, encoding, links, capability JSON, the 14 workstream tests and hook/CI caller coverage;
+`check_all.py` covers records, encoding, links, capability JSON, the 15 workstream tests and hook/CI caller coverage;
 `gypsy check` covers engine/project manifests and the hardware gate; `game verify` covers the playable slice.
 
 

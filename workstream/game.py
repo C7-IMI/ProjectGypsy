@@ -187,7 +187,7 @@ def verify(game_dir: Path = GAME_DIR) -> dict:
         "build": {k: build_result[k] for k in ("passed", "output", "bytes", "seconds")},
         "capture": ({k: capture_result[k] for k in ("passed", "movie", "mp4", "frame")} if capture_result else None),
         "captureError": capture_error,
-        "passed": demo_result["passed"] and build_result["passed"],
+        "passed": demo_result["passed"] and build_result["passed"] and bool(capture_result and capture_result["passed"]),
         "capturePassed": bool(capture_result and capture_result["passed"]),
     }
     result["evidencePath"] = str(_evidence("game-verify.json", result))

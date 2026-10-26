@@ -143,9 +143,19 @@ Each entry has:
 - Version: 2026.10.25.009
 - Commit/evidence: `game/` and `docs/PHASE-1-EVIDENCE.md`; demo `GYPSY_DEMO_OK collected=3 frames=143`;
   `build/ProjectGypsy.exe` 109,127,680 bytes and its headless demo pass; capture 72 frames at 1280x720;
-  `game verify` and `scripts/check_all.py` (6/6 PASS, 14 tests, 35 capabilities) pass.
+  `game verify` and `scripts/check_all.py` (6/6 PASS, 15 tests, 35 capabilities) pass.
 
 ---
 
-Next prompt number: 15. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 15 - 2026-10-25
+
+- Request: Fix the Phase-1 audit findings and re-verify the build, records and CI gate.
+- Status: Completed.
+- Version: 2026.10.25.010
+- Commit/evidence: CI-safe test skips (simulated clean runner PASS), `game verify` now requires capture, UTF-8
+  subprocess decoding, status/engine/records corrections; `scripts/check_all.py` 6/6 PASS, 15 tests local.
+
+---
+
+Next prompt number: 16. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

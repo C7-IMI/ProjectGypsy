@@ -110,9 +110,8 @@ other engines remain adapters and a port is not a toggle.
 
 ## Open questions
 
-- Which engine, if any, is chosen for ProjectGypsy itself? Still **PG-D3** — this ADR fixes the mechanism, not the
-  choice. The recommendation for this hardware is Godot for the pipeline proof, Unity if mobile is the target, UE5
-  only with stronger hardware.
+- **Resolved for Phase 1:** Godot 4.7.2, PC (ADR-009). The mechanism still allows another project/port; mobile vs PC
+  and any later engine change remain operator decisions.
 - PC or mobile first? Mobile changes the engine ranking and the verification matrix.
 - Does the operator want the workstream to support engine **ports** as a first-class workflow, or only per-project
   choice? (Assumed per-project choice first.)
