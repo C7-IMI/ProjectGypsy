@@ -55,6 +55,7 @@ STEP_KINDS = frozenset(
         "tests",
         "records",
         "command",
+        "toolpack",
     }
 )
 DEFAULT_TIMEOUT = 300.0

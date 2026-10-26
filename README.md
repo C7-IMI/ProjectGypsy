@@ -26,8 +26,8 @@ A game. Phase 1 is a playable **Godot 4.7.2 PC** slice; the interface standard a
 
 ## Status
 
-Phase 0 + Phase 1 + Phase 2 exist: engine/tool probes, hardware gates, manifests, tests, a playable Godot slice with
-headless demo/export/capture, a manifest-driven slice orchestrator with state, artifact hashes and multi-slice reports,
-records and the pack check list, a golden Blender import matrix (Godot pass; Unity/UE5 blocked), MCP/ComfyUI/Poly Haven
-tooling, the ADRs and the installed toolchain. Not built yet: art/character pipeline, UI, audio, console/live editing,
-mobile or performance budgets. See `docs/PHASE-2-EVIDENCE.md` and `DEFERRED.md`.
+Phase 0 + 1 + 2 + 3 exist: engine/tool probes, hardware gates, manifests, tests, a playable Godot slice with
+headless demo/export/capture, a manifest-driven slice orchestrator with state and artifact hashes, toolpacks with
+validators/provenance for golden Blender->Godot import and local MusicGen audio, records and the pack check list, the
+ADRs, MCP/ComfyUI/Poly Haven tooling and the installed toolchain. Not built yet: hero art/character pipeline, UI,
+console/live editing, mobile or performance budgets. See `docs/PHASE-3-EVIDENCE.md` and `DEFERRED.md`.

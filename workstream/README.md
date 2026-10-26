@@ -15,7 +15,8 @@ python workstream/gypsy.py project init --path game --engine godot --version 4.7
 python workstream/gypsy.py project show [--path game]
 python workstream/gypsy.py check [--project .] [--json]
 python workstream/gypsy.py game demo|build|capture|verify [--path game]
-python workstream/gypsy.py slices list|plan|run|status [--all] [--resume]
+python workstream/gypsy.py slices list|plan|run|status [--all] [--resume] [--force]
+python workstream/gypsy.py toolpacks list|check|run [--action]
 ```
 
 Run the tests:
@@ -35,6 +36,8 @@ python -m unittest discover -s workstream/tests -v
 - Phase-1 game adapter: headless demo, Windows export, exported-binary demo, windowed movie capture.
 - Phase-2 orchestrator: gypsy.slice/v1 manifests (`slices/`), ordered/dependent steps, resumable state, artifact
   SHA-256 ledger, multi-slice task report and the `slices` CLI.
+- Phase-3 toolpacks: gypsy.toolpack/v1 manifests (`toolpacks/`), explicit argv actions, file/json/text/WAV/PNG/GLB
+  validators, artifact hashes and provenance; real packs for golden Blender->Godot import and MusicGen audio.
 
 ## What is not built yet
 

@@ -12,10 +12,12 @@
 | [ADR-008-mcp-and-free-local-tools.md](ADR-008-mcp-and-free-local-tools.md) | MCP bridge, Blender/Godot MCP, ComfyUI+SD1.5, Poly Haven, no-API stack, API-provider list |
 | [ADR-009-vertical-slice.md](ADR-009-vertical-slice.md) | Phase-1 engine choice (Godot 4.7.2 PC), slice scope, acceptance gates |
 | [ADR-010-slice-orchestrator.md](ADR-010-slice-orchestrator.md) | Phase-2 slice schema, orchestrator, state, artifact ledger, multi-slice task |
+| [ADR-011-toolpacks.md](ADR-011-toolpacks.md) | Phase-3 toolpacks, validators (file/json/text/wav/png/glb) and provenance |
 | [ENGINE-SMOKE.md](ENGINE-SMOKE.md) | Phase-0 evidence: Godot headless pass, Unity licence block, UE5 gate, Flax status |
 | [IMPORT-MATRIX.md](IMPORT-MATRIX.md) | generated evidence: Blender round-trip, glTF validation, Godot import, blocked engines |
 | [PHASE-1-EVIDENCE.md](PHASE-1-EVIDENCE.md) | generated evidence: headless demo, export, exported-binary demo, capture, checks |
 | [PHASE-2-EVIDENCE.md](PHASE-2-EVIDENCE.md) | generated evidence: multi-slice task, hashes, reproducibility, resume, tests |
+| [PHASE-3-EVIDENCE.md](PHASE-3-EVIDENCE.md) | generated evidence: golden import, MusicGen audio, validators, provenance |
 
 Related: [../TOOLCHAIN.md](../TOOLCHAIN.md), [../TOOL-INVENTORY.md](../TOOL-INVENTORY.md),
 [../DEFERRED.md](../DEFERRED.md), [../workstream/README.md](../workstream/README.md),

@@ -1,0 +1,47 @@
+{
+  "schema": "gypsy.toolpack/v1",
+  "id": "audio.musicgen",
+  "name": "Local MusicGen-small menu music",
+  "tools": [
+    "MusicGen-small (facebook/musicgen-small)",
+    "PyTorch 2.11.0+cu128",
+    "FFmpeg 9.0.2"
+  ],
+  "license": "CC-BY-NC 4.0 model weights - non-commercial prototype only; human review required before use",
+  "actions": [
+    {
+      "id": "generate",
+      "argv": [
+        "powershell",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "tools/musicgen/musicgen.ps1",
+        "-Prompt",
+        "calm sci-fi menu loop, soft pads, no drums",
+        "-Seconds",
+        "4",
+        "-Out",
+        "artifacts/toolpacks/musicgen.wav"
+      ],
+      "cwd": ".",
+      "timeout": 240,
+      "artifacts": [
+        "artifacts/toolpacks/musicgen.wav"
+      ],
+      "args": {
+        "note": "local GPU generation; fp16 NaN guard falls back to float32"
+      }
+    }
+  ],
+  "validators": [
+    {
+      "id": "wav-audio",
+      "kind": "wav",
+      "artifact": "artifacts/toolpacks/musicgen.wav",
+      "minSeconds": 3,
+      "minRms": 0.01
+    }
+  ]
+}

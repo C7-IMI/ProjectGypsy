@@ -683,6 +683,46 @@ def handle_command(step, context) -> dict:
     return _run_command(argv, cwd, context["timeout"], label="command")
 
 
+def handle_toolpack(step, context) -> dict:
+    """Run a Phase-3 toolpack action or whole toolpack and return its validated result."""
+    toolpacks = _workstream_module("toolpacks")
+    args = step.get("args") or {}
+    toolpack_id = args.get("toolpack")
+    if not isinstance(toolpack_id, str) or not toolpack_id:
+        return {"passed": False, "error": "toolpack: args.toolpack is required", "output": ""}
+    root = Path(context["project_root"])
+    path = Path(args["path"]) if args.get("path") else root / "toolpacks" / (toolpack_id + ".json")
+    if not path.is_absolute():
+        path = root / path
+    try:
+        manifest = toolpacks.load_manifest(path)
+        errors = toolpacks.validate_manifest(manifest)
+        if errors:
+            return {"passed": False, "error": "; ".join(errors), "output": ""}
+        action = args.get("action")
+        if action:
+            result = toolpacks.run_action(manifest, action, project_root=root, state_dir=Path(context["state_dir"]), timeout_scale=context["timeout"] / float(step.get("timeout") or 300))
+        else:
+            result = toolpacks.run_toolpack(manifest, project_root=root, state_dir=Path(context["state_dir"]), timeout_scale=context["timeout"] / float(step.get("timeout") or 300))
+    except Exception as exc:  # noqa: BLE001 - a toolpack failure is state
+        return {"passed": False, "error": f"toolpack: {type(exc).__name__}: {exc}", "output": ""}
+    summary = {
+        "toolpack": manifest.get("id"),
+        "action": action,
+        "passed": result.get("passed"),
+        "artifacts": result.get("artifacts", []),
+        "validators": result.get("validators", []),
+        "statePath": result.get("statePath"),
+        "errors": result.get("errors", []),
+    }
+    return {
+        "passed": bool(result.get("passed")),
+        "output": json.dumps(summary, indent=2)[:4000],
+        "error": "; ".join(str(item) for item in result.get("errors", [])) or None,
+        "statePath": result.get("statePath"),
+    }
+
+
 HANDLERS = {
     "game.demo": _game_handler("demo"),
     "game.build": _game_handler("build"),
@@ -691,4 +731,5 @@ HANDLERS = {
     "tests": handle_tests,
     "records": handle_records,
     "command": handle_command,
+    "toolpack": handle_toolpack,
 }

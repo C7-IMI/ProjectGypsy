@@ -1,0 +1,54 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "workstream.toolpack",
+  "layer": "workstream",
+  "kind": "run",
+  "maturity": "stable",
+  "description": "Toolpack manifest runner: explicit argv, artifact hashing, validators (file/json/text/wav/png/glb) and atomic provenance for art/audio/import tool chains.",
+  "requires": [
+    "python>=3.10"
+  ],
+  "inputs": [
+    {
+      "name": "toolpackId",
+      "type": "string"
+    },
+    {
+      "name": "action",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "state",
+      "type": "json"
+    },
+    {
+      "name": "artifacts",
+      "type": "list"
+    }
+  ],
+  "checks": [
+    "manifest validation",
+    "no shell",
+    "declared artifacts hashed",
+    "validators fail closed",
+    "provenance atomic",
+    "failure stops later actions"
+  ],
+  "provenance": {
+    "record": [
+      "toolpack",
+      "action",
+      "argv",
+      "license",
+      "tools",
+      "artifacts.sha256",
+      "validators",
+      "runId"
+    ]
+  },
+  "notes": [
+    "Phase 3, ADR-011; real art.import.golden and audio.musicgen packs proven."
+  ]
+}

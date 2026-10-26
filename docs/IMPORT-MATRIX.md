@@ -1,6 +1,6 @@
 # IMPORT-MATRIX.md — Blender 5.2 golden-asset import matrix
 
-Generated 2026-10-25T22:42:54-05:00 by scripts/import_matrix.py. This is Phase-0 evidence for
+Generated 2026-10-26T01:46:35-05:00 by scripts/import_matrix.py. This is Phase-0 evidence for
 [ADR-006](ADR-006-blender-import-matrix.md); it is not an art-quality claim.
 
 ## Result
@@ -9,7 +9,7 @@ Generated 2026-10-25T22:42:54-05:00 by scripts/import_matrix.py. This is Phase-0
 | --- | --- | --- | --- | --- | --- |
 | Godot | 4.7.2 | PASS | not supported natively | PASS | headless --import + scene assertions: {"lod_set": {"animations": 0, "loaded": true, "meshes": 4}, "morph_face": {"animations": 0, "loaded": true, "meshes": 1}, "rigged_character": {"animations": 3, "loaded": true, "meshes": 1}, "static_cube": {"animations": 0, "loaded": true, "meshes": 1}} |
 | Unity | 6000.6.7f1 | blocked | blocked | blocked: no licence | batchmode exited 198: No valid Unity Editor license found (docs/ENGINE-SMOKE.md) |
-| UE5 | 5.8.4 | blocked | blocked | blocked: hardware gate | GPU VRAM 4.0 GB is below the 8 GB declared minimum; D: free space 51.5 GB is below the 60 GB declared minimum |
+| UE5 | 5.8.4 | blocked | blocked | blocked: hardware gate | GPU VRAM 4.0 GB is below the 8 GB declared minimum |
 | Flax | 1.13 | not tested | not tested | experimental: not tested | experimental adapter; no headless build/run demonstrated |
 
 ## Blender round-trip

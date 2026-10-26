@@ -1,0 +1,33 @@
+{
+  "schema": "gypsy.slice/v1",
+  "id": "toolpacks",
+  "project": ".",
+  "description": "Phase-3 toolpacks: Blender->Godot golden import and local MusicGen audio, validated with provenance.",
+  "artifacts": [],
+  "steps": [
+    {
+      "id": "art-import",
+      "kind": "toolpack",
+      "needs": [],
+      "required": true,
+      "timeout": 900,
+      "args": {
+        "toolpack": "art.import.golden",
+        "action": "import"
+      }
+    },
+    {
+      "id": "audio",
+      "kind": "toolpack",
+      "needs": [
+        "art-import"
+      ],
+      "required": true,
+      "timeout": 300,
+      "args": {
+        "toolpack": "audio.musicgen",
+        "action": "generate"
+      }
+    }
+  ]
+}

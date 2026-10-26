@@ -12,6 +12,7 @@ Godot; the CLI surface in ADR-010 is a thin wrapper on top of their functions.
 | --- | --- | --- | --- |
 | [phase1.json](phase1.json) | phase1 (project: game) | demo -> build -> capture | build/ProjectGypsy.exe, artifacts/game/demo.mp4, artifacts/game/frame.png |
 | [quality.json](quality.json) | quality (project: repository root) | check -> tests -> records | none |
+| [toolpacks.json](toolpacks.json) | toolpacks (project: repository root) | art import -> audio | toolpack state ledgers under workstream/state/toolpacks (gitignored) |
 
 The two slices are independent manifests: phase1 proves the game vertical slice again from a clean state; quality
 proves the pack check list, the workstream unit tests and the records guard. A task runs them in manifest order and

@@ -687,6 +687,17 @@ def main(argv=None) -> int:
         if name == "status":
             slices_cmd.add_argument("slice_id", nargs="?")
 
+    toolpacks_parser = sub.add_parser("toolpacks", help="Phase-3 toolpack manifests")
+    toolpacks_sub = toolpacks_parser.add_subparsers(dest="toolpacks_command", required=True)
+    for name in ("list", "check", "run"):
+        toolpack_cmd = toolpacks_sub.add_parser(name)
+        toolpack_cmd.add_argument("--dir", default="toolpacks")
+        toolpack_cmd.add_argument("--state-dir", default=None)
+        toolpack_cmd.add_argument("--json", action="store_true")
+        if name == "run":
+            toolpack_cmd.add_argument("toolpack_id")
+            toolpack_cmd.add_argument("--action", default=None)
+
     check_parser = sub.add_parser("check", help="run the Phase-0 checks")
     check_parser.add_argument("--project")
     check_parser.add_argument("--json", action="store_true")
@@ -782,6 +793,60 @@ def main(argv=None) -> int:
                 evidence = game_verify(Path(args.path))
                 print(json.dumps(evidence, indent=2) if args.json else f"game verify | demo={evidence['demo']['passed']} build={evidence['build']['passed']} capture={evidence['capturePassed']}")
                 return 0 if evidence["passed"] else 1
+        if args.command == "toolpacks":
+            import toolpacks as toolpack_spec
+            from pathlib import Path as _Path
+
+            manifests = toolpack_spec.load_all(_Path(args.dir))
+            state_dir = _Path(args.state_dir) if args.state_dir else STATE_DIR
+            if args.toolpacks_command == "list":
+                data = {
+                    toolpack_id: {
+                        "name": manifest.get("name"),
+                        "actions": [action["id"] for action in manifest.get("actions", [])],
+                        "validators": [validator["id"] for validator in manifest.get("validators", [])],
+                        "tools": manifest.get("tools", []),
+                    }
+                    for toolpack_id, manifest in manifests.items()
+                }
+                if args.json:
+                    print(json.dumps(data, indent=2))
+                else:
+                    for toolpack_id, info in data.items():
+                        print(f"{toolpack_id}: {info['name']} (actions: {', '.join(info['actions'])})")
+                return 0
+            if args.toolpacks_command == "check":
+                problems = {}
+                for toolpack_id, manifest in manifests.items():
+                    errors = toolpack_spec.validate_manifest(manifest)
+                    if errors:
+                        problems[toolpack_id] = errors
+                payload = {"toolpacks": len(manifests), "errors": problems}
+                if args.json:
+                    print(json.dumps(payload, indent=2))
+                else:
+                    if problems:
+                        for toolpack_id, errors in problems.items():
+                            print(f"FAIL {toolpack_id}: " + "; ".join(errors))
+                    else:
+                        print(f"toolpacks: {len(manifests)} valid")
+                return 1 if problems else 0
+            if args.toolpacks_command == "run":
+                if args.toolpack_id not in manifests:
+                    raise GypsyError(f"unknown toolpack {args.toolpack_id!r}; have: {', '.join(manifests)}")
+                manifest = manifests[args.toolpack_id]
+                if args.action:
+                    result = toolpack_spec.run_action(manifest, args.action, project_root=REPO_ROOT, state_dir=state_dir)
+                else:
+                    result = toolpack_spec.run_toolpack(manifest, project_root=REPO_ROOT, state_dir=state_dir)
+                if args.json:
+                    print(json.dumps(result, indent=2))
+                else:
+                    print(f"toolpack {result.get('toolpack')}: passed={result.get('passed')} artifacts={len(result.get('artifacts', []))} state={result.get('statePath')}")
+                    for error in result.get("errors", []):
+                        print(f"  ERROR {error}")
+                return 0 if result.get("passed") else 1
+
         if args.command == "slices":
             from pathlib import Path as _Path
 
