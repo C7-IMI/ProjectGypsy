@@ -1,0 +1,46 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "art.character.rig",
+  "layer": "art",
+  "tool": "blender",
+  "kind": "rig",
+  "maturity": "planned",
+  "description": "Auto-rig candidate (Rigify/auto-rig), skinning, bone naming/scale and weight validation; facial rig is human-authored.",
+  "requires": [
+    "blender.installed"
+  ],
+  "inputs": [
+    {
+      "name": "mesh",
+      "type": "path"
+    },
+    {
+      "name": "skeletonSpec",
+      "type": "json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "rig",
+      "type": "file"
+    },
+    {
+      "name": "report",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "bone count/naming matches the spec",
+    "no zero-weight verts",
+    "joint limits sane",
+    "deformation smoke pose renders"
+  ],
+  "provenance": {
+    "record": [
+      "blender.version",
+      "meshHash",
+      "skeletonSpec",
+      "artefactHash"
+    ]
+  }
+}

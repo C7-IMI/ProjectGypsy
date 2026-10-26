@@ -1,0 +1,46 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "art.lookdev.turntable",
+  "layer": "art",
+  "tool": "blender",
+  "kind": "capture",
+  "maturity": "planned",
+  "description": "Rendered turntable/contact sheets for review; captures are evidence, not a quality judgement.",
+  "requires": [
+    "blender.installed",
+    "display"
+  ],
+  "inputs": [
+    {
+      "name": "asset",
+      "type": "path"
+    },
+    {
+      "name": "views",
+      "type": "number"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "frames",
+      "type": "directory"
+    },
+    {
+      "name": "sheet",
+      "type": "file"
+    }
+  ],
+  "checks": [
+    "expected frame count",
+    "resolution matches",
+    "no blank frames"
+  ],
+  "provenance": {
+    "record": [
+      "blender.version",
+      "assetHash",
+      "cameraSpec",
+      "artefactHash"
+    ]
+  }
+}

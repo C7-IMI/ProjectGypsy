@@ -1,0 +1,47 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "perf.profile",
+  "layer": "performance",
+  "tool": "nsight",
+  "kind": "profile",
+  "maturity": "planned",
+  "description": "Profile fixed benchmark scenes on target hardware: frame time, GPU/CPU breakdown, memory, draw calls, VRAM.",
+  "requires": [
+    "engine.installed",
+    "nsight.installed"
+  ],
+  "inputs": [
+    {
+      "name": "build",
+      "type": "path"
+    },
+    {
+      "name": "scene",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "trace",
+      "type": "file"
+    },
+    {
+      "name": "metrics",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "benchmark scene reproducible",
+    "metrics within the target budget",
+    "regression against the previous run"
+  ],
+  "provenance": {
+    "record": [
+      "engine.version",
+      "buildHash",
+      "gpu",
+      "driver",
+      "metricsHash"
+    ]
+  }
+}

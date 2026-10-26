@@ -1,0 +1,46 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "perf.optimize",
+  "layer": "performance",
+  "tool": "engine",
+  "kind": "optimize",
+  "maturity": "planned",
+  "description": "Propose measured optimizations (LOD, impostors, merge, compression, culling, shader variants), apply reversible ones, re-run the benchmark and present the tradeoff.",
+  "requires": [
+    "perf.profile"
+  ],
+  "inputs": [
+    {
+      "name": "metrics",
+      "type": "json"
+    },
+    {
+      "name": "budget",
+      "type": "json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "change",
+      "type": "json"
+    },
+    {
+      "name": "afterMetrics",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "measured before/after",
+    "visual delta captured",
+    "reversible",
+    "human approves the tradeoff"
+  ],
+  "provenance": {
+    "record": [
+      "engine.version",
+      "beforeHash",
+      "afterHash",
+      "approver"
+    ]
+  }
+}

@@ -25,8 +25,10 @@ In this order:
    a requirement, or restore any of it without the recorded operator decision it asks for.
 4. **[`TOOLCHAIN.md`](./TOOLCHAIN.md)** — installed engines, art/audio/build tools, paths, versions and the
    `tools/tool-env.ps1` PATH loader. Read it before claiming a tool exists.
-5. **[`docs/README.md`](./docs/README.md)** — ADR-001 (engines), ADR-002 (art pipeline), ADR-003 (workstream
-   architecture), ADR-004 (generative media) and [`docs/ENGINE-SMOKE.md`](./docs/ENGINE-SMOKE.md) (Phase-0 evidence).
+5. **[`docs/README.md`](./docs/README.md)** — the ADRs: engines (001), art pipeline (002), workstream architecture
+   (003), generative media (004), character/animation automation (005), Blender import matrix (006), language
+   boundaries (007), plus [`docs/ENGINE-SMOKE.md`](./docs/ENGINE-SMOKE.md) and
+   [`docs/IMPORT-MATRIX.md`](./docs/IMPORT-MATRIX.md) (Phase-0 evidence).
 6. **[`workstream/README.md`](./workstream/README.md)** — the Phase-0 CLI: `engines probe`, `engines smoke`,
    `tools probe`, `capabilities check`, `project init`, `check`.
 7. **[`DEFERRED.md`](./DEFERRED.md)** — the work deliberately not done. Read the entry covering an area before you
@@ -71,6 +73,6 @@ In this order:
 ## What has been built (do not overstate it)
 
 Phase 0 of the workstream exists: engine/tool probes, hardware gates, capability and project manifests, a Godot
-headless smoke test, unit tests, the ADRs, the toolchain docs, and a prototype MusicGen path. There is still **no game
-code, no chosen engine, no build/export adapter, no rendered capture, no orchestrator, no console and no records
-infrastructure**. See `docs/ENGINE-SMOKE.md` and `DEFERRED.md` for the honest boundary.
+headless smoke test, unit tests, the ADRs, the toolchain docs, a golden Blender→Godot import matrix, and a prototype
+MusicGen path. There is still **no game code, no chosen engine, no build/export adapter, no rendered capture, no
+orchestrator, no console and no records infrastructure**. See `docs/ENGINE-SMOKE.md` and `DEFERRED.md` for the honest boundary.

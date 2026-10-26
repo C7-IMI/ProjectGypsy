@@ -80,6 +80,27 @@ python workstream/gypsy.py check [--project <dir>] [--json]
 python -m unittest discover -s workstream/tests -v
 ```
 
+## Golden import matrix (ADR-006)
+
+```text
+python scripts/import_matrix.py                 # regenerate the golden kit, round-trip, validate, Godot-import
+python scripts/import_matrix.py --skip-generate # reuse the last generated kit
+```
+
+- Assets: `assets/test/golden/generate_golden.py` (Blender 5.2.3) → `artifacts/golden/` (gitignored):
+  static+material, rigged+3 animations, morph face, LOD/collision set; GLB and FBX.
+- Evidence: `docs/IMPORT-MATRIX.md`; machine-readable `workstream/state/import-matrix.json`.
+- Current result: Blender round-trip pass, glTF validator no errors (one expected `NODE_SKINNED_MESH_NON_ROOT`
+  warning), **Godot 4.7.2 headless import pass** (3 animations on the rigged asset, 4 LOD meshes). Unity blocked
+  (no licence), UE5 blocked (hardware gate), Flax not tested — recorded, not faked.
+- Add-on smoke tests (Rigify, retopo/UV/bake) are policy in ADR-006; not yet automated.
+
+## Languages (ADR-007)
+
+Gameplay and editor code use the engine's language (GDScript/C#/C++/Blueprints). The workstream, validators and
+import harness use Python. **Rust is optional and not installed**; if a native need is proven, it may be used only
+behind a versioned CLI or C ABI, never as the gameplay language. See [docs/ADR-007-language-boundaries.md](docs/ADR-007-language-boundaries.md).
+
 ## Machine limits to respect
 
 - **4 GB VRAM**: no UE5 editor/Lumen work, no SDXL/FLUX local generation, MusicGen-small only for short clips.

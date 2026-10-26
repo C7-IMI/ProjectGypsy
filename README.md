@@ -26,6 +26,6 @@ A game. The repository is its working home. The engine, target platforms and int
 ## Status
 
 Phase 0 exists: engine/tool probes, hardware gates, capability and project manifests, unit tests, a Godot headless
-smoke pass, the ADRs and the installed toolchain. Not built yet: a chosen engine for the game, game code, build/export
+smoke pass, a Blender 5.2 golden import matrix (Godot pass; Unity/UE5 blocked), the ADRs and the installed toolchain. Not built yet: a chosen engine for the game, game code, build/export
 adapters, rendered capture, orchestrator/console, records infrastructure. See `docs/ENGINE-SMOKE.md` and
 `DEFERRED.md`.

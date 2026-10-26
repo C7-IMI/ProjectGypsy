@@ -1,0 +1,46 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "art.character.blockout",
+  "layer": "art",
+  "tool": "blender",
+  "kind": "blockout",
+  "maturity": "planned",
+  "description": "Generate proportionate character blockout candidates from a concept/reference spec; export engine-neutral proxy meshes.",
+  "requires": [
+    "blender.installed"
+  ],
+  "inputs": [
+    {
+      "name": "concept",
+      "type": "path"
+    },
+    {
+      "name": "proportionSpec",
+      "type": "json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "blockouts",
+      "type": "directory"
+    },
+    {
+      "name": "descriptor",
+      "type": "file"
+    }
+  ],
+  "checks": [
+    "silhouette proxy captured",
+    "proportions match the spec",
+    "proxy fits the poly budget"
+  ],
+  "provenance": {
+    "record": [
+      "blender.version",
+      "conceptHash",
+      "parameters",
+      "seed",
+      "artefactHash"
+    ]
+  }
+}

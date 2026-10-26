@@ -1,0 +1,43 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "art.import.matrix",
+  "layer": "art",
+  "tool": "python",
+  "kind": "validate",
+  "maturity": "partial",
+  "description": "Golden-asset import matrix: Blender 5.2 exports, Blender round-trip, glTF validation, Godot headless import; Unity/UE5/Flax recorded as blocked/gated (ADR-006).",
+  "requires": [
+    "blender.installed",
+    "godot.installed"
+  ],
+  "inputs": [
+    {
+      "name": "goldenKit",
+      "type": "path"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "report",
+      "type": "file"
+    },
+    {
+      "name": "json",
+      "type": "file"
+    }
+  ],
+  "checks": [
+    "Blender re-import counts match",
+    "glTF validator reports no errors",
+    "Godot loads every asset and animation",
+    "blocked engines are not claimed as pass"
+  ],
+  "provenance": {
+    "record": [
+      "blender.version",
+      "engine.version",
+      "assetHash",
+      "reportHash"
+    ]
+  }
+}

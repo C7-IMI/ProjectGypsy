@@ -1,0 +1,47 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "art.animation.retarget",
+  "layer": "art",
+  "tool": "blender",
+  "kind": "retarget",
+  "maturity": "planned",
+  "description": "Retarget motion-library/mocap animation onto the project rig; validate loop/root-motion/foot-slide; human polish remains.",
+  "requires": [
+    "blender.installed"
+  ],
+  "inputs": [
+    {
+      "name": "rig",
+      "type": "path"
+    },
+    {
+      "name": "motion",
+      "type": "path"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "animations",
+      "type": "directory"
+    },
+    {
+      "name": "report",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "clip length/range matches",
+    "root motion continuous",
+    "loop first/last pose match",
+    "foot slide under threshold"
+  ],
+  "provenance": {
+    "record": [
+      "blender.version",
+      "rigHash",
+      "motionHash",
+      "retargetSettings",
+      "artefactHash"
+    ]
+  }
+}

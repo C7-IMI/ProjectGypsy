@@ -1,0 +1,37 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "art.character.validate",
+  "layer": "validation",
+  "tool": "python",
+  "kind": "validate",
+  "maturity": "planned",
+  "description": "Aggregate character gates: silhouette, topology, UV, texture channels, rig, animation, LOD and budget checks; every gate proven red on a fixture.",
+  "requires": [
+    "blender.installed",
+    "imagemagick.installed"
+  ],
+  "inputs": [
+    {
+      "name": "assetRecord",
+      "type": "json"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "report",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "every gate has a failing fixture",
+    "report lists pass/fail per gate",
+    "history recorded per revision"
+  ],
+  "provenance": {
+    "record": [
+      "gateVersions",
+      "assetHash",
+      "reportHash"
+    ]
+  }
+}

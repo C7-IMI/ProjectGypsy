@@ -1,0 +1,51 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "art.character.retopo",
+  "layer": "art",
+  "tool": "blender",
+  "kind": "retopo",
+  "maturity": "planned",
+  "description": "Auto-retopo/UV candidate generation with topology and UV validation; human cleanup where the heuristic fails.",
+  "requires": [
+    "blender.installed"
+  ],
+  "inputs": [
+    {
+      "name": "highpoly",
+      "type": "path"
+    },
+    {
+      "name": "targetTris",
+      "type": "number"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "lowpoly",
+      "type": "file"
+    },
+    {
+      "name": "uv",
+      "type": "file"
+    },
+    {
+      "name": "report",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "manifold/watertight where required",
+    "quad ratio and pole count within band",
+    "UV overlaps and stretch within tolerance",
+    "texel density within band"
+  ],
+  "provenance": {
+    "record": [
+      "blender.version",
+      "highpolyHash",
+      "algorithm",
+      "targetTris",
+      "artefactHash"
+    ]
+  }
+}
