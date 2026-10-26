@@ -1,0 +1,44 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "game.demo",
+  "layer": "engine",
+  "engine": "godot",
+  "kind": "run",
+  "maturity": "stable",
+  "description": "Deterministic headless vertical-slice demo: auto-pilots the player, collects three crystals, emits GYPSY_DEMO_OK and exits 0.",
+  "requires": [
+    "godot.installed",
+    "game.project"
+  ],
+  "inputs": [
+    {
+      "name": "gameDir",
+      "type": "path"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "marker",
+      "type": "text"
+    },
+    {
+      "name": "evidence",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "exit 0",
+    "collected=3",
+    "marker printed once",
+    "repeatable frames"
+  ],
+  "provenance": {
+    "record": [
+      "engine.version",
+      "command",
+      "frames",
+      "exit",
+      "evidenceHash"
+    ]
+  }
+}

@@ -1,0 +1,123 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/crystal.tscn" id="3_crystal"]
+[ext_resource type="Script" path="res://scripts/camera_follow.gd" id="4_camera"]
+
+[sub_resource type="Environment" id="Environment_main"]
+background_mode = 1
+background_color = Color(0.043, 0.055, 0.09, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.45, 0.53, 0.7, 1)
+ambient_light_energy = 0.8
+tonemap_mode = 2
+
+[sub_resource type="BoxMesh" id="Mesh_floor"]
+size = Vector3(30, 1, 30)
+
+[sub_resource type="BoxShape3D" id="Shape_floor"]
+size = Vector3(30, 1, 30)
+
+[sub_resource type="StandardMaterial3D" id="Material_floor"]
+albedo_color = Color(0.16, 0.18, 0.22, 1)
+roughness = 0.95
+
+[sub_resource type="BoxMesh" id="Mesh_platform_tall"]
+size = Vector3(4, 1, 4)
+
+[sub_resource type="BoxShape3D" id="Shape_platform_tall"]
+size = Vector3(4, 1, 4)
+
+[sub_resource type="BoxMesh" id="Mesh_platform_low"]
+size = Vector3(4, 0.5, 4)
+
+[sub_resource type="BoxShape3D" id="Shape_platform_low"]
+size = Vector3(4, 0.5, 4)
+
+[sub_resource type="StandardMaterial3D" id="Material_platform"]
+albedo_color = Color(0.21, 0.3, 0.34, 1)
+roughness = 0.8
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_main")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_main")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, 0, 0.5, 0.383022, 0.642788, -0.663414, -0.321394, 0.766044, 0.55667, 0, 12, 0)
+light_energy = 1.2
+shadow_enabled = true
+
+[node name="Level" type="Node3D" parent="."]
+
+[node name="Floor" type="StaticBody3D" parent="Level"]
+position = Vector3(0, -0.5, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Level/Floor"]
+mesh = SubResource("Mesh_floor")
+surface_material_override/0 = SubResource("Material_floor")
+
+[node name="Collision" type="CollisionShape3D" parent="Level/Floor"]
+shape = SubResource("Shape_floor")
+
+[node name="PlatformNW" type="StaticBody3D" parent="Level"]
+position = Vector3(-9, 0.5, -9)
+
+[node name="Mesh" type="MeshInstance3D" parent="Level/PlatformNW"]
+mesh = SubResource("Mesh_platform_tall")
+surface_material_override/0 = SubResource("Material_platform")
+
+[node name="Collision" type="CollisionShape3D" parent="Level/PlatformNW"]
+shape = SubResource("Shape_platform_tall")
+
+[node name="PlatformNE" type="StaticBody3D" parent="Level"]
+position = Vector3(9, 0.25, -9)
+
+[node name="Mesh" type="MeshInstance3D" parent="Level/PlatformNE"]
+mesh = SubResource("Mesh_platform_low")
+surface_material_override/0 = SubResource("Material_platform")
+
+[node name="Collision" type="CollisionShape3D" parent="Level/PlatformNE"]
+shape = SubResource("Shape_platform_low")
+
+[node name="PlatformSW" type="StaticBody3D" parent="Level"]
+position = Vector3(-9, 0.25, 9)
+
+[node name="Mesh" type="MeshInstance3D" parent="Level/PlatformSW"]
+mesh = SubResource("Mesh_platform_low")
+surface_material_override/0 = SubResource("Material_platform")
+
+[node name="Collision" type="CollisionShape3D" parent="Level/PlatformSW"]
+shape = SubResource("Shape_platform_low")
+
+[node name="PlatformSE" type="StaticBody3D" parent="Level"]
+position = Vector3(9, 0.5, 9)
+
+[node name="Mesh" type="MeshInstance3D" parent="Level/PlatformSE"]
+mesh = SubResource("Mesh_platform_tall")
+surface_material_override/0 = SubResource("Material_platform")
+
+[node name="Collision" type="CollisionShape3D" parent="Level/PlatformSE"]
+shape = SubResource("Shape_platform_tall")
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector3(0, 0.9, 0)
+
+[node name="Crystals" type="Node3D" parent="."]
+
+[node name="Crystal1" parent="Crystals" instance=ExtResource("3_crystal")]
+position = Vector3(5, 1, 0)
+
+[node name="Crystal2" parent="Crystals" instance=ExtResource("3_crystal")]
+position = Vector3(-3, 1, 4)
+
+[node name="Crystal3" parent="Crystals" instance=ExtResource("3_crystal")]
+position = Vector3(1.5, 1, -5)
+
+[node name="Camera" type="Camera3D" parent="."]
+position = Vector3(0, 7.9, 10)
+script = ExtResource("4_camera")
+target_path = NodePath("../Player")
+follow_offset = Vector3(0, 7, 10)

@@ -1,0 +1,21 @@
+name: checks
+
+# The gate is CI; the hook is a convenience (ProjectPack rules 2.22-2.23). One list:
+# scripts/check_all.py. Change the checks there and both callers pick the change up.
+on:
+  push:
+  pull_request:
+
+jobs:
+  checks:
+    name: check list
+    runs-on: windows-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Run the one check list
+        run: python scripts/check_all.py

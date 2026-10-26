@@ -13,6 +13,7 @@ python workstream/gypsy.py capabilities list|check [--json]
 python workstream/gypsy.py project init --path game --engine godot --version 4.7.2 --targets pc
 python workstream/gypsy.py project show [--path game]
 python workstream/gypsy.py check [--project .] [--json]
+python workstream/gypsy.py game demo|build|capture|verify [--path game]
 ```
 
 Run the tests:
@@ -29,6 +30,7 @@ python -m unittest discover -s workstream/tests -v
 - Capability manifests with schema validation.
 - Tool manifest verification.
 - Godot headless smoke test (the reference adapter).
+- Phase-1 game adapter: headless demo, Windows export, exported-binary demo, windowed movie capture.
 
 ## What is not built yet
 

@@ -4,7 +4,7 @@
   "layer": "engine",
   "engine": "godot",
   "kind": "build",
-  "maturity": "planned",
+  "maturity": "stable",
   "description": "Headless Godot export/build for a pinned target; requires the matching export templates to be installed.",
   "requires": [
     "godot.installed",
@@ -40,6 +40,6 @@
     ]
   },
   "notes": [
-    "Planned: declared but not implemented; no run is claimed."
+    "Proven 2026-10-25: headless export to build/ProjectGypsy.exe (109,127,680 bytes), exported binary runs the demo headlessly."
   ]
 }

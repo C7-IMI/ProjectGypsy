@@ -104,6 +104,19 @@ python tools/polyhaven/polyhaven.py download brick_wall_02 --resolution 1k --slo
 - TripoSR (image-to-3D, MIT) is **not installed**: README states ~6 GB VRAM, above this machine (PG-D19). Use a cloud/
   API provider only on the operator's decision (ADR-008 has the list).
 
+## Playable slice (Phase 1, ADR-009)
+
+~~~powershell
+python workstream/gypsy.py game demo      # headless: GYPSY_DEMO_OK collected=3 frames=143, exit 0
+python workstream/gypsy.py game build     # exports build/ProjectGypsy.exe (109,127,680 bytes)
+python workstream/gypsy.py game capture   # windowed movie -> artifacts/game/demo.mp4 + frame.png
+python workstream/gypsy.py game verify    # demo + build + exported-binary demo + capture
+~~~
+
+- Engine: Godot 4.7.2, PC; export templates installed under `%APPDATA%\\Godot\\export_templates\\4.7.2.stable`.
+- Evidence: [docs/PHASE-1-EVIDENCE.md](docs/PHASE-1-EVIDENCE.md); state under `workstream/state/game-*.json` (gitignored).
+- `build/` and `artifacts/` are gitignored; the slice source is `game/`.
+
 ## Workstream commands
 
 ```text

@@ -660,6 +660,15 @@ def main(argv=None) -> int:
     project_show.add_argument("--path", default=".")
     project_show.add_argument("--json", action="store_true")
 
+    game_parser = sub.add_parser("game", help="vertical-slice adapter")
+    game_sub = game_parser.add_subparsers(dest="game_command", required=True)
+    for name in ("demo", "build", "capture", "verify"):
+        game_cmd = game_sub.add_parser(name)
+        game_cmd.add_argument("--path", default=str(REPO_ROOT / "game"))
+        game_cmd.add_argument("--json", action="store_true")
+        if name == "build":
+            game_cmd.add_argument("--preset", default="Windows Desktop")
+            game_cmd.add_argument("--out", default=None)
     check_parser = sub.add_parser("check", help="run the Phase-0 checks")
     check_parser.add_argument("--project")
     check_parser.add_argument("--json", action="store_true")
@@ -736,6 +745,25 @@ def main(argv=None) -> int:
                     print(f"targets: {', '.join(project.get('targets', []))}")
                     print(f"created: {project.get('created')}")
                 return 0
+        if args.command == "game":
+            from game import build as game_build, capture as game_capture, demo as game_demo, verify as game_verify
+
+            if args.game_command == "demo":
+                evidence = game_demo(Path(args.path))
+                print(json.dumps(evidence, indent=2) if args.json else f"PASS game demo | {evidence['marker']} | {evidence['seconds']}s")
+                return 0
+            if args.game_command == "build":
+                evidence = game_build(Path(args.path), preset=args.preset, output=Path(args.out) if args.out else None)
+                print(json.dumps(evidence, indent=2) if args.json else f"PASS game build | {evidence['output']} | {evidence['bytes']} bytes")
+                return 0
+            if args.game_command == "capture":
+                evidence = game_capture(Path(args.path))
+                print(json.dumps(evidence, indent=2) if args.json else f"PASS game capture | {evidence['movie']}")
+                return 0
+            if args.game_command == "verify":
+                evidence = game_verify(Path(args.path))
+                print(json.dumps(evidence, indent=2) if args.json else f"game verify | demo={evidence['demo']['passed']} build={evidence['build']['passed']} capture={evidence['capturePassed']}")
+                return 0 if evidence["passed"] else 1
         if args.command == "check":
             result = check_all(args.project)
             if args.json:

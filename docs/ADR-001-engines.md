@@ -104,6 +104,10 @@ engine-neutral asset contract (ADR-002) needs per-engine import profiles; a true
 - Phase 0 reference: `docs/ENGINE-SMOKE.md` records the Godot headless smoke test and the other engines' honest
   status.
 
+**Amendment 2026-10-25:** under the operator's full-autonomy instruction, the Phase-1 slice chooses **Godot 4.7.2,
+PC target** (ADR-009, `game/project.gypsy.json`). This is a recorded per-project choice, not a change to the mechanism;
+other engines remain adapters and a port is not a toggle.
+
 ## Open questions
 
 - Which engine, if any, is chosen for ProjectGypsy itself? Still **PG-D3** — this ADR fixes the mechanism, not the

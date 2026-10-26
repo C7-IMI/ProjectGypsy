@@ -1,0 +1,49 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "game.vertical_slice",
+  "layer": "engine",
+  "engine": "godot",
+  "kind": "verify",
+  "maturity": "stable",
+  "description": "Phase-1 gate: headless demo + Windows export + exported-binary demo + windowed capture, evidence in workstream/state.",
+  "requires": [
+    "godot.installed",
+    "godot.export_templates",
+    "game.project"
+  ],
+  "inputs": [
+    {
+      "name": "gameDir",
+      "type": "path"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "verify",
+      "type": "json"
+    },
+    {
+      "name": "video",
+      "type": "file"
+    },
+    {
+      "name": "frame",
+      "type": "file"
+    }
+  ],
+  "checks": [
+    "demo passes",
+    "export produces a non-empty exe",
+    "exported exe prints the marker",
+    "capture produces a non-empty video and frame"
+  ],
+  "provenance": {
+    "record": [
+      "engine.version",
+      "demo",
+      "buildHash",
+      "captureHash",
+      "timestamp"
+    ]
+  }
+}

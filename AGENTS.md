@@ -4,10 +4,10 @@ Entry point for any model working in this repository. Read this file, then the d
 
 ## What this repository is
 
-**ProjectGypsy** — a game. The engine, target platforms, input methods and the game's own interface standard are
-**not chosen yet**; they are open decisions in [`DEFERRED.md`](./DEFERRED.md) (PG-D3, PG-D4). The engine-selection
-mechanism is built ([`docs/ADR-001-engines.md`](./docs/ADR-001-engines.md), `workstream/gypsy.py`); the choice is the
-operator's. Do not describe ProjectGypsy as a website, a web application or a console, and do not apply web interface
+**ProjectGypsy** — a game. Phase 1 runs on **Godot 4.7.2, PC** ([ADR-009](./docs/ADR-009-vertical-slice.md)); other
+platforms and the game's interface standard remain open (PG-D4). The engine-selection mechanism is built
+([`docs/ADR-001-engines.md`](./docs/ADR-001-engines.md), `workstream/gypsy.py`); the Phase-1 choice can be overridden by
+a new project manifest, but an engine change is a port, not a toggle. Do not describe ProjectGypsy as a website, a web application or a console, and do not apply web interface
 rules to it.
 
 ## What governs your work
@@ -27,10 +27,10 @@ In this order:
    `tools/tool-env.ps1` PATH loader. Read it before claiming a tool exists.
 5. **[`docs/README.md`](./docs/README.md)** — the ADRs: engines (001), art pipeline (002), workstream architecture
    (003), generative media (004), character/animation automation (005), Blender import matrix (006), language
-   boundaries (007), MCP/free local tools (008), plus [`docs/ENGINE-SMOKE.md`](./docs/ENGINE-SMOKE.md) and
-   [`docs/IMPORT-MATRIX.md`](./docs/IMPORT-MATRIX.md) (Phase-0 evidence).
-6. **[`workstream/README.md`](./workstream/README.md)** — the Phase-0 CLI: `engines probe`, `engines smoke`,
-   `tools probe`, `capabilities check`, `project init`, `check`.
+   boundaries (007), MCP/free local tools (008), vertical slice (009), plus [`docs/ENGINE-SMOKE.md`](./docs/ENGINE-SMOKE.md),
+   [`docs/IMPORT-MATRIX.md`](./docs/IMPORT-MATRIX.md) and [`docs/PHASE-1-EVIDENCE.md`](./docs/PHASE-1-EVIDENCE.md).
+6. **[`workstream/README.md`](./workstream/README.md)** — the CLI: `engines probe|smoke`, `tools probe`,
+   `capabilities`, `project`, `game demo|build|capture|verify`, `check`.
 7. **[`DEFERRED.md`](./DEFERRED.md)** — the work deliberately not done. Read the entry covering an area before you
    change that area, and do not quietly close a deferred item by implementing it halfway.
 8. **[`README.md`](./README.md)** — the repository entry point and index.
@@ -44,12 +44,13 @@ In this order:
   (PG-1, Part 11.1). If a request needs interface design, say the standard is parked and treat the choice as the
   operator's — do not invent one.
 - **Verify by running** the build or the test that proves the change, and read back what you captured (§2.18). If no
-  build exists yet, say so rather than implying a verification. Phase-0 proof lives in `docs/ENGINE-SMOKE.md`.
-- **Record the work.** A change is not finished until its prompt-log and changelog entries exist, with a computed
-  version (§2.1). Those files and the version script are not built yet — see `DEFERRED.md` PG-D1 — so record what
-  was done in the change's own report until the mechanism exists. Do not pretend the mechanism exists.
-- **One list of checks** when checks exist; a tracked hook and CI both read it, and a coverage check compares them
-  (§2.22–§2.23). The workstream's unit tests and `gypsy check` are not yet that pack-wide list (PG-D2).
+  build exists yet, say so rather than implying a verification. Evidence lives in `docs/ENGINE-SMOKE.md`,
+  `docs/IMPORT-MATRIX.md` and `docs/PHASE-1-EVIDENCE.md`.
+- **Record the work.** A change is not finished until its [Retrace.md](./Retrace.md) and [BuildNotes.md](./BuildNotes.md)
+  entries exist, with a version from [`scripts/next-version.py`](./scripts/next-version.py) (§2.1).
+  [`scripts/check_all.py`](./scripts/check_all.py) guards the records.
+- **One list of checks:** [`scripts/check_all.py`](./scripts/check_all.py); the tracked pre-commit hook and the
+  GitHub Actions caller both run it, and its coverage guard compares the two (§2.22–§2.23). Never keep a second list.
 - **Records and peer projects are separate** (Part 11.5): C7NTRY, C7NC, C7NTAX, C7TNL, C7NTRL and the other C7-IMI
   projects are peers. A prompt asked here is logged here; nothing crosses without explicit instruction.
 - **Nothing fake in the build** (Part 11.6): no dead controls, no pretend features; unavailable behaviour says so.
@@ -67,12 +68,15 @@ In this order:
 2. Check `git status` and the newest records entry — if the records do not exist yet, say so rather than pretending.
 3. Run `python workstream/gypsy.py engines probe` and `python workstream/gypsy.py check` before trusting the
    environment; report what they actually print.
-4. Ask what the session is for, then run the matching prompt from `ProjectPack.md` Part 3 — **P1** only if the
+4. Run `python scripts/check_all.py` and `python workstream/gypsy.py game verify` before trusting the tree; report
+   what they print.
+5. Ask what the session is for, then run the matching prompt from `ProjectPack.md` Part 3 — **P1** only if the
    bootstrap is incomplete, otherwise **P2** onward. Prompts P4 and P16 are parked; do not renumber the others.
 
 ## What has been built (do not overstate it)
 
-Phase 0 of the workstream exists: engine/tool probes, hardware gates, capability and project manifests, a Godot
-headless smoke test, unit tests, the ADRs, the toolchain docs, a golden Blender→Godot import matrix, a local MCP bridge (Blender/Godot), ComfyUI+SD1.5 image generation, a Poly Haven
-CC0 downloader, and a prototype MusicGen path. There is still **no game code, no chosen engine, no build/export adapter, no rendered capture, no
-orchestrator, no console and no records infrastructure**. See `docs/ENGINE-SMOKE.md` and `DEFERRED.md` for the honest boundary.
+Phase 0 and Phase 1 exist: engine/tool probes, hardware gates, manifests, a Godot headless smoke, a playable Godot 4.7.2
+PC slice with deterministic headless demo, Windows export and windowed capture, workstream game commands, records and
+the one pack check list, the ADRs, a golden Blender import matrix, MCP/ComfyUI/Poly Haven tooling and a prototype
+MusicGen path. There is still **no art/character pipeline, UI, audio, orchestrator/console, mobile build or performance
+budget**. See `docs/PHASE-1-EVIDENCE.md` and `DEFERRED.md` for the honest boundary.

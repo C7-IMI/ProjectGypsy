@@ -13,7 +13,7 @@ here: the project's side lives here, and the pack's parked interface material li
 | Base | `C7NTRY/ProjectPack.md` revision **2.5**, 2026-10-23, SHA-256 `FC5754DDCDB25535B6808042291C083B6B0BC13F27E36EC8035945AEB70ABE65` |
 | This copy | revision **PG-1**, 2026-10-25 — Parts 1–10 carried, the interface design/redesign rules parked, Part 11 re-authored |
 | Interface material | **parked, not in force** — `ProjectPack-ADDENDUM-Interface.md` (16 verbatim blocks) |
-| Product | a **game** — not a website, not a web application; engine and platforms not chosen yet (`DEFERRED.md` PG-D3) |
+| Product | a **game** — not a website, not a web application; Phase-1 engine **Godot 4.7.2, PC** (ADR-009); other platforms open |
 | Last applied | 2026-10-25 — the pack was copied and applied in the change that created this file |
 
 ## What was parked, and why
@@ -84,7 +84,7 @@ The "declined" entries are in Part 11.13 of the pack and in `DEFERRED.md` only w
 | `<CONTRACT_GUIDE>` | the same |
 | `<PRODUCT_DOCS>` | [`README.md`](./README.md), [`docs/README.md`](./docs/README.md), this file, `ProjectPack.md`, `TOOLCHAIN.md` and `DEFERRED.md`; the links guard is still owed (**PG-D5**) |
 | `<DEFERRED_REGISTER>` | [`DEFERRED.md`](./DEFERRED.md) |
-| `<HEALTH_COMMAND>` | none — nothing runs yet (engine decision **PG-D3**) |
+| `<HEALTH_COMMAND>` | `python workstream/gypsy.py game demo` (headless slice); `python scripts/check_all.py` for the pack checks |
 | `<SWEEP_COMMAND>` | none — no test rig writes state yet |
 | `<DESIGN_LANGUAGE>` | **removed from this copy** — interface material is parked (addendum, **PG-D4**) |
 | `<MOCKUP_DIR>` | **removed from this copy** — parked with the design material (**PG-D4**) |
@@ -93,40 +93,40 @@ The "declined" entries are in Part 11.13 of the pack and in `DEFERRED.md` only w
 
 | The decision | This repository's answer |
 | --- | --- |
-| Where the prompt log and changelog live, and how the version is computed | Not built yet (**PG-D1**). The intended home is the C7NTRY pattern: a prompt log, a changelog and a script-computed version, guard-checked; the first build bootstraps it |
+| Where the prompt log and changelog live, and how the version is computed | [`Retrace.md`](./Retrace.md), [`BuildNotes.md`](./BuildNotes.md) and [`scripts/next-version.py`](./scripts/next-version.py); guarded by [`scripts/records_check.py`](./scripts/records_check.py) (**PG-D1** closed) |
 | Which generated copies exist, and who regenerates them | None — nothing generated yet |
-| The single check list, and how the hook and CI are kept in step | None yet (**PG-D2**). Phase 0 runs `python -m unittest discover -s workstream/tests` and `python workstream/gypsy.py check`; the pack-wide list, tracked hook and CI caller are created together by the first game build |
+| The single check list, and how the hook and CI are kept in step | [`scripts/check_all.py`](./scripts/check_all.py) is the one list; [`.githooks/pre-commit`](./.githooks/pre-commit) and [`.github/workflows/checks.yml`](./.github/workflows/checks.yml) both run it, and its caller-coverage guard compares them (**PG-D2** closed) |
 | The published contract artefact and what checks it | Not applicable yet; if the game exposes an API this becomes **PG-D7** |
-| Where the product's own documentation lives, and what keeps it reachable | README, `docs/README.md` and the ADRs/`ENGINE-SMOKE.md` today; the links guard is still owed (**PG-D5**) |
+| Where the product's own documentation lives, and what keeps it reachable | README, [`docs/README.md`](./docs/README.md) and the ADRs; `scripts/check_all.py` checks every relative Markdown link (**PG-D5** closed) |
 | The design language, and what guards it | **Parked** — the web design rules are in the addendum and not in force (**PG-D4**). No game-side standard has been chosen; inventing one is an operator decision |
 | How many interfaces and themes exist, and what they are called | Not decided; parked with the interface material. Do not claim interface facts until the game's interface standard exists |
 | Whether the product runs as more than one instance, and what makes scheduled work safe | Nothing runs yet; when a server exists it answers the four questions (§2.20, Part 11.7) |
-| Which bug classes this codebase actually produces | None recorded — no game code exists; the Phase-0 workstream has only its own tests and checks |
+| Which bug classes this codebase actually produces | None recorded yet; the Phase-1 slice and workstream have tests but no defect history worth classifying |
 | Where the scratch rigs live, and how they are reaped | None started by this repository's work |
 | Whether anything commits on somebody's behalf | No. Commits are made by a person or a session; no auto-publisher exists |
 | Which layers need a rollback document | None yet (**PG-D8**); `ProjectPack.md` §2.13 and Part 11.9 state what each will need |
-| The token and context budget, and which loop is the expensive one | Not measured; the repository is small. The expensive loop will be asset builds and play-test runs once an engine exists |
+| The token and context budget, and which loop is the expensive one | Not measured at scale; Phase 1's expensive steps are Godot export (~2.6 s), windowed capture (~8 s) and the test suite (~6 s). Asset builds remain future work |
 | The register of deliberately deferred work | [`DEFERRED.md`](./DEFERRED.md) |
 | Which artefacts are stamped, and who bumps the stamp | None — nothing is distributed |
 | What is checked before a deploy, without a subscription | Nothing deployed, no templates, no infrastructure |
-| What runs on the operator's machine, and how it is registered | Nothing yet — no hooks, tasks or services installed |
+| What runs on the operator's machine, and how it is registered | The repo pre-commit hook is installed via `core.hooksPath=.githooks`; no scheduled tasks or services |
 | Whether the parked interface rules are restored, and which ones | **No** (PG-1). The addendum is not in force until a recorded decision restores it, or replaces it with a game-side standard (**PG-D4**) |
 
 ## §2.31 — which rules are in force today (applied 2026-10-25, pack PG-1)
 
-This repository is **a game with rules and a Phase-0 workstream, but no game code yet**: no chosen engine, no game
-build, no pack-wide check list and no records infrastructure. That state is why most of the pack is conduct rather than
-mechanism here; the workstream tests/CLI are not the pack's checks.
+This repository is **a game with rules, a Phase-0 workstream, a Phase-1 playable slice, a pack-wide check list and
+records**. The engine is chosen for this slice (Godot 4.7.2, PC), the build and capture are proven, and the records/check
+machinery is in place; remaining work is asset authorship, adapters and phases 2+.
 
-- **In force as conduct, not mechanised:** Part 1's laws; §2.1–§2.4 records and prose (the mechanism is PG-D1); §2.5
+- **In force as conduct, not mechanised:** Part 1's laws; §2.1–§2.4 records and prose (records now guarded); §2.5
   one source; §2.6 brand packet (when assets exist); §2.7 configuration declared; §2.13 reversibility; §2.14–§2.16
   permissions, sweeps and secrets; §2.17–§2.19 reproducibility, evidence and budget; §2.20 scale-and-move; §2.22–§2.30
   operations (when a build exists); §2.31 itself; §2.32 text and encoding; §2.33/§2.34 peer separation and context
   limits; Part 10 (operator's rules); Part 12; and Part 11 in this copy.
-- **Mechanised today (Phase 0):** the workstream's own checks — `python -m unittest discover -s workstream/tests`
-  (13 tests) and `python workstream/gypsy.py check` (capability schemas, tool paths, engine/project manifests, hardware
-  gate) — plus the manifest files themselves. These are not the pack-wide check list (§2.22/§2.23) and they do not
-  guard records: PG-D1 and PG-D2 remain open. The report discipline in Part 11.2 is still the main enforcement.
+- **Mechanised today:** `python scripts/check_all.py` (records, encoding, links, capability JSON, 14 tests, hook/CI
+  caller coverage), `python workstream/gypsy.py check` (engine/project manifests, hardware gate), and `python
+  workstream/gypsy.py game verify` (demo, export, exported-binary demo, capture). The pre-commit hook runs the same
+  list. The report discipline in Part 11.2 remains the human half.
 - **Parked — not in force:** every interface design and redesign rule, plus the browser-verification rule. The full
   list is in the addendum and in the table above. They are not to be applied, quoted as requirements, or partially
   restored without the recorded decision the addendum asks for.
@@ -137,36 +137,35 @@ mechanism here; the workstream tests/CLI are not the pack's checks.
 
 ## §8.2 — the inventory of check kinds, filled or declined
 
-The pack-wide check list is not built (PG-D2). Phase 0 has the workstream checks above; the table below names the pack
-checks the first game build should produce, and the pack's §9 list is the full menu.
+The pack-wide check list is built: `scripts/check_all.py` runs the checks below and the hook/CI call it. The table
+records what is covered and what remains a manual capability.
 
 | Check kind | Status | What compares / why not |
 | --- | --- | --- |
-| records | not yet | **PG-D1**: the prompt log, changelog and generated copies need the first records files |
-| newest-first / version computation | not yet | same (**PG-D1**) |
-| encoding | not yet | the first build adds the guard; the pack files are UTF-8 without BOM (checked) |
-| documentation links | not yet | **PG-D5**: the docs tree now exists (`docs/README.md`); the links guard is still owed. |
+| records | **PASS** | `scripts/records_check.py` checks `Retrace.md`/`BuildNotes.md` newest-first, header and contiguous prompts |
+| newest-first / version computation | **PASS** | records check + `scripts/next-version.py` |
+| encoding | **PASS** | `scripts/check_all.py` checks tracked text blobs are UTF-8 with no BOM/CR |
+| documentation links | **PASS** | `scripts/check_all.py` resolves every relative Markdown link in the index |
 | secret scan | not yet | no code or config yet; the first build adds the scanner before any credential exists |
 | project boundary | not yet | **PG-D6**: the peer guard is a discipline until the guard exists (Part 11.5) |
-| typecheck / build | not yet | no engine or code (**PG-D3**) |
+| typecheck / build | **PASS (build)** | Godot export + exported-binary headless demo; no static typecheck in GDScript |
 | generated artefacts | not yet | no game-art generator; MusicGen prototype outputs exist under the ADR-004 record, not a game pipeline |
 | contract / curated prose | not yet | no API (**PG-D7** if one appears) |
 | deploy templates, auto-publish gate, leak sweep, audit sweep, artefact stamp, health, token lint, browser check | n/a | each has no subject in this repository yet; the token-lint and browser rows are **parked** with the interface material |
 
 ## How the pack is enforced here
 
-There is no pack-wide enforcement yet — no `scripts/checks.mjs`, no hook, no CI. Phase 0 does have the workstream's
-own checks:
+The pack has one enforced list, `scripts/check_all.py`, run by the tracked pre-commit hook and the CI caller:
 
 ```text
-git status
-python -m unittest discover -s workstream/tests -v
+python scripts/check_all.py
 python workstream/gypsy.py check
+python workstream/gypsy.py game verify
 ```
 
-They validate the workstream's manifests, tool paths, engine detection and hardware gates; they do not enforce §2.1
-records or the pack's check list. The first game build creates the one pack check list and both callers (§2.22–§2.23)
-together, not one at a time.
+`check_all.py` covers records, encoding, links, capability JSON, the 14 workstream tests and hook/CI caller coverage;
+`gypsy check` covers engine/project manifests and the hardware gate; `game verify` covers the playable slice.
+
 
 ## How this application of the pack was verified
 

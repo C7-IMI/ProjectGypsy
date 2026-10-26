@@ -4,7 +4,7 @@
   "layer": "engine",
   "engine": "godot",
   "kind": "capture",
-  "maturity": "planned",
+  "maturity": "partial",
   "description": "Capture rendered evidence from a windowed run or Godot movie-maker mode. Headless mode cannot render, so this is not a headless capability.",
   "requires": [
     "godot.installed",
@@ -44,6 +44,6 @@
     ]
   },
   "notes": [
-    "Planned: declared but not implemented; no run is claimed."
+    "Proven windowed movie-maker path: 72 frames at 1280x720, 30 fps, converted to mp4 + frame. Headless has no renderer; capture needs a desktop session."
   ]
 }

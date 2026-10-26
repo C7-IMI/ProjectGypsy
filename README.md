@@ -1,7 +1,7 @@
 # ProjectGypsy
 
-A game. The repository is its working home. The engine, target platforms and interface standard are not chosen yet
-(see [`DEFERRED.md`](DEFERRED.md) PG-D3/PG-D4); the workstream can select and pin an engine per project.
+A game. Phase 1 is a playable **Godot 4.7.2 PC** slice; the interface standard and other platforms remain open
+(PG-D4). The workstream selects and pins an engine per project.
 
 ## Start here
 
@@ -25,8 +25,8 @@ A game. The repository is its working home. The engine, target platforms and int
 
 ## Status
 
-Phase 0 exists: engine/tool probes, hardware gates, capability and project manifests, unit tests, a Godot headless
-smoke pass, a Blender 5.2 golden import matrix (Godot pass; Unity/UE5 blocked), a local MCP bridge (Blender/Godot),
-ComfyUI+SD1.5 image generation, a Poly Haven CC0 downloader, the ADRs and the installed toolchain. Not built yet: a chosen engine for the game, game code, build/export
-adapters, rendered capture, orchestrator/console, records infrastructure. See `docs/ENGINE-SMOKE.md` and
-`DEFERRED.md`.
+Phase 0 + Phase 1 exist: engine/tool probes, hardware gates, capability/project manifests, unit tests, a playable
+Godot slice with headless demo, Windows export and windowed capture, records and the pack check list, a golden Blender
+import matrix (Godot pass; Unity/UE5 blocked), MCP/ComfyUI/Poly Haven tooling, the ADRs and the installed toolchain.
+Not built yet: art/character pipeline, UI, audio, orchestrator/console, mobile or performance budgets. See
+`docs/PHASE-1-EVIDENCE.md` and `DEFERRED.md`.
