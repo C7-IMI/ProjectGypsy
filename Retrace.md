@@ -221,5 +221,15 @@ Each entry has:
 
 ---
 
-Next prompt number: 22. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 22 - 2026-10-26
+
+- Request: Decide whether a GUI is needed; mock several versions or give CLI instructions.
+- Status: Completed — decision and four mockups delivered; CLI usage documented; nothing implemented.
+- Version: 2026.10.25.017
+- Commit/evidence: design/control-panel/ (Studio Board, Mission Control, Command Hybrid, Director's Table; HTML + PNG)
+  and README with recommendation and current CLI commands; no game/workstream code changed.
+
+---
+
+Next prompt number: 23. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

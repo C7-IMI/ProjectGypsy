@@ -23,6 +23,7 @@ A game. Phase 1 is a playable **Godot 4.7.2 PC** slice; the interface standard a
   **parked and not in force** because this is a game, not a website.
 - [`DEFERRED.md`](DEFERRED.md) — the work deliberately not done, and what unblocks it.
 - [`TOOL-INVENTORY.md`](TOOL-INVENTORY.md) — full installed-tool inventory, open-source replacements, hardware limits.
+- [`design/control-panel/README.md`](design/control-panel/README.md) — four control-panel mockups (proposal; not implemented).
 
 ## Status
 

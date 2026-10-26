@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.25.016
+Current version: 2026.10.25.017
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,19 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.25.017
+
+**Control-panel mockups: four GUI directions and a CLI usage guide.**
+
+- Date: 2026-10-26
+- Commit: this change.
+- Change: design/control-panel/ with four 1440x900 mockups (Studio Board, Mission Control, Command Hybrid, Director's
+  Table), editable HTML sources, rendered PNGs and README; comparison/recommendation and exact current CLI invocation;
+  root README link. These are proposals for local developer tooling, not the game interface; nothing is wired in and
+  PG-D4 remains parked.
+- Verification: mockups render at 1440x900 with Microsoft Edge headless; links/encoding checked by scripts/check_all.py;
+  all figures match the current workstream (4 slices, 172 tests, 42 capabilities, 2 blocked gates).
 
 ## 2026.10.25.016
 

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Mission Control</title>
+<style>
+:root{--bg:#080d13;--panel:#0e1620;--panel2:#111c27;--line:#1d2b38;--line2:#273948;--text:#d9e6ee;--muted:#8095a4;--dim:#5e7281;--cyan:#48d7c1;--cyan2:#1c8f82;--green:#57d68a;--amber:#f0b35b;--red:#ff7a6b;--blue:#6aa8ff;--violet:#9b8cff}
+*{box-sizing:border-box}html,body{width:1440px;height:900px;margin:0;overflow:hidden;background:var(--bg);color:var(--text);font:12px/1.45 Inter,"Segoe UI",system-ui,sans-serif}
+.app{display:grid;grid-template-columns:64px 1fr;grid-template-rows:58px 1fr 42px;height:900px}
+.rail{grid-row:1/4;background:#0a1017;border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:7px}.rail .logo{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#1c8f82,#48d7c1);position:relative;margin-bottom:14px}.rail .logo:after{content:"";position:absolute;inset:8px;background:#071014;clip-path:polygon(50% 0,100% 100%,50% 72%,0 100%)}.ricon{width:34px;height:34px;border-radius:8px;border:1px solid transparent;display:grid;place-items:center;color:#60798a;font-size:14px}.ricon.active{background:#12232d;border-color:#1f3946;color:var(--cyan)}.rail .grow{flex:1}.rail .ver{color:#4d6372;font:9px "Cascadia Code",monospace;writing-mode:vertical-rl}
+.top{grid-column:2;display:flex;align-items:center;gap:14px;padding:0 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#0c131b,#0a1017)}
+.title{display:flex;align-items:baseline;gap:10px}.title b{font-size:14px;letter-spacing:.18em;font-weight:700}.title span{color:var(--dim);font-size:10px;letter-spacing:.16em}.status{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border:1px solid #1f3a45;border-radius:999px;background:#0d1c22;color:#77e5d4;font-size:10px;letter-spacing:.05em}.status .d{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.right{margin-left:auto;display:flex;align-items:center;gap:8px}.chip{height:27px;border:1px solid var(--line2);border-radius:6px;background:#0c151e;display:flex;align-items:center;padding:0 9px;color:#8ea4b3;font-size:10.5px;gap:7px}.chip b{color:#d8e7ee;font-weight:600}.chip .dot{width:6px;height:6px;border-radius:50%;background:var(--amber)}.run{height:29px;border:1px solid #1d7a70;background:#0d2b2a;color:#9af2e4;border-radius:6px;padding:0 11px;font:700 10.5px Inter;letter-spacing:.04em;display:flex;align-items:center;gap:7px}
+.main{grid-column:2;display:grid;grid-template-columns:240px 1fr 300px;gap:12px;padding:14px 16px;overflow:hidden}
+.col{display:flex;flex-direction:column;gap:12px;min-height:0}
+.card{background:linear-gradient(180deg,var(--panel),#0b131c);border:1px solid var(--line);border-radius:9px;overflow:hidden}.card .hd{display:flex;align-items:center;gap:8px;padding:9px 11px;border-bottom:1px solid var(--line);color:#8ba0ae;font-size:10px;letter-spacing:.12em;text-transform:uppercase}.card .hd b{color:#cfe0e9;font-weight:600;letter-spacing:.04em}.card .hd .right{margin-left:auto;color:#5f7685;letter-spacing:0}
+.body{padding:11px}
+.h-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.h{background:#0b151e;border:1px solid #172734;border-radius:7px;padding:9px}.h .lbl{font-size:9.5px;color:#6f8595;letter-spacing:.08em;text-transform:uppercase;display:flex;justify-content:space-between}.h .val{font-size:16px;font-weight:700;margin-top:5px;letter-spacing:-.2px}.h .val small{font-size:10px;color:#6f8595;font-weight:500;letter-spacing:0}.h .sub{font-size:9.5px;color:#5f7685;margin-top:2px}.ok{color:var(--green)}.warn{color:var(--amber)}.bad{color:var(--red)}.cyan{color:var(--cyan)}
+.phase{display:flex;gap:9px;padding:9px;border-radius:7px;border:1px solid #152530;background:#0a131b;margin-bottom:7px}.phase:last-child{margin:0}.phase .num{width:24px;height:24px;border-radius:6px;background:#101f29;border:1px solid #1d3441;display:grid;place-items:center;font:700 10px "Cascadia Code",monospace;color:#7e97a7;flex:none}.phase .txt b{font-size:11px}.phase .txt p{margin:2px 0 0;color:#657b8a;font-size:9.5px;line-height:1.3}.phase .st{margin-left:auto;align-self:center;font:700 8.5px Inter;letter-spacing:.08em;padding:3px 6px;border-radius:4px}.st.p{color:#7fe0a7;background:#10271d}.st.a{color:#f2c878;background:#2b2112}.st.b{color:#ff9b90;background:#2e1717}
+.center{min-width:0}.hero{padding:14px 16px;background:radial-gradient(900px 160px at 20% 0,#102831,#0c151e)}.hero .eyebrow{color:#5f7685;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase}.hero h1{margin:5px 0 3px;font-size:22px;letter-spacing:-.3px;font-weight:700}.hero p{margin:0;color:#7c93a2;font-size:11px}.hero .row{display:flex;gap:18px;margin-top:14px}.stat b{font-size:18px;letter-spacing:-.2px}.stat span{display:block;color:#627988;font-size:9.5px;margin-top:1px}.timeline{padding:12px 14px}.tl{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.tl .s{border:1px solid #172a36;border-radius:6px;padding:7px;background:#0a141d}.tl .s .n{font-size:9.5px;color:#7c93a2;display:flex;justify-content:space-between}.tl .s .bar{height:3px;border-radius:2px;background:#182934;margin-top:6px;overflow:hidden}.tl .s .bar i{display:block;height:100%;background:var(--cyan2)}.tl .s.pass .bar i{background:var(--green)}.tl .s.block .bar i{background:var(--red);width:18%!important}
+.log{font:10px/1.65 "Cascadia Code",Consolas,monospace;color:#8ea6b5;padding:10px 12px;max-height:184px;overflow:hidden}.log .t{color:#516a7a}.log .ok{color:var(--green)}.log .warnl{color:var(--amber)}.log .fail{color:var(--red)}.log div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.art{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.thumb{border:1px solid #172a36;border-radius:6px;background:#0a141d;padding:6px}.thumb .box{height:48px;border-radius:4px;background:linear-gradient(135deg,#123037,#0b1b22);position:relative;overflow:hidden}.thumb .box.apk:after{content:"APK";position:absolute;inset:0;display:grid;place-items:center;color:#64cabb;font:700 10px "Cascadia Code"}.thumb .box.img:after{content:"";position:absolute;width:26px;height:26px;background:linear-gradient(135deg,#56cbbb,#1d7c74);left:50%;top:50%;transform:translate(-50%,-50%) rotate(28deg);border-radius:3px}.thumb .box.wav:after{content:"▁▃▅▂▆▃▁";position:absolute;inset:0;display:grid;place-items:center;color:#7bd6c6;font:14px monospace}.thumb .lbl{font-size:9.5px;margin-top:5px;color:#9db0bc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.thumb .sz{font-size:8.5px;color:#5f7685}
+.gate{display:flex;gap:8px;padding:8px;border:1px solid #172a36;border-radius:6px;background:#0a141d;margin-bottom:7px}.gate .dot{width:7px;height:7px;border-radius:50%;margin-top:4px;flex:none}.gate b{font-size:10.5px}.gate p{margin:2px 0 0;color:#657b8a;font-size:9.5px;line-height:1.35}.gate .code{margin-left:auto;font:8.5px "Cascadia Code";color:#5e7281;align-self:flex-start}
+.legend{padding:8px 10px;border-top:1px solid var(--line);color:#5d7382;font-size:9px;display:flex;gap:12px}
+.foot{grid-column:2;display:flex;align-items:center;gap:10px;padding:0 16px;border-top:1px solid var(--line);background:#0a1017}.cmd{flex:1;height:26px;border:1px solid #172a36;border-radius:5px;background:#0b151e;display:flex;align-items:center;padding:0 9px;font:10px "Cascadia Code";color:#92a9b8;gap:7px;overflow:hidden;white-space:nowrap}.cmd .p{color:var(--cyan)}.foot .h{color:#4f6675;font-size:9px;letter-spacing:.04em}
+</style></head><body>
+<div class="app">
+  <aside class="rail"><div class="logo"></div><div class="ricon active">⌂</div><div class="ricon">▤</div><div class="ricon">◇</div><div class="ricon">▧</div><div class="ricon">⌁</div><div class="grow"></div><div class="ver">PG // 0.16</div></aside>
+  <header class="top"><div class="title"><b>PROJECTGYPSY</b><span>MISSION CONTROL</span></div><div class="status"><span class="d"></span>ORCHESTRATOR ONLINE</div><div class="right"><div class="chip"><span class="dot"></span><b>main</b> clean</div><div class="chip"><b>Godot</b> 4.7.2</div><div class="chip"><b>172</b> tests</div><button class="run">▶ RUN ALL</button></div></header>
+  <main class="main">
+    <div class="col">
+      <div class="card"><div class="hd"><b>Machine</b><span class="right">LIVE PROBE</span></div><div class="body"><div class="h-grid">
+        <div class="h"><div class="lbl"><span>GPU</span><span class="warn">LIMIT</span></div><div class="val">4.0<small> GB</small></div><div class="sub">T600 · 16.67 ms budget</div></div>
+        <div class="h"><div class="lbl"><span>DISK C:</span><span class="ok">OK</span></div><div class="val">241<small> GB</small></div><div class="sub">D: 60 GB free</div></div>
+        <div class="h"><div class="lbl"><span>RAM</span><span class="ok">OK</span></div><div class="val">63.7<small> GB</small></div><div class="sub">Windows · i7-12800H</div></div>
+        <div class="h"><div class="lbl"><span>CI HOOK</span><span class="ok">ON</span></div><div class="val">6/6</div><div class="sub">checks green</div></div>
+      </div></div></div>
+      <div class="card"><div class="hd"><b>Phase ladder</b><span class="right">ADR-003</span></div><div class="body">
+        <div class="phase"><span class="num">0</span><div class="txt"><b>Foundation</b><p>probes, manifests, Godot smoke</p></div><span class="st p">DONE</span></div>
+        <div class="phase"><span class="num">1</span><div class="txt"><b>Vertical slice</b><p>demo · build · capture</p></div><span class="st p">DONE</span></div>
+        <div class="phase"><span class="num">2</span><div class="txt"><b>Orchestrator</b><p>state · hashes · multi-slice</p></div><span class="st p">DONE</span></div>
+        <div class="phase"><span class="num">3</span><div class="txt"><b>Toolpacks</b><p>art import · seeded audio</p></div><span class="st p">DONE</span></div>
+        <div class="phase"><span class="num">4</span><div class="txt"><b>Console</b><p>read-only board/preview/diff</p></div><span class="st p">DONE</span></div>
+        <div class="phase"><span class="num">5</span><div class="txt"><b>Live / mobile</b><p>watcher · APK · benchmark</p></div><span class="st a">PARTIAL</span></div>
+        <div class="phase"><span class="num">6</span><div class="txt"><b>UE5 adapter</b><p>hardware-gated: 4 &lt; 8 GB</p></div><span class="st b">BLOCKED</span></div>
+      </div></div>
+    </div>
+    <div class="col center">
+      <div class="card hero"><div class="eyebrow">Latest run · task-20261026T064601Z</div><h1>All executable gates passed.</h1><p>8/8 steps · 79.9 s · 3 artifacts hashed · second engine and UE5 are blocked, not failed.</p><div class="row"><div class="stat"><b class="ok">4</b><span>slices passed</span></div><div class="stat"><b>9</b><span>steps</span></div><div class="stat"><b>0</b><span>blocking defects</span></div><div class="stat"><b class="cyan">42</b><span>capabilities</span></div></div></div>
+      <div class="card"><div class="hd"><b>Run timeline</b><span class="right">LAST 4 RUNS</span></div><div class="timeline"><div class="tl">
+        <div class="s pass"><div class="n"><span>phase1</span><span>13.1 s</span></div><div class="bar"><i style="width:100%"></i></div></div>
+        <div class="s pass"><div class="n"><span>quality</span><span>21.5 s</span></div><div class="bar"><i style="width:100%"></i></div></div>
+        <div class="s pass"><div class="n"><span>toolpacks</span><span>45.6 s</span></div><div class="bar"><i style="width:100%"></i></div></div>
+        <div class="s block"><div class="n"><span>mobile</span><span>11.6 s</span></div><div class="bar"><i style="width:100%"></i></div></div>
+      </div></div></div>
+      <div class="card"><div class="hd"><b>Artifact vault</b><span class="right">3 TRACKED · HASHED</span></div><div class="body"><div class="art">
+        <div class="thumb"><div class="box apk"></div><div class="lbl">ProjectGypsy.apk</div><div class="sz">28.3 MB · signed</div></div>
+        <div class="thumb"><div class="box img"></div><div class="lbl">frame.png</div><div class="sz">1280×720 · 33 KB</div></div>
+        <div class="thumb"><div class="box wav"></div><div class="lbl">musicgen.wav</div><div class="sz">3.94 s · seeded</div></div>
+      </div></div></div>
+      <div class="card"><div class="hd"><b>Recent output</b><span class="right">workstream/state</span></div><div class="log">
+        <div><span class="t">07:24:00</span> <span class="ok">PASS</span> toolpacks · art.import.golden · 2 validators</div>
+        <div><span class="t">07:24:08</span> <span class="ok">PASS</span> toolpacks · audio.musicgen · seeded sha fe1f40</div>
+        <div><span class="t">07:23:21</span> <span class="ok">PASS</span> slices · toolpacks · 2/2 steps</div>
+        <div><span class="t">07:22:00</span> <span class="warnl">BLOCKED</span> engine · Unity · exit 198 (licence)</div>
+        <div><span class="t">07:22:00</span> <span class="warnl">BLOCKED</span> engine · UE5 · VRAM 4.0 &lt; 8.0</div>
+        <div><span class="t">07:21:00</span> <span class="ok">PASS</span> mobile · APK · 28,305,095 B · arm64</div>
+      </div></div>
+    </div>
+    <div class="col">
+      <div class="card"><div class="hd"><b>Gates</b><span class="right">HONEST STATE</span></div><div class="body">
+        <div class="gate"><span class="dot" style="background:var(--green)"></span><div><b>Mobile package</b><p>Signed arm64 debug APK; package + cert verified.</p></div><span class="code">PASS</span></div>
+        <div class="gate"><span class="dot" style="background:var(--amber)"></span><div><b>Device launch</b><p>No device/emulator. Not claimed.</p></div><span class="code">UNTESTED</span></div>
+        <div class="gate"><span class="dot" style="background:var(--red)"></span><div><b>Second engine</b><p>Unity 198 · UE5 VRAM · Flax no headless.</p></div><span class="code">BLOCKED</span></div>
+        <div class="gate"><span class="dot" style="background:var(--red)"></span><div><b>Phase 6 · UE5</b><p>Needs ≥8 GB VRAM / remote builder.</p></div><span class="code">BLOCKED</span></div>
+        <div class="gate" style="border-style:dashed"><span class="dot" style="background:#5d7382"></span><div><b>No approval queue</b><p>Gates are automated; evidence is the review surface.</p></div></div>
+      </div></div>
+      <div class="card"><div class="hd"><b>Run a gate</b><span class="right">CLI</span></div><div class="body" style="display:flex;flex-direction:column;gap:6px">
+        <div class="cmd" style="height:28px"><span class="p">$</span>slices run --all</div>
+        <div class="cmd" style="height:28px"><span class="p">$</span>game bench --runs 3</div>
+        <div class="cmd" style="height:28px"><span class="p">$</span>toolpacks run audio.musicgen</div>
+        <div class="cmd" style="height:28px"><span class="p">$</span>live --once --command demo</div>
+        <div style="display:flex;gap:6px;margin-top:4px"><button class="run" style="flex:1;justify-content:center">OPEN EVIDENCE</button><button class="chip" style="flex:1;justify-content:center">COPY</button></div>
+      </div></div>
+      <div class="card"><div class="hd"><b>Policy</b><span class="right">PACK PG-1</span></div><div class="body" style="color:#708796;font-size:10px;line-height:1.5">No fake passes. Blocked engines stay blocked. Every artifact has a hash and a licence record. Interface design for the game remains parked (PG-D4).</div></div>
+    </div>
+  </main>
+  <footer class="foot"><div class="cmd"><span class="p">$</span>python workstream/gypsy.py slices status</div><span class="h">READ-ONLY VIEW OF STATE</span><span class="h">CLI IS THE SOURCE OF TRUTH</span></div>
+</div></body></html>
