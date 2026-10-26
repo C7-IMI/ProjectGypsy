@@ -86,6 +86,8 @@ func _nearest_crystal() -> Node3D:
 
 func _on_crystal_collected(_crystal: Node) -> void:
     collected += 1
+    if player != null and player.has_method("play_collect"):
+        player.call("play_collect")
 
 func _finish_ok() -> void:
     if finished:

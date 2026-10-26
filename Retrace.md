@@ -362,5 +362,16 @@ Each entry has:
 
 ---
 
-Next prompt number: 36. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 36 - 2026-10-26
+
+- Request: Build both missing pieces — hero art/character pipeline and self-extension — and complete the project.
+- Status: Completed; device launch and UE5 remain gated.
+- Version: 2026.10.26.002
+- Commit/evidence: Wayfarer GLB/FBX/atlas, 20-bone rig, idle/run/reach, Godot integration with marker preserved,
+  hero validator/toolpack/slice; safe extension registry/CLI/lockfile/lifecycle; ADR-016/017; 272 tests, 50 capabilities,
+  check_all 6/6.
+
+---
+
+Next prompt number: 37. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

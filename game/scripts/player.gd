@@ -15,10 +15,12 @@ extends CharacterBody3D
 var autopilot_enabled := false
 var autopilot_direction := Vector3.ZERO
 var spawn_position := Vector3.ZERO
+var hero: Node = null
 
 func _ready() -> void:
     add_to_group("player")
     spawn_position = global_position
+    hero = get_node_or_null("Hero")
 
 func _physics_process(delta: float) -> void:
     if not is_on_floor():
@@ -29,6 +31,9 @@ func _physics_process(delta: float) -> void:
         direction = autopilot_direction
         velocity.x = direction.x * move_speed
         velocity.z = direction.z * move_speed
+        if direction.length_squared() > 0.0001:
+            var autopilot_yaw := atan2(-direction.x, -direction.z)
+            rotation.y = lerp_angle(rotation.y, autopilot_yaw, clampf(delta * 12.0, 0.0, 1.0))
     else:
         var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
         direction = Vector3(input.x, 0.0, input.y).limit_length(1.0)
@@ -42,7 +47,19 @@ func _physics_process(delta: float) -> void:
             rotation.y = lerp_angle(rotation.y, target_yaw, clampf(delta * 12.0, 0.0, 1.0))
 
     move_and_slide()
+    _update_hero_animation()
 
     if global_position.y < fall_reset_y:
         global_position = spawn_position
         velocity = Vector3.ZERO
+
+func _update_hero_animation() -> void:
+    if hero == null:
+        return
+    var horizontal_speed := Vector2(velocity.x, velocity.z).length()
+    if hero.has_method("play_motion"):
+        hero.call("play_motion", horizontal_speed, is_on_floor())
+
+func play_collect() -> void:
+    if hero != null and hero.has_method("play_collect"):
+        hero.call("play_collect")

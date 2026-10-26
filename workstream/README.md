@@ -4,6 +4,23 @@ The Gypsy Studio harness described in [docs/ADR-003-workstream-architecture.md](
 engine/tool detection, manifests and checks (Phase 0), a playable Godot slice (Phase 1), a manifest-driven orchestrator
 (Phase 2), toolpacks (Phase 3), a read-only console (Phase 4), and live/performance/mobile gates (Phase 5).
 
+## Hero pipeline
+
+The first hero asset and pipeline are reproducible:
+
+    python workstream/gypsy.py toolpacks run hero.wayfarer
+    python workstream/gypsy.py slices run hero
+
+See `docs/ART-DIRECTION.md`, `docs/ADR-017-hero-character-pipeline.md`, `assets/hero/` and `scripts/hero/`.
+
+## Extensions
+
+Safe self-extension lives in `extensions/` and is reviewed/registered through the CLI:
+
+    python workstream/gypsy.py extension list|show|validate|test|register|disable|remove|run|reload
+
+See `extensions/README.md` and [ADR-016](../docs/ADR-016-self-extension.md). The core is not self-modified.
+
 ## Commands
 
 ```text

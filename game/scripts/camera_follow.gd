@@ -2,7 +2,7 @@ extends Camera3D
 ## Fixed-offset third-person camera that smoothly follows the player.
 
 @export var target_path: NodePath
-@export var follow_offset := Vector3(0.0, 7.0, 10.0)
+@export var follow_offset := Vector3(0.0, 4.2, 6.0)
 @export var smoothing := 6.0
 
 var target: Node3D

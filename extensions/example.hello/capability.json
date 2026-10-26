@@ -1,0 +1,42 @@
+{
+  "schema": "gypsy.capability/v1",
+  "file": "capability.json",
+  "id": "extension.example.hello",
+  "layer": "extension",
+  "tool": "example",
+  "kind": "example",
+  "maturity": "experimental",
+  "description": "Reference isolated extension with a passing action and an intentionally failing action; the manifest's negative test proves the runner detects failure.",
+  "requires": [
+    "python 3.14 standard library"
+  ],
+  "inputs": [
+    {
+      "name": "action",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "marker",
+      "type": "text"
+    }
+  ],
+  "checks": [
+    "hello exits 0 and prints EXTENSION_HELLO_OK",
+    "fail exits nonzero and prints EXTENSION_EXPECTED_FAILURE to stderr",
+    "the declared negative test passes only when the failing action actually fails",
+    "the extension resolves inside extensions/example.hello and is registered by explicit review"
+  ],
+  "provenance": {
+    "record": [
+      "extension",
+      "version",
+      "treeSha256",
+      "action",
+      "argv",
+      "exit",
+      "seconds"
+    ]
+  }
+}

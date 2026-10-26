@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.26.001
+Current version: 2026.10.26.002
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,22 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.26.002
+
+**Complete the missing hero art/character pipeline and safe self-extension.**
+
+- Date: 2026-10-26
+- Commit: this change.
+- Change: original Wayfarer hero (Blender 5.2.3 generator, 20-joint rig, idle/run/reach, 256² atlas, GLB/FBX, non-Blender
+  validator, Godot integration preserving collision/autopilot/marker, preview/showroom captures, hero toolpack and
+  slice); safe self-extension pipeline (extensions.py, gypsy extension CLI, isolated manifests/capability/lockfile,
+  dry-run, register/review gate, disable/remove/reload, negative tests, example extension and capability); ADR-016,
+  ADR-017, ART-DIRECTION and status/doc updates.
+- Verification: Blender generation exit 0, WAYFARER_GEN_OK bytes=282668 bones=20 actions=3 tris=1126; validator exit 0
+  HERO_VALIDATE_OK checks=60 (60/60); Godot headless demo x2 exit 0 with GYPSY_DEMO_OK collected=3 frames=143;
+  integration check HERO_CHECK_OK; game verify/capture pass; hero slice passed; extension test 55/55 plus lifecycle and
+  negative paths; full suite 272 tests OK (2 skipped); capabilities 50; toolpacks 5; slices 6; check_all 6/6.
 
 ## 2026.10.26.001
 

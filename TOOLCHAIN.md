@@ -149,6 +149,8 @@ python workstream/gypsy.py slices run --all   # phase1 + quality + toolpacks + m
 python workstream/gypsy.py slices status      # latest task state
 python workstream/gypsy.py toolpacks list|check
 python workstream/gypsy.py toolpacks run art.import.golden   # Blender->Godot import + validators
+python workstream/gypsy.py slices run hero                  # Wayfarer generation + validation + capture
+python scripts/hero/validate_wayfarer.py                    # non-Blender hero asset/rig/action validator
 python workstream/gypsy.py toolpacks run audio.musicgen      # local MusicGen WAV + validator
 python workstream/gypsy.py console board                    # read-only task board
 python workstream/gypsy.py console preview artifacts/game/frame.png

@@ -1,0 +1,76 @@
+{
+  "schema": "gypsy.capability/v1",
+  "file": "workstream.extension.json",
+  "id": "workstream.extension",
+  "layer": "workstream",
+  "tool": "gypsy",
+  "kind": "registry",
+  "maturity": "experimental",
+  "description": "Discover, validate, test, review-register and run isolated declarative extensions with fixed argv, no shell, timeouts, dry-run, path containment, a lockfile gate and disable/remove/reload. The pipeline is tested; OS-level sandboxing and network enforcement are not claimed.",
+  "requires": [
+    "python 3.14 standard library",
+    "write access to the extension root for the lockfile and run state"
+  ],
+  "inputs": [
+    {
+      "name": "extension",
+      "type": "string"
+    },
+    {
+      "name": "action",
+      "type": "string"
+    },
+    {
+      "name": "accept",
+      "type": "boolean"
+    },
+    {
+      "name": "dryRun",
+      "type": "boolean"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "validation",
+      "type": "json"
+    },
+    {
+      "name": "testReport",
+      "type": "json"
+    },
+    {
+      "name": "lockfile",
+      "type": "json"
+    },
+    {
+      "name": "runState",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "extension root is extensions/ or out of checkout, never a core directory",
+    "manifest schema, apiVersion, semantic version and capability id validate",
+    "entrypoint argv is an explicit list, never a shell string",
+    "entrypoint and declared read/write paths resolve inside the extension directory",
+    "every manifest declares a negative test and extension test fails when it unexpectedly succeeds",
+    "run refuses an unregistered, disabled or changed extension",
+    "dry-run executes nothing and writes no lockfile",
+    "register --accept hashes the tree and writes gypsy.lock.json atomically",
+    "disable/reload/remove are explicit, reversible or confirmed paths"
+  ],
+  "provenance": {
+    "record": [
+      "extension",
+      "version",
+      "capability",
+      "manifestSha256",
+      "treeSha256",
+      "action",
+      "argv",
+      "cwd",
+      "timeoutSeconds",
+      "exit",
+      "seconds"
+    ]
+  }
+}

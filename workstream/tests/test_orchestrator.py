@@ -222,7 +222,7 @@ class ManifestFileTests(unittest.TestCase):
         cls.manifests = slices.load_all(REPO_ROOT / "slices")
 
     def test_repository_manifests_load_and_validate(self):
-        self.assertEqual(set(self.manifests), {"phase1", "quality", "toolpacks", "mobile", "leftbehind"})
+        self.assertEqual(set(self.manifests), {"phase1", "quality", "toolpacks", "mobile", "leftbehind", "hero"})
         for slice_id, manifest in self.manifests.items():
             self.assertEqual(slices.validate_manifest(manifest), [], slice_id)
             self.assertEqual(manifest["schema"], "gypsy.slice/v1")

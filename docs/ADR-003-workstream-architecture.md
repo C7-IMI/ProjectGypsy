@@ -103,13 +103,15 @@ explicit approval. Generated code is evidence only after it is read and run.
 | 5 | Live iteration, mobile export, second engine adapter | same slice runs on two engines; mobile gate passes |
 | 6 | Gated UE5 adapter (hardware/remote) | UE5 slice builds on a machine that meets the gate — **BLOCKED here: 4 GB VRAM < 8 GB** ([PHASE-6-GATE.md](PHASE-6-GATE.md)) |
 
-Phase-5 status: mobile APK package gate, live watcher and performance baseline pass; the second-engine part of the gate is **blocked** (Unity licence 198, UE5 VRAM, Flax no headless) — [PHASE-5-EVIDENCE.md](PHASE-5-EVIDENCE.md).
+Phase-5 status: mobile APK package gate, live watcher, performance baseline and the second-engine part of the gate pass
+(Godot + LeftBehind Unity 6), with device launch still untested; UE5 remains hardware-blocked —
+[PHASE-5-EVIDENCE.md](PHASE-5-EVIDENCE.md), [UNITY-SLICE.md](UNITY-SLICE.md).
 
 ## What is not built yet
 
-Orchestrator state machine, artifact store writes, capture harness, engine adapters beyond detection, console,
-self-extension pipeline, live reload. They are registered as deferred work rather than pretended. Phase 0 is the
-current boundary.
+The orchestrator, artifact store, capture harness, engine adapters, console, hero pipeline and safe self-extension are
+built. Remaining gaps are device launch, UE5, production art and true engine hot reload; they are recorded rather than
+pretended.
 
 ## Alternatives rejected
 

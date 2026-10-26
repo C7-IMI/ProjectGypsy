@@ -79,12 +79,15 @@ In this order:
    boundaries (007), MCP/free local tools (008), vertical slice (009), slice orchestrator (010), toolpacks (011),
    thin console (012), phase-5 mobile/live/perf (013), local dashboard (014), ActionForge toolkit (015), plus
    [`docs/DASHBOARD.md`](./docs/DASHBOARD.md), [`docs/GYPSY-AGENT-GUIDE.md`](./docs/GYPSY-AGENT-GUIDE.md),
+   [`docs/ADR-016-self-extension.md`](./docs/ADR-016-self-extension.md),
+   [`docs/ADR-017-hero-character-pipeline.md`](./docs/ADR-017-hero-character-pipeline.md),
    [`docs/UNITY-SLICE.md`](./docs/UNITY-SLICE.md),
    [`docs/ENGINE-SMOKE.md`](./docs/ENGINE-SMOKE.md), [`docs/IMPORT-MATRIX.md`](./docs/IMPORT-MATRIX.md),
    the PHASE-1..5 evidence files and [`docs/PHASE-6-GATE.md`](./docs/PHASE-6-GATE.md).
 6. **[`workstream/README.md`](./workstream/README.md)** — the CLI: `engines probe|smoke`, `tools probe`,
    `capabilities`, `toolkit list|show|probe|capabilities` and `toolkit actionforge catalog|fetch`, `project`,
-   `game demo|build|capture|verify`, `slices list|plan|run|status`, `toolpacks list|check|run`,
+   `extension list|show|validate|test|register|disable|remove|run|reload`, `game demo|build|capture|verify`,
+   `slices list|plan|run|status`, `toolpacks list|check|run`,
    `console board|preview|diff`, `dashboard`, `game bench`, `live`, `check`.
 7. **[`DEFERRED.md`](./DEFERRED.md)** — the work deliberately not done. Read the entry covering an area before you
    change that area, and do not quietly close a deferred item by implementing it halfway.
@@ -135,6 +138,6 @@ with demo/export/capture, a manifest-driven slice orchestrator with state/artifa
 validators/provenance, a read-only terminal console, a live watcher, a performance baseline, a signed Android debug
 APK, the Gypsy Studio operations console and classic four-view dashboard; **LeftBehind** proves the same slice on Unity 6
 (build, demo and capture); records and the one pack check list; the ADRs; a golden Blender import matrix; MCP/ComfyUI/Poly Haven
-tooling. There is still **no hero art/character pipeline, self-extension or tested device launch**; Phase 6 (UE5) is
-hardware-blocked. See `docs/PHASE-5-EVIDENCE.md`, `docs/UNITY-SLICE.md`, `docs/PHASE-6-GATE.md`, `docs/DASHBOARD.md`
-and `DEFERRED.md`.
+tooling, the safe self-extension pipeline and the first hero art/character pipeline. There is still **no tested device
+launch**; Phase 6 (UE5) is hardware-blocked. See `docs/PHASE-5-EVIDENCE.md`, `docs/UNITY-SLICE.md`,
+`docs/ADR-017-hero-character-pipeline.md`, `docs/PHASE-6-GATE.md`, `docs/DASHBOARD.md` and `DEFERRED.md`.

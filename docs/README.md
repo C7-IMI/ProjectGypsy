@@ -16,6 +16,9 @@
 | [ADR-012-thin-console.md](ADR-012-thin-console.md) | Phase-4 read-only terminal console (board/preview/diff), CLI parity |
 | [ADR-013-phase5-mobile-live-perf.md](ADR-013-phase5-mobile-live-perf.md) | Phase-5 mobile package, live watcher, performance baseline, second-engine gate |
 | [ADR-014-local-dashboard.md](ADR-014-local-dashboard.md) | local operations console: overview/run detail/mission/commands/review/slices/artifacts; classic four views; token actions, localhost safety |
+| [ADR-016-self-extension.md](ADR-016-self-extension.md) | safe isolated self-extension: manifest/capability validation, dry-run, review gate, lockfile, disable/remove/reload, negative tests |
+| [ADR-017-hero-character-pipeline.md](ADR-017-hero-character-pipeline.md) | first hero character: art direction, Blender generator, 20-joint rig, idle/run/reach, atlas, GLB/FBX, Godot integration and validation |
+| [ART-DIRECTION.md](ART-DIRECTION.md) | Wayfarer art direction, palette, silhouette, rig/animation set and validation contract |
 | [ADR-015-actionforge-toolkit.md](ADR-015-actionforge-toolkit.md) | reusable toolkit/plugin registry, ActionForge CC0 rig/animation fetch, licence/provenance, network and path safety, what stays manual |
 | [ENGINE-SMOKE.md](ENGINE-SMOKE.md) | Phase-0 evidence: Godot headless pass, Unity licence block, UE5 gate, Flax status |
 | [IMPORT-MATRIX.md](IMPORT-MATRIX.md) | generated evidence: Blender round-trip, glTF validation, Godot import, blocked engines |
@@ -28,6 +31,7 @@
 | [UNITY-SLICE.md](UNITY-SLICE.md) | LeftBehind Unity 6 second-engine build/demo/capture evidence |
 | [DASHBOARD.md](DASHBOARD.md) | launch/use guide for the operations console and classic views |
 | [GYPSY-AGENT-GUIDE.md](GYPSY-AGENT-GUIDE.md) | instructions for coding agents using Gypsy on new or existing projects |
+| [../extensions/README.md](../extensions/README.md) | extension schema, commands, safety model and limitations |
 
 Related: [../TOOLCHAIN.md](../TOOLCHAIN.md), [../TOOL-INVENTORY.md](../TOOL-INVENTORY.md),
 [../DEFERRED.md](../DEFERRED.md), [../workstream/README.md](../workstream/README.md),

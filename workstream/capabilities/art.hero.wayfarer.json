@@ -1,0 +1,69 @@
+{
+  "schema": "gypsy.capability/v1",
+  "file": "art.hero.wayfarer.json",
+  "id": "art.hero.wayfarer",
+  "layer": "art",
+  "tool": "blender",
+  "kind": "character",
+  "maturity": "partial",
+  "description": "Reproducible stylized hero character pipeline: Blender 5.2.3 generator, 20-joint rig, skin weights, 3 actions, procedural atlas, GLB/FBX, non-Blender validator and Godot integration. The asset is a prototype, not production art.",
+  "requires": [
+    "blender 5.2.3",
+    "godot 4.7.2",
+    "python 3.14 standard library"
+  ],
+  "inputs": [
+    {
+      "name": "repo",
+      "type": "path"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "glb",
+      "type": "file"
+    },
+    {
+      "name": "fbx",
+      "type": "file"
+    },
+    {
+      "name": "texture",
+      "type": "file"
+    },
+    {
+      "name": "generationReport",
+      "type": "json"
+    },
+    {
+      "name": "validationReport",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "GLB and FBX re-import in Blender with 20 bones and 3 actions",
+    "skin weights normalized, no unweighted vertices, max 3 influences",
+    "height 1.905 m, feet at ground, 4 materials, embedded 256x256 atlas",
+    "non-Blender validator reports 60/60 checks pass",
+    "Godot demo retains GYPSY_DEMO_OK and shows the hero in capture"
+  ],
+  "provenance": {
+    "record": [
+      "blender version",
+      "script sha256",
+      "glb sha256",
+      "fbx bytes",
+      "texture sha256",
+      "actions",
+      "bones",
+      "triangles",
+      "validation checks",
+      "capture sha256"
+    ]
+  },
+  "notes": [
+    "Prototype limitations: no facial rig, cloth simulation, cape bones, LODs or normal maps; gameplay camera is distant.",
+    "FBX bytes are not deterministic; GLB and atlas are reproducible.",
+    "Evidence: artifacts/hero/generation-report.json, validation.json, hero-preview-contact.png; game frame."
+  ]
+}

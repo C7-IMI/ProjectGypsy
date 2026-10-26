@@ -1,0 +1,54 @@
+{
+  "schema": "gypsy.extension/v1",
+  "id": "example.hello",
+  "version": "1.0.0",
+  "apiVersion": "1",
+  "name": "Example hello extension",
+  "description": "Safe reference extension: one action passes and one action fails so the negative test proves failure detection.",
+  "license": "MIT",
+  "author": "Gypsy Studio",
+  "capability": "extension.example.hello",
+  "entrypoints": {
+    "hello": {
+      "description": "Print a stable marker and exit 0.",
+      "argv": [
+        "python",
+        "run.py",
+        "--action",
+        "hello"
+      ],
+      "timeout": 10
+    },
+    "fail": {
+      "description": "Print an expected failure marker to stderr and exit 3.",
+      "argv": [
+        "python",
+        "run.py",
+        "--action",
+        "fail"
+      ],
+      "timeout": 10
+    }
+  },
+  "tests": [
+    {
+      "id": "hello-passes",
+      "action": "hello",
+      "expectExit": 0,
+      "stdoutContains": "EXTENSION_HELLO_OK"
+    },
+    {
+      "id": "fail-is-detected",
+      "action": "fail",
+      "expectExit": "nonzero",
+      "stderrContains": "EXTENSION_EXPECTED_FAILURE"
+    }
+  ],
+  "permissions": {
+    "network": false,
+    "reads": [
+      "."
+    ],
+    "writes": []
+  }
+}

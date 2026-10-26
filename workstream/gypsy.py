@@ -12,6 +12,7 @@ Usage:
     python workstream/gypsy.py capabilities list|check [--json]
     python workstream/gypsy.py toolkit list|show|probe|capabilities [--json]
     python workstream/gypsy.py toolkit actionforge catalog|fetch [--json]
+    python workstream/gypsy.py extension list|show|validate|test|register|disable|remove|run|reload [--json]
     python workstream/gypsy.py project init --path DIR --engine ID --version VER [--targets pc,mobile] [--force]
     python workstream/gypsy.py project show [--path DIR] [--json]
     python workstream/gypsy.py check [--project DIR] [--json]
@@ -33,6 +34,7 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
+import extensions as extension_spec
 import toolkit as toolkit_spec
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -831,6 +833,60 @@ def main(argv=None) -> int:
             toolpack_cmd.add_argument("toolpack_id")
             toolpack_cmd.add_argument("--action", default=None)
 
+    extension_parser = sub.add_parser(
+        "extension", help="isolated declarative extensions (ADR-003 self-extension)"
+    )
+    extension_sub = extension_parser.add_subparsers(dest="extension_command", required=True)
+    extension_list = extension_sub.add_parser("list", help="list discovered extensions and status")
+    extension_list.add_argument("--dir", default=None, help="extension root (default: extensions/)")
+    extension_list.add_argument("--json", action="store_true")
+    extension_show = extension_sub.add_parser("show", help="show one extension, its files and review")
+    extension_show.add_argument("extension_id")
+    extension_show.add_argument("--dir", default=None, help="extension root (default: extensions/)")
+    extension_show.add_argument("--json", action="store_true")
+    extension_validate = extension_sub.add_parser("validate", help="validate manifests, capabilities and paths")
+    extension_validate.add_argument("extension_id", nargs="?")
+    extension_validate.add_argument("--dir", default=None, help="extension root (default: extensions/)")
+    extension_validate.add_argument("--json", action="store_true")
+    extension_test = extension_sub.add_parser("test", help="run declared tests, including the negative test")
+    extension_test.add_argument("extension_id")
+    extension_test.add_argument("--dir", default=None, help="extension root (default: extensions/)")
+    extension_test.add_argument("--json", action="store_true")
+    extension_register = extension_sub.add_parser(
+        "register", help="review gate: hash and register extensions (requires --accept)"
+    )
+    extension_register.add_argument("extension_ids", nargs="*")
+    extension_register.add_argument("--accept", action="store_true", help="accept the shown review")
+    extension_register.add_argument("--dry-run", action="store_true", help="show the review/lock plan without writing")
+    extension_register.add_argument("--dir", default=None, help="extension root (default: extensions/)")
+    extension_register.add_argument("--json", action="store_true")
+    extension_disable = extension_sub.add_parser("disable", help="disable a registered extension without deleting it")
+    extension_disable.add_argument("extension_id")
+    extension_disable.add_argument("--dry-run", action="store_true")
+    extension_disable.add_argument("--dir", default=None, help="extension root (default: extensions/)")
+    extension_disable.add_argument("--json", action="store_true")
+    extension_remove = extension_sub.add_parser("remove", help="unregister, or delete with --delete")
+    extension_remove.add_argument("extension_id")
+    extension_remove.add_argument("--delete", action="store_true", help="also delete the extension directory")
+    extension_remove.add_argument("--dry-run", action="store_true")
+    extension_remove.add_argument("--dir", default=None, help="extension root (default: extensions/)")
+    extension_remove.add_argument("--json", action="store_true")
+    extension_run = extension_sub.add_parser("run", help="run one registered extension action")
+    extension_run.add_argument("extension_id")
+    extension_run.add_argument("--action", required=True)
+    extension_run.add_argument("--dry-run", action="store_true", help="resolve and print the plan; execute nothing")
+    extension_run.add_argument("--timeout", type=float, default=None, help="shorten the declared timeout (seconds)")
+    extension_run.add_argument("--dir", default=None, help="extension root (default: extensions/)")
+    extension_run.add_argument("--json", action="store_true")
+    extension_reload = extension_sub.add_parser(
+        "reload", help="re-review and re-register changed extensions (requires --accept)"
+    )
+    extension_reload.add_argument("extension_ids", nargs="*")
+    extension_reload.add_argument("--accept", action="store_true", help="accept the shown review")
+    extension_reload.add_argument("--dry-run", action="store_true")
+    extension_reload.add_argument("--dir", default=None, help="extension root (default: extensions/)")
+    extension_reload.add_argument("--json", action="store_true")
+
     console_parser = sub.add_parser("console", help="read-only Phase-4 terminal console")
     console_sub = console_parser.add_subparsers(dest="console_command", required=True)
     console_board = console_sub.add_parser("board")
@@ -1036,6 +1092,68 @@ def main(argv=None) -> int:
             from dashboard import serve
             return serve(args.port, not args.no_open)
 
+        if args.command == "extension":
+            extension_root = Path(args.dir) if args.dir else None
+            if args.extension_command == "list":
+                data = extension_spec.list_extensions(extension_root)
+                print(json.dumps(data, indent=2) if args.json else extension_spec.render_list(data))
+                return 0
+            if args.extension_command == "show":
+                data = extension_spec.show_extension(extension_root, args.extension_id)
+                print(json.dumps(data, indent=2) if args.json else extension_spec.render_show(data))
+                return 0
+            if args.extension_command == "validate":
+                data = extension_spec.validate_extensions(extension_root, args.extension_id)
+                print(json.dumps(data, indent=2) if args.json else extension_spec.render_validate(data))
+                return 0 if data["passed"] else 1
+            if args.extension_command == "test":
+                data = extension_spec.test_extension(extension_root, args.extension_id)
+                print(json.dumps(data, indent=2) if args.json else extension_spec.render_test(data))
+                return 0 if data["passed"] else 1
+            if args.extension_command == "register":
+                data = extension_spec.register(
+                    extension_root,
+                    args.extension_ids,
+                    accept=args.accept,
+                    dry_run=args.dry_run,
+                )
+                print(json.dumps(data, indent=2) if args.json else extension_spec.render_register(data))
+                return 0
+            if args.extension_command == "reload":
+                data = extension_spec.reload(
+                    extension_root,
+                    args.extension_ids,
+                    accept=args.accept,
+                    dry_run=args.dry_run,
+                )
+                print(json.dumps(data, indent=2) if args.json else extension_spec.render_register(data))
+                return 0
+            if args.extension_command == "disable":
+                data = extension_spec.disable(extension_root, args.extension_id, dry_run=args.dry_run)
+                print(json.dumps(data, indent=2) if args.json else extension_spec.render_disable(data))
+                return 0
+            if args.extension_command == "remove":
+                data = extension_spec.remove(
+                    extension_root,
+                    args.extension_id,
+                    delete=args.delete,
+                    dry_run=args.dry_run,
+                )
+                print(json.dumps(data, indent=2) if args.json else extension_spec.render_remove(data))
+                return 0
+            if args.extension_command == "run":
+                data = extension_spec.run_extension(
+                    extension_root,
+                    args.extension_id,
+                    args.action,
+                    dry_run=args.dry_run,
+                    timeout=args.timeout,
+                )
+                print(json.dumps(data, indent=2) if args.json else extension_spec.render_run(data))
+                if data.get("dryRun"):
+                    return 0 if data.get("ok") else 1
+                return 0 if data.get("passed") else 1
+
         if args.command == "console":
             import console as console_mod
             from pathlib import Path as _Path
@@ -1210,7 +1328,7 @@ def main(argv=None) -> int:
         if args.command == "version":
             print("Gypsy Studio 0.1.0")
             return 0
-    except (GypsyError, toolkit_spec.ToolkitError) as exc:
+    except (GypsyError, toolkit_spec.ToolkitError, extension_spec.ExtensionError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
     return 1

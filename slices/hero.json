@@ -1,0 +1,19 @@
+{
+  "schema": "gypsy.slice/v1",
+  "id": "hero",
+  "project": ".",
+  "description": "Hero art/character pipeline: Blender generation, non-Blender validation and Godot capture.",
+  "artifacts": [],
+  "steps": [
+    {
+      "id": "wayfarer",
+      "kind": "toolpack",
+      "needs": [],
+      "required": true,
+      "timeout": 1200,
+      "args": {
+        "toolpack": "hero.wayfarer"
+      }
+    }
+  ]
+}

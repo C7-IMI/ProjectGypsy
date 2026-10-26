@@ -1,0 +1,129 @@
+{
+  "schema": "gypsy.toolpack/v1",
+  "id": "hero.wayfarer",
+  "name": "Wayfarer hero character pipeline",
+  "tools": [
+    "Blender 5.2.3",
+    "Godot 4.7.2",
+    "Python 3.14 stdlib"
+  ],
+  "license": "Original in-repo prototype asset generated from scripts/hero/generate_wayfarer.py; no external IP or textures.",
+  "actions": [
+    {
+      "id": "generate",
+      "argv": [
+        "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+        "--background",
+        "--factory-startup",
+        "--python",
+        "scripts/hero/generate_wayfarer.py",
+        "--",
+        "--repo",
+        "."
+      ],
+      "cwd": ".",
+      "timeout": 600,
+      "artifacts": [
+        "assets/hero/wayfarer.glb",
+        "assets/hero/wayfarer.fbx",
+        "assets/hero/textures/wayfarer_atlas.png",
+        "artifacts/hero/generation-report.json"
+      ]
+    },
+    {
+      "id": "validate",
+      "argv": [
+        "C:\\Python\\python.exe",
+        "scripts/hero/validate_wayfarer.py",
+        "--json",
+        "artifacts/hero/validation.json"
+      ],
+      "cwd": ".",
+      "timeout": 120,
+      "artifacts": [
+        "artifacts/hero/validation.json"
+      ]
+    },
+    {
+      "id": "capture",
+      "argv": [
+        "C:\\Python\\python.exe",
+        "workstream/gypsy.py",
+        "game",
+        "capture",
+        "--path",
+        "game"
+      ],
+      "cwd": ".",
+      "timeout": 300,
+      "artifacts": [
+        "artifacts/game/frame.png",
+        "artifacts/game/demo.avi",
+        "artifacts/game/demo.mp4"
+      ]
+    }
+  ],
+  "validators": [
+    {
+      "id": "glb",
+      "kind": "glb",
+      "artifact": "assets/hero/wayfarer.glb"
+    },
+    {
+      "id": "fbx",
+      "kind": "file",
+      "artifact": "assets/hero/wayfarer.fbx",
+      "minBytes": 100000
+    },
+    {
+      "id": "atlas",
+      "kind": "png",
+      "artifact": "assets/hero/textures/wayfarer_atlas.png",
+      "minWidth": 256,
+      "minHeight": 256
+    },
+    {
+      "id": "gen-report",
+      "kind": "json",
+      "artifact": "artifacts/hero/generation-report.json",
+      "checks": [
+        {
+          "path": "schema",
+          "equals": "gypsy.hero.generate/v1"
+        },
+        {
+          "path": "errors",
+          "equals": []
+        }
+      ]
+    },
+    {
+      "id": "val-report",
+      "kind": "json",
+      "artifact": "artifacts/hero/validation.json",
+      "checks": [
+        {
+          "path": "passed",
+          "equals": true
+        },
+        {
+          "path": "facts.skinning.joints",
+          "equals": 20
+        }
+      ]
+    },
+    {
+      "id": "frame",
+      "kind": "png",
+      "artifact": "artifacts/game/frame.png",
+      "minWidth": 1280,
+      "minHeight": 720
+    },
+    {
+      "id": "movie",
+      "kind": "file",
+      "artifact": "artifacts/game/demo.mp4",
+      "minBytes": 10000
+    }
+  ]
+}

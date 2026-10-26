@@ -15,11 +15,12 @@ Godot; the CLI surface in ADR-010 is a thin wrapper on top of their functions.
 | [toolpacks.json](toolpacks.json) | toolpacks (project: repository root) | art import -> audio | toolpack state ledgers under workstream/state/toolpacks (gitignored) |
 | [mobile.json](mobile.json) | mobile (project: repository root) | Android APK toolpack | build/ProjectGypsy.apk |
 | [leftbehind.json](leftbehind.json) | leftbehind (project: repository root) | Unity build → demo → capture toolpack | artifacts/leftbehind/{build.log,player.log,frame.png} |
+| [hero.json](hero.json) | hero (project: repository root) | Wayfarer generate → validate → capture toolpack | assets/hero/{wayfarer.glb,wayfarer.fbx}, artifacts/game/frame.png |
 
-The four slices are independent manifests: phase1 proves the game vertical slice again from a clean state; quality
-proves the pack check list, the workstream unit tests and the records guard; toolpacks proves golden import + audio;
-mobile builds the Android APK. A task runs them in manifest order and stops at the first failing slice; quality does
-not require Godot, only Python and git.
+The slices are independent manifests: phase1 proves the game vertical slice again from a clean state; quality proves
+the pack check list, the workstream unit tests and the records guard; toolpacks proves golden import + audio; mobile
+builds the Android APK; leftbehind proves the Unity second engine; hero proves the Wayfarer character pipeline. A task
+runs them in manifest order and stops at the first failing slice; quality does not require Godot, only Python and git.
 
 ## Schema: gypsy.slice/v1
 

@@ -1,0 +1,62 @@
+{
+  "schema": "gypsy.extension-lock/v1",
+  "updated": "2026-10-26T07:14:26-05:00",
+  "extensions": {
+    "example.hello": {
+      "id": "example.hello",
+      "version": "1.0.0",
+      "capability": "extension.example.hello",
+      "directory": "example.hello",
+      "manifest": "extension.json",
+      "manifestSha256": "cf12356f7d3eaa3777945a4c24b17e8965c896c5425c15f93c5ac5f5c9c5eba8",
+      "capabilitySha256": "d987ea6e4676911263b35f2d46a5f1ef77c1da07cdfc93a49120cc08a2a220b5",
+      "treeSha256": "0c2a4b99eb0ffbedc80d6cca22a92ce3a96cda618e92f584a27c15dca53193d3",
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "7b99523b97c6399a4495752e6ae7de2965326c436d4532ca7c4412c113db94e1",
+          "bytes": 752
+        },
+        {
+          "path": "capability.json",
+          "sha256": "62d925c655f013310539298f5bc072694ecc5945e2cdb62dfa7d1d9fca256606",
+          "bytes": 1069
+        },
+        {
+          "path": "extension.json",
+          "sha256": "5a191597ccf85016f4503436e51301fdbaa116d06631ebd8f46afb5a1ed0029d",
+          "bytes": 1200
+        },
+        {
+          "path": "run.py",
+          "sha256": "ed194e82680b7b0c6fb9f8838602f3d195f200a360aef20ba9392c921d829f88",
+          "bytes": 885
+        }
+      ],
+      "accepted": true,
+      "acceptedAt": "2026-10-26T07:13:07-05:00",
+      "enabled": true,
+      "review": {
+        "id": "example.hello",
+        "version": "1.0.0",
+        "capability": "extension.example.hello",
+        "entrypoints": [
+          "fail",
+          "hello"
+        ],
+        "tests": 2,
+        "negativeTests": 1,
+        "permissions": {
+          "network": false,
+          "reads": [
+            "."
+          ],
+          "writes": []
+        },
+        "files": 4,
+        "manifestSha256": "cf12356f7d3eaa3777945a4c24b17e8965c896c5425c15f93c5ac5f5c9c5eba8",
+        "treeSha256": "0c2a4b99eb0ffbedc80d6cca22a92ce3a96cda618e92f584a27c15dca53193d3"
+      }
+    }
+  }
+}
