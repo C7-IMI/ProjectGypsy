@@ -1,0 +1,53 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "workstream.dashboard",
+  "layer": "workstream",
+  "kind": "gui",
+  "maturity": "stable",
+  "description": "Dark local-only control panel with four views, token-protected whitelisted actions, artifact previews and job polling.",
+  "requires": [
+    "python>=3.10",
+    "browser"
+  ],
+  "inputs": [
+    {
+      "name": "view",
+      "type": "string"
+    },
+    {
+      "name": "action",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "state",
+      "type": "json"
+    },
+    {
+      "name": "job",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "four views render",
+    "Studio Board default",
+    "actions token-protected",
+    "no arbitrary argv",
+    "localhost only",
+    "artifact traversal rejected",
+    "job observable"
+  ],
+  "provenance": {
+    "record": [
+      "action",
+      "argv",
+      "jobId",
+      "startedAt",
+      "returncode"
+    ]
+  },
+  "notes": [
+    "Phase 4 GUI extension, ADR-014; the game's own interface remains parked."
+  ]
+}

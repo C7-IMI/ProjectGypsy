@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.25.017
+Current version: 2026.10.25.018
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,20 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.25.018
+
+**Local dark GUI dashboard: four views, token actions, artifact previews.**
+
+- Date: 2026-10-26
+- Commit: this change.
+- Change: workstream/dashboard.py (localhost-only server, /api/state, /api/job, /api/artifact, /api/diff,
+  token-protected /api/run with a fixed argv whitelist); design/dashboard/ (dark single-page app, Studio Board
+  default, Mission Control, Command Hybrid, Director's Table; screenshots); CLI dashboard; 9 dashboard tests;
+  ADR-014, docs/DASHBOARD.md and capability workstream.dashboard. The game interface remains parked.
+- Verification: 181 tests OK; /api/state returns 4 slices/172 tests/42 capabilities/2 blocked; browser screenshots
+  for all four views; POST /api/run requires token (403 without), live_once job passed; artifact raw PNG served;
+  traversal rejected; 43 capabilities.
 
 ## 2026.10.25.017
 

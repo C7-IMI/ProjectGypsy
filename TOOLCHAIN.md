@@ -125,9 +125,11 @@ python workstream/gypsy.py console diff                     # read-only git diff
 python workstream/gypsy.py game bench --runs 3              # performance baseline + budgets
 python workstream/live.py --paths game --once --command demo  # live watcher, one run
 powershell -File scripts/build_android.ps1                 # Android debug APK, signed + package-verified
+python workstream/gypsy.py dashboard                      # local dark GUI at 127.0.0.1:8765
 ~~~
 
 - Engine: Godot 4.7.2, PC; export templates installed under `%APPDATA%\\Godot\\export_templates\\4.7.2.stable`.
+- Dashboard: [docs/DASHBOARD.md](docs/DASHBOARD.md) and [ADR-014](docs/ADR-014-local-dashboard.md).
 - Evidence: [docs/PHASE-1-EVIDENCE.md](docs/PHASE-1-EVIDENCE.md), [docs/PHASE-2-EVIDENCE.md](docs/PHASE-2-EVIDENCE.md),
   [docs/PHASE-3-EVIDENCE.md](docs/PHASE-3-EVIDENCE.md), [docs/PHASE-4-EVIDENCE.md](docs/PHASE-4-EVIDENCE.md),
   [docs/PHASE-5-EVIDENCE.md](docs/PHASE-5-EVIDENCE.md) and [docs/PHASE-6-GATE.md](docs/PHASE-6-GATE.md); state under

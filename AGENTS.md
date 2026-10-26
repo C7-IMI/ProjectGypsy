@@ -28,12 +28,13 @@ In this order:
 5. **[`docs/README.md`](./docs/README.md)** — the ADRs: engines (001), art pipeline (002), workstream architecture
    (003), generative media (004), character/animation automation (005), Blender import matrix (006), language
    boundaries (007), MCP/free local tools (008), vertical slice (009), slice orchestrator (010), toolpacks (011),
-   thin console (012), phase-5 mobile/live/perf (013), plus
+   thin console (012), phase-5 mobile/live/perf (013), local dashboard (014), plus
+   [`docs/DASHBOARD.md`](./docs/DASHBOARD.md),
    [`docs/ENGINE-SMOKE.md`](./docs/ENGINE-SMOKE.md), [`docs/IMPORT-MATRIX.md`](./docs/IMPORT-MATRIX.md),
    the PHASE-1..5 evidence files and [`docs/PHASE-6-GATE.md`](./docs/PHASE-6-GATE.md).
 6. **[`workstream/README.md`](./workstream/README.md)** — the CLI: `engines probe|smoke`, `tools probe`,
    `capabilities`, `project`, `game demo|build|capture|verify`, `slices list|plan|run|status`, `toolpacks list|check|run`,
-   `console board|preview|diff`, `game bench`, `live`, `check`.
+   `console board|preview|diff`, `dashboard`, `game bench`, `live`, `check`.
 7. **[`DEFERRED.md`](./DEFERRED.md)** — the work deliberately not done. Read the entry covering an area before you
    change that area, and do not quietly close a deferred item by implementing it halfway.
 8. **[`README.md`](./README.md)** — the repository entry point and index.
@@ -80,7 +81,8 @@ In this order:
 
 Phase 0-5 exist: engine/tool probes, hardware gates, manifests, a Godot headless smoke, a playable Godot 4.7.2 PC slice
 with demo/export/capture, a manifest-driven slice orchestrator with state/artifact hashes, toolpacks with
-validators/provenance, a read-only terminal console, a live watcher, a performance baseline and a signed Android debug
-APK; records and the one pack check list; the ADRs; a golden Blender import matrix; MCP/ComfyUI/Poly Haven tooling.
-There is still **no hero art/character pipeline, self-extension, tested device launch or second engine**; Phases 6
-(UE5) is hardware-blocked. See `docs/PHASE-5-EVIDENCE.md`, `docs/PHASE-6-GATE.md` and `DEFERRED.md`.
+validators/provenance, a read-only terminal console, a live watcher, a performance baseline, a signed Android debug
+APK and a local dark GUI dashboard with four views; records and the one pack check list; the ADRs; a golden Blender
+import matrix; MCP/ComfyUI/Poly Haven tooling. There is still **no hero art/character pipeline, self-extension, tested
+device launch or second engine**; Phase 6 (UE5) is hardware-blocked. See `docs/PHASE-5-EVIDENCE.md`,
+`docs/PHASE-6-GATE.md`, `docs/DASHBOARD.md` and `DEFERRED.md`.

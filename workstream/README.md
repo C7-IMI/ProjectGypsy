@@ -19,6 +19,7 @@ python workstream/gypsy.py slices list|plan|run|status [--all] [--resume] [--for
 python workstream/gypsy.py toolpacks list|check|run [--action]
 python workstream/gypsy.py console board|preview|diff [--json]
 python workstream/gypsy.py game bench [--runs 3]
+python workstream/gypsy.py dashboard [--port 8765] [--no-open]
 python workstream/live.py --paths game --once --command demo
 ```
 

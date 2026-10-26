@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="gypsy-token" content="__TOKEN__">
+<title>ProjectGypsy — local control panel</title>
+<link rel="stylesheet" href="/app.css">
+<script defer src="/app.js"></script>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="brand"><div class="mark"></div><div><b>ProjectGypsy</b><small>local control panel</small></div></div>
+    <nav class="tabs" aria-label="Views">
+      <button class="tab" data-view="studio">Studio Board</button>
+      <button class="tab" data-view="mission">Mission Control</button>
+      <button class="tab" data-view="hybrid">Command Hybrid</button>
+      <button class="tab" data-view="director">Director's Table</button>
+    </nav>
+    <div class="top-actions">
+      <span class="pill" id="head-pill"><span class="dot"></span><span id="head-text">connecting</span></span>
+      <button class="btn ghost small" id="refresh">Refresh</button>
+      <button class="btn primary" id="run-all">▶ Run all gates</button>
+    </div>
+  </header>
+  <main id="view" aria-live="polite"></main>
+  <footer class="foot">
+    <span>LOCAL ONLY · 127.0.0.1</span>
+    <span class="grow"></span>
+    <span>CLI source of truth</span>
+    <span class="grow"></span>
+    <span class="cmd" id="foot-cmd">python workstream/gypsy.py slices run --all</span>
+    <span id="foot-version">Phase 0–6</span>
+  </footer>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<div class="job" id="job" aria-live="polite">
+  <div class="job-h"><span id="job-state" class="badge running">RUNNING</span><b id="job-title">run</b><button class="close" id="job-close" title="Close">×</button></div>
+  <div class="job-body" id="job-output"></div>
+  <div class="job-foot"><span id="job-meta">starting…</span><span class="spacer" style="flex:1"></span><button class="btn small" id="job-refresh">Open evidence</button></div>
+</div>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true">
+  <div class="dialog">
+    <h3 id="modal-title">Run command?</h3>
+    <p id="modal-hint">This executes a real command and writes state under workstream/state.</p>
+    <div class="cmd" id="modal-cmd">python …</div>
+    <div class="row"><button class="btn ghost" id="modal-cancel">Cancel</button><button class="btn primary" id="modal-run">Run</button></div>
+  </div>
+</div>
+
+</body>
+</html>

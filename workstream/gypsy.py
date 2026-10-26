@@ -722,6 +722,10 @@ def main(argv=None) -> int:
     live_parser.add_argument("--command", dest="live_command", choices=["demo", "verify"], default="demo")
     live_parser.add_argument("--json", action="store_true")
 
+    dashboard_parser = sub.add_parser("dashboard", help="local-only Phase-4 GUI control panel")
+    dashboard_parser.add_argument("--port", type=int, default=8765)
+    dashboard_parser.add_argument("--no-open", action="store_true")
+
     check_parser = sub.add_parser("check", help="run the Phase-0 checks")
     check_parser.add_argument("--project")
     check_parser.add_argument("--json", action="store_true")
@@ -833,6 +837,10 @@ def main(argv=None) -> int:
             summary = live_mod.watch(args.paths or ["game"], runner=runner, iterations=args.iterations, interval=args.interval, debounce=args.debounce)
             print(json.dumps(summary, indent=2) if args.json else f"live: {summary['iterations']} change(s), {summary['runs']} run(s), {len(summary['errors'])} error(s)")
             return 0 if not summary["errors"] else 1
+
+        if args.command == "dashboard":
+            from dashboard import serve
+            return serve(args.port, not args.no_open)
 
         if args.command == "console":
             import console as console_mod

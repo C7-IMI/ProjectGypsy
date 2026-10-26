@@ -165,7 +165,7 @@ python workstream/gypsy.py check
 python workstream/gypsy.py game verify
 ```
 
-`check_all.py` covers records, encoding, links, capability JSON, the 172 workstream tests and hook/CI caller coverage;
+`check_all.py` covers records, encoding, links, capability JSON, the 181 workstream tests and hook/CI caller coverage;
 `gypsy check` covers engine/project manifests and the hardware gate; `game verify` covers the playable slice; `slices run
 --all` covers the multi-slice task and artifact hashes; `toolpacks run` covers art/audio validation/provenance; `console`
 is a read-only view of the same state.

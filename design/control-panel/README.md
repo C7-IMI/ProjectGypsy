@@ -1,7 +1,6 @@
 # ProjectGypsy control panel — mockups
 
-**Status: proposals, not implemented.** These are four directions for a local developer control panel. The game's own
-interface standard is still parked (PG-D4); this is tooling, not the game UI. Nothing here is wired into the workstream
+**Status: implemented as one local dark app.** The four directions are combined in the local dashboard ([docs/DASHBOARD.md](../../docs/DASHBOARD.md), ADR-014); Studio Board is the default. The PNGs here remain the design exploration; the maintained app lives in design/dashboard. The game's own interface standard is still parked (PG-D4); this is tooling, not the game UI. Nothing here is wired into the workstream
 yet.
 
 ## Short answer: do you need a GUI?
