@@ -50,6 +50,7 @@ are later if the art direction is accepted. No third-party asset may be shipped 
 - Armature has a humanoid root/spine/limb hierarchy.
 - At least three named actions exist and are non-empty.
 - LOD1/LOD2 preserve the rig/actions; normal/roughness maps and the Smile morph are present.
+- Runtime systems: distance LOD switching, driven Smile, spring-driven cape motion, and the demo marker remain functional.
 - Bounds are approximately human scale; origin at feet.
 - Materials/textures are present and the glTF/FBX re-imports without errors.
 - The Godot slice still passes the headless marker and produces a rendered frame.

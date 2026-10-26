@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.26.003
+Current version: 2026.10.26.004
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,20 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.26.004
+
+**Add runtime hero LOD, driven facial expression and spring cape; retry device launch.**
+
+- Date: 2026-10-26
+- Commit: this change.
+- Change: hero manager now owns LOD0/LOD1/LOD2 with distance-driven switching (9 m/14 m), driven Smile morph on
+  collection, and spring-driven cape_a/b/c secondary motion; player scene instanced all three LODs while preserving
+  collision; integration check asserts forced and distance LOD switching, face value and cape bones; hero toolpack adds
+  a systems action and HERO_SYSTEMS_OK validator. Device launch retried with a windowed emulator; it exits after 11 s
+  without ADB; docs/DEVICE-LAUNCH.md updated.
+- Verification: HERO_SYSTEMS_OK lods=3 face=driven cape=driven; HERO_CHECK_OK; GYPSY_DEMO_OK frames=143; hero slice
+  passed with generation, validation, systems and capture; game capture passed; 281 tests; check_all 6/6.
 
 ## 2026.10.26.003
 

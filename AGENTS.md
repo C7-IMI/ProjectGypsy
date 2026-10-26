@@ -138,6 +138,6 @@ with demo/export/capture, a manifest-driven slice orchestrator with state/artifa
 validators/provenance, a read-only terminal console, a live watcher, a performance baseline, a signed Android debug
 APK, the Gypsy Studio operations console and classic four-view dashboard; **LeftBehind** proves the same slice on Unity 6
 (build, demo and capture); records and the one pack check list; the ADRs; a golden Blender import matrix; MCP/ComfyUI/Poly Haven
-tooling, the safe self-extension pipeline and the first hero art/character pipeline. There is still **no tested device
+tooling, the safe self-extension pipeline and the first hero art/character pipeline (runtime LOD, driven Smile, spring cape). There is still **no tested device
 launch**; Phase 6 (UE5) is hardware-blocked. See `docs/PHASE-5-EVIDENCE.md`, `docs/UNITY-SLICE.md`,
 `docs/ADR-017-hero-character-pipeline.md`, `docs/PHASE-6-GATE.md`, `docs/DASHBOARD.md` and `DEFERRED.md`.

@@ -50,6 +50,23 @@
       ]
     },
     {
+      "id": "systems",
+      "argv": [
+        "powershell",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/hero/run_hero_systems.ps1"
+      ],
+      "cwd": ".",
+      "timeout": 180,
+      "artifacts": [
+        "artifacts/hero/systems.log",
+        "artifacts/hero/systems.ok"
+      ]
+    },
+    {
       "id": "capture",
       "argv": [
         "C:\\Python\\python.exe",
@@ -153,6 +170,12 @@
       "kind": "file",
       "artifact": "artifacts/game/demo.mp4",
       "minBytes": 10000
+    },
+    {
+      "id": "systems",
+      "kind": "text",
+      "artifact": "artifacts/hero/systems.ok",
+      "contains": "HERO_SYSTEMS_OK"
     }
   ]
 }

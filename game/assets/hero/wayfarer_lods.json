@@ -1,0 +1,33 @@
+{
+  "schema": "gypsy.hero.lods/v1",
+  "generator": "scripts/hero/generate_wayfarer.py",
+  "blender": "5.2.3 LTS",
+  "base": {
+    "file": "wayfarer.glb",
+    "triangles": 1126
+  },
+  "lods": [
+    {
+      "level": "lod1",
+      "ratio": 0.55,
+      "file": "wayfarer_lod1.glb",
+      "triangles": 615,
+      "vertices": 449,
+      "bytes": 877796,
+      "sha256": "0b08182c2d41eeb6ea2f8df27038156a4bbabe0b6096a9cc52a4978eaf27d2e5"
+    },
+    {
+      "level": "lod2",
+      "ratio": 0.28,
+      "file": "wayfarer_lod2.glb",
+      "triangles": 306,
+      "vertices": 271,
+      "bytes": 832252,
+      "sha256": "03a97c0139428dc57b4d37baef7d753d32ff389034ba34c24af02890ceb53688"
+    }
+  ],
+  "godotImport": {
+    "generate_lods": true,
+    "note": "LOD0 is integrated under Player; the Godot glTF import also generates renderer LODs (meshes/generate_lods=true) and the explicit LOD GLBs are tracked for the next LOD pass."
+  }
+}

@@ -49,6 +49,6 @@ headless demo/export/capture, a manifest-driven slice orchestrator with state an
 validators/provenance for golden Blender->Godot import and local MusicGen audio, a read-only terminal console, records
 and the pack check list, the ADRs, MCP/ComfyUI/Poly Haven tooling and the installed toolchain. Also present: a live
 watcher, performance baseline, a signed Android debug APK (not device-tested), the Gypsy Studio operations console, the
-LeftBehind Unity 6 second-engine slice, the first hero art/character pipeline (Wayfarer) and safe self-extension. Not
+LeftBehind Unity 6 second-engine slice, the first hero art/character pipeline (Wayfarer with runtime LOD, driven Smile and spring cape) and safe self-extension. Not
 built yet: tested device launch; UE5 is hardware-blocked. See `docs/PHASE-5-EVIDENCE.md`,
 `docs/ADR-017-hero-character-pipeline.md`, `docs/PHASE-6-GATE.md` and `DEFERRED.md`.

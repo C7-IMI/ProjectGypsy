@@ -384,5 +384,15 @@ Each entry has:
 
 ---
 
-Next prompt number: 38. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 38 - 2026-10-26
+
+- Request: Keep going on the hero's missing runtime LOD switching, driven facial animation and cloth simulation.
+- Status: Completed hero systems; device launch retried and still blocked before ADB.
+- Version: 2026.10.26.004
+- Commit/evidence: LOD0/1/2 runtime switching, Smile morph driven on collection, spring cape bones, HERO_SYSTEMS_OK;
+  windowed emulator exited after 11 s with no ADB, docs/DEVICE-LAUNCH.md; 281 tests; check_all 6/6.
+
+---
+
+Next prompt number: 39. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

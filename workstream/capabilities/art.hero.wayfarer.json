@@ -6,7 +6,7 @@
   "tool": "blender",
   "kind": "character",
   "maturity": "partial",
-  "description": "Reproducible stylized hero character pipeline: Blender 5.2.3 generator, 20-joint rig, skin weights, 3 actions, procedural atlas, GLB/FBX, non-Blender validator and Godot integration. The asset is a prototype, not production art.",
+  "description": "Reproducible stylized hero pipeline: Blender 5.2.3 generator, 23-joint rig with cape, 3 actions, Smile morph, 512² base/normal/roughness maps, LOD1/LOD2, GLB/FBX, non-Blender validator, and Godot runtime LOD/facial/cape systems. Prototype art, not production-final.",
   "requires": [
     "blender 5.2.3",
     "godot 4.7.2",
@@ -45,7 +45,11 @@
     "skin weights normalized, no unweighted vertices, max 3 influences",
     "height 1.905 m, feet at ground, 4 materials, embedded 256x256 atlas",
     "non-Blender validator reports 60/60 checks pass",
-    "Godot demo retains GYPSY_DEMO_OK and shows the hero in capture"
+    "Godot demo retains GYPSY_DEMO_OK and shows the hero in capture",
+    "runtime LOD switches by camera distance and forced mode",
+    "Smile morph is driven by crystal collection",
+    "cape_a/b/c have spring-driven secondary motion",
+    "hero systems action writes HERO_SYSTEMS_OK"
   ],
   "provenance": {
     "record": [
@@ -64,6 +68,7 @@
   "notes": [
     "Prototype limitations: no facial rig, cloth simulation, cape bones, LODs or normal maps; gameplay camera is distant.",
     "FBX bytes are not deterministic; GLB and atlas are reproducible.",
-    "Evidence: artifacts/hero/generation-report.json, validation.json, hero-preview-contact.png; game frame."
+    "Evidence: artifacts/hero/generation-report.json, validation.json, hero-preview-contact.png; game frame.",
+    "Runtime systems are in game/scripts/hero_visual.gd and hero_integration_check.gd."
   ]
 }

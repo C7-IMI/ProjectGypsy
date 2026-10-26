@@ -1,8 +1,10 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_player"]
 [ext_resource type="PackedScene" path="res://assets/hero/wayfarer.glb" id="2_hero"]
 [ext_resource type="Script" path="res://scripts/hero_visual.gd" id="3_hero_visual"]
+[ext_resource type="PackedScene" path="res://assets/hero/wayfarer_lod1.glb" id="4_lod1"]
+[ext_resource type="PackedScene" path="res://assets/hero/wayfarer_lod2.glb" id="5_lod2"]
 
 [sub_resource type="CapsuleShape3D" id="Shape_capsule"]
 radius = 0.4
@@ -14,6 +16,14 @@ script = ExtResource("1_player")
 [node name="Collision" type="CollisionShape3D" parent="."]
 shape = SubResource("Shape_capsule")
 
-[node name="Hero" parent="." instance=ExtResource("2_hero")]
+[node name="Hero" type="Node3D" parent="."]
 position = Vector3(0, -0.9, 0)
 script = ExtResource("3_hero_visual")
+
+[node name="LOD0" parent="Hero" instance=ExtResource("2_hero")]
+
+[node name="LOD1" parent="Hero" instance=ExtResource("4_lod1")]
+visible = false
+
+[node name="LOD2" parent="Hero" instance=ExtResource("5_lod2")]
+visible = false

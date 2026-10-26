@@ -149,7 +149,7 @@ python workstream/gypsy.py slices run --all   # phase1 + quality + toolpacks + m
 python workstream/gypsy.py slices status      # latest task state
 python workstream/gypsy.py toolpacks list|check
 python workstream/gypsy.py toolpacks run art.import.golden   # Blender->Godot import + validators
-python workstream/gypsy.py slices run hero                  # Wayfarer generation + validation + capture
+python workstream/gypsy.py slices run hero                  # Wayfarer generation + validation + systems + capture
 # Android emulator installed at %LOCALAPPDATA%\Programs\GameTools\AndroidSdk; AVD Gypsy_API35b
 # launch is recorded as blocked in docs/DEVICE-LAUNCH.md (host emulator multi-instance error).
 python scripts/hero/validate_wayfarer.py                    # non-Blender hero asset/rig/action validator

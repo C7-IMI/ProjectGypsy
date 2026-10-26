@@ -19,8 +19,9 @@
     adb devices -> (empty)
 
 The host reports this even after killing every emulator/qemu process and deleting both AVD multiinstance.lock files. A
-freshly created AVD shows the same error. No ADB device is registered, so the APK has not been installed or launched.
-This is recorded as an environment/host block, not a game failure.
+freshly created AVD shows the same error. A later windowed launch (no -no-window, GPU swiftshader_indirect) started
+without the multi-instance error but exited after 11 s without registering ADB. No ADB device is registered, so the APK
+has not been installed or launched. This is recorded as an environment/host block, not a game failure.
 
 ## Retry path
 
