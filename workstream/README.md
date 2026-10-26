@@ -14,6 +14,7 @@ python workstream/gypsy.py project init --path game --engine godot --version 4.7
 python workstream/gypsy.py project show [--path game]
 python workstream/gypsy.py check [--project .] [--json]
 python workstream/gypsy.py game demo|build|capture|verify [--path game]
+python workstream/gypsy.py slices list|plan|run|status [--all] [--resume]
 ```
 
 Run the tests:

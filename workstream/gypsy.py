@@ -670,6 +670,23 @@ def main(argv=None) -> int:
         if name == "build":
             game_cmd.add_argument("--preset", default="Windows Desktop")
             game_cmd.add_argument("--out", default=None)
+    slices_parser = sub.add_parser("slices", help="manifest-driven Phase-2 orchestrator")
+    slices_sub = slices_parser.add_subparsers(dest="slices_command", required=True)
+    for name in ("list", "plan", "run", "status"):
+        slices_cmd = slices_sub.add_parser(name)
+        slices_cmd.add_argument("--dir", default="slices", help="slice manifest directory")
+        slices_cmd.add_argument("--state-dir", default=None)
+        slices_cmd.add_argument("--json", action="store_true")
+        if name == "plan":
+            slices_cmd.add_argument("slice_id")
+        if name == "run":
+            slices_cmd.add_argument("slice_ids", nargs="*")
+            slices_cmd.add_argument("--all", action="store_true")
+            slices_cmd.add_argument("--resume", action="store_true")
+            slices_cmd.add_argument("--force", action="store_true")
+        if name == "status":
+            slices_cmd.add_argument("slice_id", nargs="?")
+
     check_parser = sub.add_parser("check", help="run the Phase-0 checks")
     check_parser.add_argument("--project")
     check_parser.add_argument("--json", action="store_true")
@@ -765,6 +782,94 @@ def main(argv=None) -> int:
                 evidence = game_verify(Path(args.path))
                 print(json.dumps(evidence, indent=2) if args.json else f"game verify | demo={evidence['demo']['passed']} build={evidence['build']['passed']} capture={evidence['capturePassed']}")
                 return 0 if evidence["passed"] else 1
+        if args.command == "slices":
+            from pathlib import Path as _Path
+
+            import slices as slice_spec
+            from orchestrator import run_slice, run_task
+
+            manifest_dir = _Path(args.dir)
+            state_dir = _Path(args.state_dir) if args.state_dir else STATE_DIR
+            manifests = slice_spec.load_all(manifest_dir)
+            if args.slices_command == "list":
+                data = {
+                    slice_id: {
+                        "description": manifest.get("description", ""),
+                        "project": manifest.get("project", "."),
+                        "steps": [step["id"] for step in manifest.get("steps", [])],
+                        "artifacts": manifest.get("artifacts", []),
+                    }
+                    for slice_id, manifest in manifests.items()
+                }
+                if args.json:
+                    print(json.dumps(data, indent=2))
+                else:
+                    for slice_id, info in data.items():
+                        print(f"{slice_id}: {info['description']} (steps: {', '.join(info['steps'])})")
+                return 0
+            if args.slices_command == "plan":
+                if args.slice_id not in manifests:
+                    raise GypsyError(f"unknown slice {args.slice_id!r}; have: {', '.join(manifests)}")
+                manifest = manifests[args.slice_id]
+                errors = slice_spec.validate_manifest(manifest)
+                if errors:
+                    raise GypsyError("; ".join(errors))
+                order = slice_spec.resolve_order(manifest)
+                data = {"slice": args.slice_id, "order": order, "manifest": manifest}
+                if args.json:
+                    print(json.dumps(data, indent=2))
+                else:
+                    print(f"{args.slice_id}: " + " -> ".join(order))
+                    print(f"artifacts: {', '.join(manifest.get('artifacts', [])) or 'none'}")
+                return 0
+            if args.slices_command == "run":
+                ids = list(manifests) if args.all else list(args.slice_ids)
+                if not ids:
+                    raise GypsyError("pass one or more slice ids, or --all")
+                missing = [slice_id for slice_id in ids if slice_id not in manifests]
+                if missing:
+                    raise GypsyError(f"unknown slice(s): {', '.join(missing)}")
+                if len(ids) == 1 and (args.force or manifests[ids[0]].get("project")):
+                    # run_slice supports force; a task does not need it (default is a clean rerun).
+                    result = run_slice(manifests[ids[0]], project_root=REPO_ROOT, state_dir=state_dir, resume=args.resume, force=args.force if len(ids) == 1 else False)
+                else:
+                    result = run_task([manifests[slice_id] for slice_id in ids], project_root=REPO_ROOT, state_dir=state_dir, resume=args.resume)
+                if args.json:
+                    print(json.dumps(result, indent=2))
+                else:
+                    if result.get("schema", "").endswith("task-state/v1"):
+                        print(f"task {result.get('task')}: passed={result.get('passed')} slices={len(result.get('slices', []))} artifacts={len(result.get('artifacts', []))}")
+                        for summary in result.get("slices", []):
+                            print(f"  {summary['slice']}: {summary['status']}")
+                    else:
+                        print(f"slice {result.get('slice')}: passed={result.get('passed')} steps={len(result.get('steps', []))} artifacts={len(result.get('artifacts', []))}")
+                    if result.get("errors"):
+                        for error in result["errors"]:
+                            print(f"  ERROR {error}")
+                return 0 if result.get("passed") else 1
+            if args.slices_command == "status":
+                import os as _os
+                state_root = state_dir / "slices"
+                if args.slice_id:
+                    path = state_root / f"{args.slice_id}.json"
+                    if not path.exists():
+                        raise GypsyError(f"no state for slice {args.slice_id!r} at {path}")
+                    data = json.loads(path.read_text(encoding="utf-8"))
+                else:
+                    tasks = sorted(state_root.glob("task-*.json"), key=lambda item: item.stat().st_mtime)
+                    if not tasks:
+                        raise GypsyError(f"no task state under {state_root}")
+                    data = json.loads(tasks[-1].read_text(encoding="utf-8"))
+                if args.json:
+                    print(json.dumps(data, indent=2))
+                else:
+                    print(f"{data.get('schema')} {data.get('task') or data.get('slice')}: passed={data.get('passed')} state={data.get('statePath') or data.get('task')}")
+                    for summary in data.get("slices", []):
+                        print(f"  {summary['slice']}: {summary['status']}")
+                    if isinstance(data.get("steps"), list):
+                        for step in data["steps"]:
+                            print(f"  {step['id']}: {step['status']} {step.get('seconds', '')}s")
+                return 0
         if args.command == "check":
             result = check_all(args.project)
             if args.json:

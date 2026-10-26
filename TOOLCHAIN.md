@@ -111,6 +111,8 @@ python workstream/gypsy.py game demo      # headless: GYPSY_DEMO_OK collected=3 
 python workstream/gypsy.py game build     # exports build/ProjectGypsy.exe (109,127,680 bytes)
 python workstream/gypsy.py game capture   # windowed movie -> artifacts/game/demo.mp4 + frame.png
 python workstream/gypsy.py game verify    # demo + build + exported-binary demo + capture
+python workstream/gypsy.py slices run --all   # Phase-2: phase1 + quality, one report
+python workstream/gypsy.py slices status      # latest task state
 ~~~
 
 - Engine: Godot 4.7.2, PC; export templates installed under `%APPDATA%\\Godot\\export_templates\\4.7.2.stable`.

@@ -1,0 +1,48 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "workstream.artifact_ledger",
+  "layer": "workstream",
+  "kind": "record",
+  "maturity": "stable",
+  "description": "Hashes declared slice artifacts (SHA-256 + bytes) into a ledger and fails a slice when an artifact is missing.",
+  "requires": [
+    "hashlib"
+  ],
+  "inputs": [
+    {
+      "name": "artifacts",
+      "type": "list"
+    },
+    {
+      "name": "projectRoot",
+      "type": "path"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "ledger",
+      "type": "json"
+    },
+    {
+      "name": "sha256",
+      "type": "string"
+    }
+  ],
+  "checks": [
+    "hash matches bytes",
+    "missing artifact fails",
+    "ledger written atomically"
+  ],
+  "provenance": {
+    "record": [
+      "path",
+      "sha256",
+      "bytes",
+      "runId",
+      "timestamp"
+    ]
+  },
+  "notes": [
+    "Phase 2, ADR-010; Phase-1 exe/mp4/frame hashes are stable across reruns."
+  ]
+}

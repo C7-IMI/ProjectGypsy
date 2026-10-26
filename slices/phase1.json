@@ -1,0 +1,44 @@
+{
+  "schema": "gypsy.slice/v1",
+  "id": "phase1",
+  "project": "game",
+  "description": "Phase-1 vertical slice: deterministic headless demo, Windows export, windowed capture.",
+  "artifacts": [
+    "build/ProjectGypsy.exe",
+    "artifacts/game/demo.mp4",
+    "artifacts/game/frame.png"
+  ],
+  "steps": [
+    {
+      "id": "demo",
+      "kind": "game.demo",
+      "needs": [],
+      "required": true,
+      "timeout": 300,
+      "args": {}
+    },
+    {
+      "id": "build",
+      "kind": "game.build",
+      "needs": [
+        "demo"
+      ],
+      "required": true,
+      "timeout": 900,
+      "args": {
+        "preset": "Windows Desktop",
+        "out": "build/ProjectGypsy.exe"
+      }
+    },
+    {
+      "id": "capture",
+      "kind": "game.capture",
+      "needs": [
+        "build"
+      ],
+      "required": true,
+      "timeout": 360,
+      "args": {}
+    }
+  ]
+}

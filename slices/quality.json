@@ -1,0 +1,37 @@
+{
+  "schema": "gypsy.slice/v1",
+  "id": "quality",
+  "project": ".",
+  "description": "Repository quality gates: check_all, the workstream unit tests and the records guard.",
+  "artifacts": [],
+  "steps": [
+    {
+      "id": "check",
+      "kind": "check_all",
+      "needs": [],
+      "required": true,
+      "timeout": 180,
+      "args": {}
+    },
+    {
+      "id": "tests",
+      "kind": "tests",
+      "needs": [
+        "check"
+      ],
+      "required": true,
+      "timeout": 900,
+      "args": {}
+    },
+    {
+      "id": "records",
+      "kind": "records",
+      "needs": [
+        "tests"
+      ],
+      "required": true,
+      "timeout": 120,
+      "args": {}
+    }
+  ]
+}

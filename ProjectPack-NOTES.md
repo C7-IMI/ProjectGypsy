@@ -13,7 +13,7 @@ here: the project's side lives here, and the pack's parked interface material li
 | Base | `C7NTRY/ProjectPack.md` revision **2.5**, 2026-10-23, SHA-256 `FC5754DDCDB25535B6808042291C083B6B0BC13F27E36EC8035945AEB70ABE65` |
 | This copy | revision **PG-1**, 2026-10-25 — Parts 1–10 carried, the interface design/redesign rules parked, Part 11 re-authored |
 | Interface material | **parked, not in force** — `ProjectPack-ADDENDUM-Interface.md` (16 verbatim blocks) |
-| Product | a **game** — not a website, not a web application; Phase-1 engine **Godot 4.7.2, PC** (ADR-009); other platforms open |
+| Product | a **game** — not a website, not a web application; Phase-1 engine **Godot 4.7.2, PC** (ADR-009); Phase-2 orchestrator exists (ADR-010); other platforms open |
 | Last applied | 2026-10-25 — the pack was copied and applied in the change that created this file |
 
 ## What was parked, and why
@@ -123,10 +123,11 @@ machinery is in place; remaining work is asset authorship, adapters and phases 2
   permissions, sweeps and secrets; §2.17–§2.19 reproducibility, evidence and budget; §2.20 scale-and-move; §2.22–§2.30
   operations (when a build exists); §2.31 itself; §2.32 text and encoding; §2.33/§2.34 peer separation and context
   limits; Part 10 (operator's rules); Part 12; and Part 11 in this copy.
-- **Mechanised today:** `python scripts/check_all.py` (records, encoding, links, capability JSON, 15 tests, hook/CI
-  caller coverage), `python workstream/gypsy.py check` (engine/project manifests, hardware gate), and `python
-  workstream/gypsy.py game verify` (demo, export, exported-binary demo, capture). The pre-commit hook runs the same
-  list. The report discipline in Part 11.2 remains the human half.
+- **Mechanised today:** `python scripts/check_all.py` (records, encoding, links, capability JSON, 54 tests, hook/CI
+  caller coverage), `python workstream/gypsy.py check` (engine/project manifests, hardware gate), `python
+  workstream/gypsy.py game verify` (demo, export, exported-binary demo, capture) and `python workstream/gypsy.py
+  slices run --all` (Phase-2 multi-slice task with artifact hashes). The pre-commit hook runs the same list. The report
+  discipline in Part 11.2 remains the human half.
 - **Parked — not in force:** every interface design and redesign rule, plus the browser-verification rule. The full
   list is in the addendum and in the table above. They are not to be applied, quoted as requirements, or partially
   restored without the recorded decision the addendum asks for.

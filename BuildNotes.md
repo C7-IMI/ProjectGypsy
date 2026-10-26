@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.25.010
+Current version: 2026.10.25.011
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,20 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.25.011
+
+**Phase 2: manifest-driven slice orchestrator, durable state, artifact ledger and multi-slice task.**
+
+- Date: 2026-10-25/26
+- Commit: this change.
+- Change: workstream/slices.py (gypsy.slice/v1 schema/loader/validator/ordering), workstream/orchestrator.py
+  (handlers, run_slice, run_task, atomic state, artifact SHA-256 ledger, resume), slices/phase1.json and
+  slices/quality.json, slices/README.md; CLI slices list|plan|run|status; 39 orchestrator tests; ADR-010 and
+  PHASE-2-EVIDENCE; capabilities workstream.slice_orchestrator and workstream.artifact_ledger.
+- Verification: slices run --all -> 6/6 steps, 3 artifacts, 20.363 s, one task report; phase1 13.133 s, quality
+  7.225 s; second run produced identical SHA-256 for the exe, mp4 and frame; resume phase1 PASS; 54 workstream tests;
+  scripts/check_all.py 6/6 PASS; gypsy check PASS; capabilities 37.
 
 ## 2026.10.25.010
 

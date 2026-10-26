@@ -1,0 +1,50 @@
+{
+  "schema": "gypsy.capability/v1",
+  "id": "workstream.slice_orchestrator",
+  "layer": "workstream",
+  "kind": "run",
+  "maturity": "stable",
+  "description": "Manifest-driven orchestrator: validates gypsy.slice/v1, resolves stable order, executes dependent steps, persists resumable state and writes one task report.",
+  "requires": [
+    "python>=3.10"
+  ],
+  "inputs": [
+    {
+      "name": "sliceIds",
+      "type": "list"
+    },
+    {
+      "name": "resume",
+      "type": "boolean"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "taskState",
+      "type": "json"
+    },
+    {
+      "name": "report",
+      "type": "text"
+    }
+  ],
+  "checks": [
+    "invalid manifests rejected",
+    "required failure skips dependents",
+    "resume skips passed steps",
+    "task runs multiple slices",
+    "second run reproduces artifact hashes"
+  ],
+  "provenance": {
+    "record": [
+      "manifestSha256",
+      "runId",
+      "stepStatuses",
+      "duration",
+      "statePath"
+    ]
+  },
+  "notes": [
+    "Phase 2, ADR-010. State under workstream/state/slices (gitignored)."
+  ]
+}
