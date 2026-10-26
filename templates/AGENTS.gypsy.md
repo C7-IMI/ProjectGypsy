@@ -3,18 +3,25 @@
 This project is developed with **Gypsy Studio** (short: **Gypsy**), the local workstream/orchestration tool. Do not
 reimplement its probes, checks, slices, toolpacks or evidence by hand.
 
-## Trigger phrase: “Open Gypsy”
+## Trigger phrases: “Open Gypsy”, “Load Gypsy”, “Use Gypsy”
 
-If the operator says **Open Gypsy** (case-insensitive), do not ask what they mean. Load Gypsy and bring up the
-dashboard:
+If the operator says any of these (case-insensitive), do not ask what they mean:
+
+| Phrase | What to do |
+| --- | --- |
+| **Open Gypsy** | Load/verify Gypsy, ensure the dashboard is up, report/open the URL, summarize state. |
+| **Load Gypsy** | Load/verify Gypsy and import the guide/template; bring up the dashboard/state if available. |
+| **Use Gypsy** | Load/verify Gypsy and route the current task through the Gypsy CLI; start with `gypsy check --project <dir>` (or `gypsy check`). |
+
+All three:
 
 1. Verify `python "$GYPSY_HOME\workstream\gypsy.py" version`.
 2. Check `http://127.0.0.1:8765/api/state`; if down, run
    `python "$GYPSY_HOME\workstream\gypsy.py" dashboard --no-open` and wait for it.
 3. Open or report `http://127.0.0.1:8765/`; summarize slices/gates from `/api/state`.
-4. In another project, this also means import Gypsy: read the Gypsy checkout's `docs/GYPSY-AGENT-GUIDE.md` and this
-   project's `AGENTS.gypsy.md` block. Do not start a duplicate or an ad-hoc orchestrator.
-5. If Gypsy cannot be found or started, report the exact failure; do not fake the URL or state.
+4. In another project, read the Gypsy checkout's `docs/GYPSY-AGENT-GUIDE.md` and this project's `AGENTS.gypsy.md` block.
+   Do not start a duplicate or an ad-hoc orchestrator.
+5. If Gypsy cannot be found or started, report the exact failure; do not fake the URL, commands or state.
 
 ## Locate Gypsy
 

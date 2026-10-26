@@ -9,9 +9,10 @@ platforms remain open (PG-D4). The workstream selects and pins an engine per pro
 
 ## Open Gypsy
 
-Say **Open Gypsy** (or **open gypsy**) to tell a coding agent to load Gypsy Studio, ensure the local dashboard is
-running at http://127.0.0.1:8765/, and summarize the current slices and gates. In another project, the same phrase
-means “import Gypsy”: read [the agent guide](docs/GYPSY-AGENT-GUIDE.md) and the target project's copy of
+Say **Open Gypsy**, **Load Gypsy** or **Use Gypsy** (case-insensitive) to tell a coding agent to load Gypsy Studio and
+use it. **Open** ensures the local dashboard is running at http://127.0.0.1:8765/ and summarizes state; **Load** imports
+the guide/template; **Use** routes the current task through the Gypsy CLI. In another project, all three mean “import
+Gypsy”: read [the agent guide](docs/GYPSY-AGENT-GUIDE.md) and the target project's copy of
 [templates/AGENTS.gypsy.md](templates/AGENTS.gypsy.md).
 
 ## Start here

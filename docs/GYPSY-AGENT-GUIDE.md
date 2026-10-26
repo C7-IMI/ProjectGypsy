@@ -15,19 +15,27 @@ Gypsy, the agent must call Gypsy rather than reimplementing probes, builds, chec
 The product name is **Gypsy Studio / Gypsy**. The checkout directory, Python package and manifest schema still use the
 legacy `ProjectGypsy` / `gypsy` identifiers; do not rename repository paths or schema keys as a branding change.
 
-## 2. Trigger phrase: “Open Gypsy”
+## 2. Trigger phrases: “Open Gypsy”, “Load Gypsy”, “Use Gypsy”
 
-When the operator says **Open Gypsy** (or **open gypsy**, case-insensitive), do not ask for clarification. Treat it as:
+When the operator says **Open Gypsy**, **Load Gypsy** or **Use Gypsy** (case-insensitive, including lower-case), do not
+ask for clarification. Treat all three as:
 
-1. **Load Gypsy** — read this guide and verify the CLI with `python "$env:GYPSY_HOME\workstream\gypsy.py" version`.
-2. **Call it up** — check `http://127.0.0.1:8765/api/state`; if the dashboard is down, start
+| Phrase | What to do |
+| --- | --- |
+| **Open Gypsy** | Load/verify Gypsy, ensure the dashboard is up, open or report `http://127.0.0.1:8765/`, and summarize state. |
+| **Load Gypsy** | Load/verify Gypsy and import the guide/template into the current project; also bring up the dashboard/state if available. |
+| **Use Gypsy** | Load/verify Gypsy and route the current task through the Gypsy CLI; start with `gypsy check --project <dir>` (or `gypsy check` here), then use the relevant probes/slices/toolpacks/game commands. |
+
+All three:
+
+1. Read this guide and verify the CLI with `python "$env:GYPSY_HOME\workstream\gypsy.py" version`.
+2. Check `http://127.0.0.1:8765/api/state`; if the dashboard is down, start
    `python "$env:GYPSY_HOME\workstream\gypsy.py" dashboard --no-open`, wait for the endpoint, then open or report
    `http://127.0.0.1:8765/`.
-3. **Import it into the current project** — if you are outside this checkout, read
-   [templates/AGENTS.gypsy.md](../templates/AGENTS.gypsy.md) and the target project's `AGENTS.gypsy.md` block, and use
-   Gypsy for the workstream actions. Do not create a duplicate copy or an ad-hoc orchestrator.
-4. **Report current state** — summarize the slices and gates from `/api/state`; name the dashboard URL.
-5. If Gypsy is missing or the dashboard cannot start, report the exact failure; never fake the URL or state.
+3. If outside this checkout, read [templates/AGENTS.gypsy.md](../templates/AGENTS.gypsy.md) and the target project's
+   `AGENTS.gypsy.md` block; do not create a duplicate copy or an ad-hoc orchestrator.
+4. Report the dashboard URL, current slices/gates, and exactly what Gypsy was used for; if Gypsy is missing or the
+   dashboard cannot start, report the exact failure. Never fake the URL, commands or state.
 
 ## 3. Locate and verify Gypsy
 

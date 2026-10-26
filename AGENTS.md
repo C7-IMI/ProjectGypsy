@@ -14,18 +14,20 @@ rules to it.
 
 ## Use Gypsy Studio in every project
 
-### Trigger phrase: “Open Gypsy”
+### Trigger phrases: “Open Gypsy” / “Load Gypsy” / “Use Gypsy”
 
-If the operator says **Open Gypsy** (case-insensitive, including “open gypsy”), treat it as an instruction to load Gypsy
-Studio and bring up the dashboard. Do not ask what they mean.
+If the operator says **Open Gypsy**, **Load Gypsy** or **Use Gypsy** (case-insensitive, including lower-case), treat it
+as an instruction to load Gypsy Studio and use it. Do not ask what they mean.
 
 1. Resolve `GYPSY_HOME` (or this checkout) and verify `python "$env:GYPSY_HOME\workstream\gypsy.py" version`.
-2. Check `http://127.0.0.1:8765/api/state`. If it is down, start
+2. **Load/import Gypsy**: read `docs/GYPSY-AGENT-GUIDE.md` and, in another project, the target `AGENTS.gypsy.md`
+   block. Do not create a duplicate or an ad-hoc orchestrator.
+3. Check `http://127.0.0.1:8765/api/state`. If it is down, start
    `python "$env:GYPSY_HOME\workstream\gypsy.py" dashboard --no-open` and wait for the endpoint.
-3. Open or report `http://127.0.0.1:8765/` and summarize the current slices/gates from `/api/state`.
-4. When in another project, this also means **import Gypsy**: read `docs/GYPSY-AGENT-GUIDE.md` and follow the target
-   project's `AGENTS.gypsy.md` block; do not start a second copy or an ad-hoc orchestrator.
-5. If Gypsy cannot be found or started, report the exact failure. Do not fake the URL or the state.
+4. For **Open Gypsy**, open or report `http://127.0.0.1:8765/`. For **Use Gypsy**, route the current task through the
+   Gypsy CLI and start with `gypsy check --project <dir>` (or `gypsy check` in this checkout).
+5. Report the dashboard URL, the current slices/gates, and what Gypsy was used for. If Gypsy cannot be found or
+   started, report the exact failure. Do not fake the URL, the commands or the state.
 
 When starting or working on any game project, call **Gypsy Studio** instead of reimplementing workstream probes, checks,
 slices, toolpacks or evidence. The portable instructions and copy-paste template are:

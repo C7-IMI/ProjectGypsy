@@ -329,5 +329,15 @@ Each entry has:
 
 ---
 
-Next prompt number: 33. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 33 - 2026-10-26
+
+- Request: Also make “Load Gypsy” and “Use Gypsy” trigger Gypsy.
+- Status: Completed.
+- Version: 2026.10.25.028
+- Commit/evidence: trigger table in AGENTS, guide, template and README; Open/Load/Use semantics documented; 182 tests;
+  check_all 6/6.
+
+---
+
+Next prompt number: 34. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).
