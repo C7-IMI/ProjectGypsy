@@ -34,7 +34,7 @@ Chromium. The Android emulator launch and Unity hero import are now real evidenc
 
 | Check | Result |
 | --- | --- |
-| Full unit suite | **505 tests OK (3 skipped)** (412 at P0, 456 after remote cache, 505 after assets/metrics) |
+| Full unit suite | **601 tests OK (3 skipped)** (412 at P0; 505 after assets/metrics; 601 after worker/traces) |
 | check_all | **6/6 PASS** |
 | All slices | **PASS** — hero 35.9 s, leftbehind 27.5 s, mobile 13.6 s, phase1 16.7 s, quality 79.5 s, toolpacks 84.3 s, visual 19.1 s |
 | Visual gate | PASS — 0/921600 changed; median 2.811 s; p95 2.811 s; GPU 0.87 ms; 143 frames |
