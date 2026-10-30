@@ -22,6 +22,7 @@ Gypsy”: read [the agent guide](docs/GYPSY-AGENT-GUIDE.md) and the target proje
 - [`AGENTS.md`](AGENTS.md) — read first; entry point for any model working here.
 - [`docs/GYPSY-AGENT-GUIDE.md`](docs/GYPSY-AGENT-GUIDE.md) — how an agent uses Gypsy on a new or existing project.
 - [`docs/UNITY-PORT-INSTRUCTIONS.md`](docs/UNITY-PORT-INSTRUCTIONS.md) — Stage B Unity migration instructions for UltraBlade 2.
+- [`docs/IMPROVEMENT-ROADMAP.md`](docs/IMPROVEMENT-ROADMAP.md) — research-backed improvements for speed, quality and usability.
 - [`templates/UNITY-MIGRATION-PROMPT.md`](templates/UNITY-MIGRATION-PROMPT.md) — copy-paste prompt for the new session.
 - [`templates/AGENTS.gypsy.md`](templates/AGENTS.gypsy.md) — copy-paste instruction block for a target project's `AGENTS.md`.
 - [`TOOLCHAIN.md`](TOOLCHAIN.md) — installed engines, art/audio/build tools, paths and the PATH loader.

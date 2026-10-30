@@ -404,5 +404,16 @@ Each entry has:
 
 ---
 
-Next prompt number: 40. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 40 - 2026-10-30
+
+- Request: Extensively research similar concepts and game development practice to suggest improvements in robustness,
+  usability, efficiency, speed, intuition, productivity and output quality.
+- Status: Completed; research-backed roadmap added.
+- Version: 2026.10.26.006
+- Commit/evidence: docs/IMPROVEMENT-ROADMAP.md with primary-source citations and P0/P1/P2 recommendations; 282 tests;
+  check_all pending final.
+
+---
+
+Next prompt number: 41. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

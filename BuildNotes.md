@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.26.005
+Current version: 2026.10.26.006
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,18 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.26.006
+
+**Add a research-backed improvement roadmap for Gypsy.**
+
+- Date: 2026-10-30
+- Commit: this change.
+- Change: docs/IMPROVEMENT-ROADMAP.md — primary-source research (GameCI, Bazel remote cache, Backstage, Unreal Horde
+  and Gauntlet, OpenUSD, MaterialX/OCIO, Insights, GdUnit4/GUT, OpenTelemetry, DORA, Git LFS, sccache) translated into
+  prioritized P0/P1/P2 workstreams for action caching, parallel scheduling, engine adapters, QA, asset governance,
+  developer experience, agent safety, observability and supply chain.
+- Verification: document written; links checked by check_all; 282 tests; no code behavior changed.
 
 ## 2026.10.26.005
 

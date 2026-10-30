@@ -32,6 +32,7 @@
 | [UNITY-SLICE.md](UNITY-SLICE.md) | LeftBehind Unity 6 second-engine build/demo/capture evidence |
 | [DEVICE-LAUNCH.md](DEVICE-LAUNCH.md) | Android emulator attempt, exact host block and retry path |
 | [UNITY-PORT-INSTRUCTIONS.md](UNITY-PORT-INSTRUCTIONS.md) | Stage B Unity migration/port instructions for UltraBlade 2 |
+| [IMPROVEMENT-ROADMAP.md](IMPROVEMENT-ROADMAP.md) | research-backed roadmap: cache/scheduler, QA, asset graph, DX, observability, agent safety |
 | [DASHBOARD.md](DASHBOARD.md) | launch/use guide for the operations console and classic views |
 | [GYPSY-AGENT-GUIDE.md](GYPSY-AGENT-GUIDE.md) | instructions for coding agents using Gypsy on new or existing projects |
 | [../extensions/README.md](../extensions/README.md) | extension schema, commands, safety model and limitations |
