@@ -1047,6 +1047,35 @@ def _run_detail(run_id, state_root=None):
     }
 
 
+def _provenance_summary():
+    document = _read_json(STATE / "provenance" / "artifacts.json")
+    sbom = _read_json(STATE / "provenance" / "sbom.json")
+    result = {
+        "available": isinstance(document, dict) or isinstance(sbom, dict),
+        "signedArtifacts": 0,
+        "signatureValid": None,
+        "keyFingerprint": None,
+        "sbomComponents": 0,
+        "sbomRelationships": 0,
+        "error": None,
+    }
+    if isinstance(document, dict):
+        try:
+            import provenance as provenance_spec
+            verification = provenance_spec.verify_provenance(document, project_root=REPO_ROOT)
+            result["signedArtifacts"] = len(document.get("subject", {}).get("artifacts", []))
+            result["signatureValid"] = bool(verification.get("passed"))
+            result["keyFingerprint"] = verification.get("keyFingerprint")
+            if not verification.get("passed"):
+                result["error"] = "; ".join(verification.get("errors", [])[:2])
+        except Exception as exc:
+            result["error"] = type(exc).__name__ + ": " + str(exc)
+    if isinstance(sbom, dict):
+        result["sbomComponents"] = len(sbom.get("components", []))
+        result["sbomRelationships"] = len(sbom.get("relationships", []))
+    return result
+
+
 def collect_state():
     task = _latest_task()
     states = _slice_states()
@@ -1136,6 +1165,7 @@ def collect_state():
         "insights": insights,
         "observability": observability,
         "assetRegistry": asset_registry,
+        "provenance": _provenance_summary(),
         "cache": insights["cache"],
         "scheduler": insights["scheduler"],
         "commands": [{"id": key, **value} for key, value in COMMANDS.items()],
@@ -1422,6 +1452,9 @@ class Handler(BaseHTTPRequestHandler):
                 self._json(HTTPStatus.OK, collect_state())
             except Exception as exc:
                 self._json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": type(exc).__name__ + ": " + str(exc)})
+            return
+        if parsed.path == "/api/provenance":
+            self._json(HTTPStatus.OK, _provenance_summary())
             return
         if parsed.path == "/api/metrics":
             try:

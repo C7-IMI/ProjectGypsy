@@ -320,7 +320,14 @@
     if (s.cancelled !== null && s.cancelled !== undefined) cells += stat('Cancelled', s.cancelled);
     return '<div class="stats4">' + cells + '</div><p class="lead">' + esc(s.summary) + '</p><div class="src">source: ' + esc(s.source || 'state') + '</div>';
   }
-  function renderInsights() {
+  function provenanceCard() {
+    var p = (state && state.provenance) || {};
+    if (!p.available) return emptyState('No signed provenance yet', 'Generate it with: python workstream/gypsy.py provenance sign <artifacts> --write workstream/state/provenance/artifacts.json', '');
+    if (p.error) return emptyState('Provenance needs attention', p.error, '');
+    var cells = stat('Signed', p.signedArtifacts || 0) + stat('Signature', p.signatureValid ? 'PASS' : 'FAIL') + stat('SBOM', p.sbomComponents || 0) + stat('Relations', p.sbomRelationships || 0);
+    return '<div class="stats4">' + cells + '</div><p class="lead">HMAC integrity for declared artifacts plus a deterministic SBOM. This is local integrity, not PKI.</p><div class="src">signer: ' + esc(p.keyFingerprint || '—') + '</div>';
+  }
+    function renderInsights() {
     shell.className = 'body';
     var ins = insight();
     var summaryList = (ins.summary || []).map(function (line) { return '<li>' + esc(line) + '</li>'; }).join('');
@@ -336,6 +343,7 @@
       insightCard('Parallel scheduler', 'OPT-IN', schedulerCard()) +
       insightCard('Run metrics', 'STATE-DERIVED', observabilityCard()) +
       insightCard('Asset registry', 'READ-ONLY', assetsCard()) +
+      insightCard('Provenance + SBOM', 'SIGNED / LOCAL', provenanceCard()) +
       insightCard('Next actions', 'ACTIONABLE', actions || emptyState('No actions', 'Nothing needs attention in the recorded state.', '') , true) +
       '</div></main>' +
       '<aside class="right"><div class="rpanel"><div class="rpanel-h"><b>Gates</b><span class="right">HONEST STATE</span></div><div class="rpad">' + gatesMarkup() + '</div></div><div class="rpanel"><div class="rpanel-h"><b>How this stays honest</b><span>READ ONLY</span></div><div class="rpad note">Every value comes from task/slice/toolpack state, project manifests, engine probe state and live artifact files. Cache and scheduler cards stay empty until opt-in runs record stats; they never invent hits or workers.</div></div></aside>';

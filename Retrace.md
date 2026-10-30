@@ -446,5 +446,14 @@ Each entry has:
 
 ---
 
-Next prompt number: 44. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 44 - 2026-10-30
+
+- Request: Keep going until complete; implement the next provenance/observability increment.
+- Status: Artifact provenance/SBOM implemented, CLI/API/Insights wired, evidence checked.
+- Version: 2026.10.30.010
+- Evidence: 3 signed artifacts PASS, SBOM 152/155, 529 tests, check_all 6/6; HMAC local integrity not PKI.
+
+---
+
+Next prompt number: 45. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

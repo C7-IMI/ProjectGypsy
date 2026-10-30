@@ -43,6 +43,9 @@ python workstream/gypsy.py cache serve [--host 127.0.0.1] [--port 8767] [--root 
 python workstream/gypsy.py cache remote [--json]
 python workstream/gypsy.py assets [--root DIR] [--registry FILE] [--write] [--json]
 python workstream/gypsy.py metrics [--write] [--json]
+python workstream/gypsy.py provenance sign ARTIFACT... [--write FILE] [--state-dir DIR]
+python workstream/gypsy.py provenance verify FILE [--state-dir DIR]
+python workstream/gypsy.py provenance sbom [--write FILE]
 python workstream/gypsy.py cache serve [--host 127.0.0.1] [--port 8767] [--root DIR]
 python workstream/gypsy.py cache remote [--url URL] [--json]
 python workstream/gypsy.py catalog [--root DIR] [--json] [--save-state]
@@ -121,6 +124,8 @@ python -m unittest discover -s workstream/tests -v
   duplicate-content groups and provenance warnings (`workstream/assets.py`, `gypsy assets`).
 - Metrics: state-derived task/slice/toolpack/cache/quality aggregates (`workstream/metrics.py`, `gypsy metrics`,
   `/api/metrics`), surfaced as Insights cards; not live OpenTelemetry.
+- Provenance: HMAC-SHA256 signed artifact manifests and a deterministic SBOM (`workstream/provenance.py`,
+  `gypsy provenance sign|verify|sbom`); local integrity, not PKI/code signing.
 
 ## What is not built yet
 

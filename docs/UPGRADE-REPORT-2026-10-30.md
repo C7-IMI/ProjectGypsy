@@ -74,6 +74,15 @@ emulator scope.
 - **UI/API**: Insights cards for run metrics and asset registry; /api/assets and /api/metrics; full suite **505 tests**.
 - ADR-021 documents both as read-only views, not build proof.
 
+## P1 increment: provenance and SBOM
+
+- **Signed provenance**: 3 real artifacts (frame.png, wayfarer.glb, ProjectGypsy.exe), HMAC-SHA256, verify PASS,
+  key fingerprint sha256:11232c0e..., key gitignored and never embedded.
+- **SBOM**: 152 components / 155 relationships, deterministic, manifest-derived.
+- **Surfaces**: provenance sign/verify/sbom CLI, /api/provenance, Insights Provenance + SBOM card.
+- **Honesty**: local symmetric integrity, not PKI; no certificates, external identity, timestamp authority or legal
+  clearance. Full suite **529 tests**.
+
 ## Remaining external gates (not software-buildable here)
 
 The following remain **blocked by hardware, accounts/spend, or a missing upstream capability**. They are not silently

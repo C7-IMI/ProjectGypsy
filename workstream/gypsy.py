@@ -859,6 +859,21 @@ def main(argv=None) -> int:
             toolpack_cmd.add_argument("--parallel", type=int, default=1, help="opt-in parallel workers for independent actions (1-8)")
             toolpack_cmd.add_argument("--no-cache", action="store_true", help="disable the action cache for this run")
 
+    provenance_parser = sub.add_parser("provenance", help="signed artifact provenance and SBOM")
+    provenance_sub = provenance_parser.add_subparsers(dest="provenance_command", required=True)
+    provenance_sign = provenance_sub.add_parser("sign", help="hash and HMAC-sign declared artifacts")
+    provenance_sign.add_argument("artifacts", nargs="+")
+    provenance_sign.add_argument("--write", default=None, help="write the signed document to this path")
+    provenance_sign.add_argument("--state-dir", default=None)
+    provenance_sign.add_argument("--json", action="store_true")
+    provenance_verify = provenance_sub.add_parser("verify", help="verify a signed provenance document")
+    provenance_verify.add_argument("file")
+    provenance_verify.add_argument("--state-dir", default=None)
+    provenance_verify.add_argument("--json", action="store_true")
+    provenance_sbom = provenance_sub.add_parser("sbom", help="build a deterministic SBOM")
+    provenance_sbom.add_argument("--write", default=None, help="write the SBOM JSON to this path")
+    provenance_sbom.add_argument("--json", action="store_true")
+
     assets_parser = sub.add_parser("assets", help="read-only asset registry")
     assets_parser.add_argument("--root", action="append", default=None, help="asset root (repeatable; default asset roots)")
     assets_parser.add_argument("--registry", default=None, help="optional provenance sidecar JSON")
@@ -1220,6 +1235,58 @@ def main(argv=None) -> int:
                 if data.get("dryRun"):
                     return 0 if data.get("ok") else 1
                 return 0 if data.get("passed") else 1
+
+        if args.command == "provenance":
+            import provenance as provenance_spec
+            from pathlib import Path as _Path
+
+            if args.provenance_command == "sign":
+                state_dir = _Path(args.state_dir) if args.state_dir else STATE_DIR
+                try:
+                    document = provenance_spec.create_provenance(
+                        args.artifacts,
+                        state_dir=state_dir,
+                        project_root=REPO_ROOT,
+                    )
+                except provenance_spec.ProvenanceError as exc:
+                    raise GypsyError(str(exc)) from exc
+                if args.write:
+                    provenance_spec.write_provenance(_Path(args.write), document)
+                if args.json:
+                    print(json.dumps(document, indent=2))
+                else:
+                    print("signed provenance: artifacts=" + str(len(document["subject"]["artifacts"])) + " signer=" + document["signer"]["keyFingerprint"] + ((" path=" + args.write) if args.write else ""))
+                return 0
+            if args.provenance_command == "verify":
+                state_dir = _Path(args.state_dir) if args.state_dir else STATE_DIR
+                try:
+                    document = provenance_spec.read_provenance(args.file)
+                    result = provenance_spec.verify_provenance(
+                        document,
+                        project_root=REPO_ROOT,
+                        state_dir=state_dir,
+                    )
+                except provenance_spec.ProvenanceError as exc:
+                    raise GypsyError(str(exc)) from exc
+                if args.json:
+                    print(json.dumps(result, indent=2))
+                else:
+                    print("provenance " + ("PASS" if result.get("passed") else "FAIL") + " signatureValid=" + str(result.get("signatureValid")) + " artifacts=" + str(len(result.get("artifacts", []))))
+                    for error in result.get("errors", []):
+                        print("  ERROR " + error)
+                return 0 if result.get("passed") else 1
+            if args.provenance_command == "sbom":
+                try:
+                    document = provenance_spec.build_sbom(REPO_ROOT)
+                except provenance_spec.ProvenanceError as exc:
+                    raise GypsyError(str(exc)) from exc
+                if args.write:
+                    provenance_spec.write_sbom(_Path(args.write), document)
+                if args.json:
+                    print(json.dumps(document, indent=2))
+                else:
+                    print("SBOM components=" + str(len(document.get("components", []))) + " relationships=" + str(len(document.get("relationships", []))) + ((" path=" + args.write) if args.write else ""))
+                return 0
 
         if args.command == "assets":
             import assets as asset_spec

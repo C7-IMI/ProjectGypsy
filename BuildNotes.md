@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.30.009
+Current version: 2026.10.30.010
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,18 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.30.010
+
+**P1 increment: local HMAC artifact provenance and deterministic SBOM, wired into CLI/API/Insights.**
+
+- Date: 2026-10-30
+- Commit: this change.
+- Change: workstream/provenance.py signs declared artifact hashes with HMAC-SHA256 using a gitignored local key;
+  tamper/wrong-key/missing-artifact verification; deterministic SBOM from project/capability/toolpack/tool manifests;
+  gypsy provenance sign|verify|sbom; /api/provenance; Insights Provenance + SBOM card; ADR-022.
+- Verification: 3 artifacts signed and verified signatureValid=True; SBOM 152 components/155 relationships; full suite
+  **529 tests OK (3 skipped)**; check_all 6/6; HMAC is local integrity, not PKI.
 
 ## 2026.10.30.009
 
