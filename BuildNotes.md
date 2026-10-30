@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.30.008
+Current version: 2026.10.30.009
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,19 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.30.009
+
+**P1 increment: asset registry, state-derived metrics, CLI/dashboard integration.**
+
+- Date: 2026-10-30
+- Commit: this change.
+- Change: workstream/assets.py read-only hashed registry with duplicate-content groups and provenance sidecar warnings;
+  workstream/metrics.py deterministic state aggregation; gypsy assets/metrics commands; /api/assets and /api/metrics;
+  Insights cards for run metrics and asset registry; ADR-021 and docs.
+- Verification: full suite **505 tests OK (3 skipped)**; check_all 6/6; oversize remote-cache 413 flake fixed by bounded draining; asset scan 30 assets/9,255,627 B/7
+  duplicate groups/1 provenance warning/0 errors; metrics 11 runs (9 pass/2 fail), 7/7 slices, cache 1 hit/7 misses,
+  quality passed, problems []; deterministic metrics output.
 
 ## 2026.10.30.008
 

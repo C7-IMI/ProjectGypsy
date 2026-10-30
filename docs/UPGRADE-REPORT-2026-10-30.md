@@ -34,7 +34,7 @@ Chromium. The Android emulator launch and Unity hero import are now real evidenc
 
 | Check | Result |
 | --- | --- |
-| Full unit suite | **412 tests OK (3 skipped)** |
+| Full unit suite | **505 tests OK (3 skipped)** (412 at P0, 456 after remote cache, 505 after assets/metrics) |
 | check_all | **6/6 PASS** |
 | All slices | **PASS** — hero 35.9 s, leftbehind 27.5 s, mobile 13.6 s, phase1 16.7 s, quality 79.5 s, toolpacks 84.3 s, visual 19.1 s |
 | Visual gate | PASS — 0/921600 changed; median 2.811 s; p95 2.811 s; GPU 0.87 ms; 143 frames |
@@ -65,6 +65,14 @@ emulator scope.
 - Slice-step cache cwd made checkout-relative so the same cache descriptor can match across different absolute checkout
   roots.
 - Full suite after this increment: **456 tests OK (3 skipped)**.
+
+## P1 increment: assets and metrics
+
+- **Asset registry**: 30 assets, 9,255,627 bytes, 3 roots, 7 duplicate-content groups, 1 provenance warning, 0 errors.
+- **Metrics**: 11 task runs (9 pass, 2 fail), median 26.564 s, p95 276.385 s; 7/7 slices; 89 toolpack actions;
+  cache 1 hit / 7 misses / 7 stores; quality gate passed; problems [].
+- **UI/API**: Insights cards for run metrics and asset registry; /api/assets and /api/metrics; full suite **505 tests**.
+- ADR-021 documents both as read-only views, not build proof.
 
 ## Remaining external gates (not software-buildable here)
 

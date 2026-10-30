@@ -40,6 +40,10 @@ python workstream/gypsy.py slices list|plan|run|status [--all] [--resume] [--for
 python workstream/gypsy.py toolpacks list|check|run [--action] [--parallel N] [--force] [--no-cache]
 python workstream/gypsy.py cache stats|list|clear [--json] [--yes]
 python workstream/gypsy.py cache serve [--host 127.0.0.1] [--port 8767] [--root DIR]
+python workstream/gypsy.py cache remote [--json]
+python workstream/gypsy.py assets [--root DIR] [--registry FILE] [--write] [--json]
+python workstream/gypsy.py metrics [--write] [--json]
+python workstream/gypsy.py cache serve [--host 127.0.0.1] [--port 8767] [--root DIR]
 python workstream/gypsy.py cache remote [--url URL] [--json]
 python workstream/gypsy.py catalog [--root DIR] [--json] [--save-state]
 python workstream/gypsy.py console board|preview|diff [--json]
@@ -113,6 +117,10 @@ python -m unittest discover -s workstream/tests -v
   fallback, cache/scheduler cards with honest empty states, and actionable failures.
 - Project catalog: read-only discovery of `project.gypsy.json` manifests with health, duplicate detection and an optional
   state file; golden-path Unity/Godot templates under `templates/`.
+- Asset registry: read-only hashed inventory under `assets/`, `game/assets/` and `unity/LeftBehind/Assets`, with
+  duplicate-content groups and provenance warnings (`workstream/assets.py`, `gypsy assets`).
+- Metrics: state-derived task/slice/toolpack/cache/quality aggregates (`workstream/metrics.py`, `gypsy metrics`,
+  `/api/metrics`), surfaced as Insights cards; not live OpenTelemetry.
 
 ## What is not built yet
 

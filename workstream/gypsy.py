@@ -859,6 +859,16 @@ def main(argv=None) -> int:
             toolpack_cmd.add_argument("--parallel", type=int, default=1, help="opt-in parallel workers for independent actions (1-8)")
             toolpack_cmd.add_argument("--no-cache", action="store_true", help="disable the action cache for this run")
 
+    assets_parser = sub.add_parser("assets", help="read-only asset registry")
+    assets_parser.add_argument("--root", action="append", default=None, help="asset root (repeatable; default asset roots)")
+    assets_parser.add_argument("--registry", default=None, help="optional provenance sidecar JSON")
+    assets_parser.add_argument("--write", action="store_true", help="write workstream/state/assets/registry.json")
+    assets_parser.add_argument("--json", action="store_true")
+
+    metrics_parser = sub.add_parser("metrics", help="state-derived run/cache/quality metrics")
+    metrics_parser.add_argument("--write", action="store_true", help="write workstream/state/metrics.json")
+    metrics_parser.add_argument("--json", action="store_true")
+
     catalog_parser = sub.add_parser("catalog", help="read-only project catalog")
     catalog_parser.add_argument("--root", default=str(REPO_ROOT), help="root to scan (default: repository)")
     catalog_parser.add_argument("--state", default=None, help="optional catalog state path")
@@ -1210,6 +1220,36 @@ def main(argv=None) -> int:
                 if data.get("dryRun"):
                     return 0 if data.get("ok") else 1
                 return 0 if data.get("passed") else 1
+
+        if args.command == "assets":
+            import assets as asset_spec
+
+            payload = asset_spec.scan(roots=args.root, registry=args.registry)
+            if args.write:
+                path = asset_spec.save_state(payload)
+                payload["statePath"] = str(path)
+            if args.json:
+                print(json.dumps(payload, indent=2))
+            else:
+                print(asset_spec.render_summary(payload))
+            return 1 if payload.get("errors") else 0
+
+        if args.command == "metrics":
+            import metrics as metrics_spec
+
+            data = metrics_spec.collect()
+            if args.write:
+                path = metrics_spec.write_metrics(STATE_DIR / "metrics.json", data)
+                data["statePath"] = str(path)
+            if args.json:
+                print(json.dumps(data, indent=2))
+            else:
+                tasks = data.get("tasks", {})
+                cache = data.get("cache", {})
+                print(f"metrics: tasks={tasks.get('total', 0)} passed={tasks.get('passed', 0)} failed={tasks.get('failed', 0)}")
+                print(f"cache: hits={cache.get('counters', {}).get('hits', 0)} misses={cache.get('counters', {}).get('misses', 0)} hitRate={cache.get('hitRate')}")
+                print(f"problems={len(data.get('problems', []))} asOf={data.get('asOf')}")
+            return 0
 
         if args.command == "catalog":
             import catalog

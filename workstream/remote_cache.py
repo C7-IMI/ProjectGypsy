@@ -359,6 +359,15 @@ def _handler_for(store: RemoteCacheStore, token: str, verbose: bool):
                 self._error(400, "Content-Length must not be negative")
                 return None
             if length > limit:
+                # Drain the bounded body before the 413. Closing immediately while the
+                # client is still writing makes some clients report a connection reset
+                # instead of the HTTP status. Refuse absurd lengths without draining.
+                remaining = min(length, 64 * 1024 * 1024)
+                while remaining > 0:
+                    chunk = self.rfile.read(min(65536, remaining))
+                    if not chunk:
+                        break
+                    remaining -= len(chunk)
                 self._error(413, "request body exceeds the %d byte limit" % limit)
                 return None
             data = self.rfile.read(length)

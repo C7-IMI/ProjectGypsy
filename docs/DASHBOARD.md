@@ -12,7 +12,7 @@ the port. Stop with Ctrl+C. The server binds 127.0.0.1 only.
 | View | What it is for |
 | --- | --- |
 | **Overview** (default) | Next best action, pipeline, recent runs, artifacts, readiness checklist, grouped gates |
-| **Insights** | Plain-language engine/default, last-run health, quality/gates, cache, scheduler and next actions |
+| **Insights** | Plain-language engine/default, last-run health, quality/gates, cache, scheduler, run metrics, asset registry and next actions |
 | **Projects** | Read-only project catalog: engine/version, targets, manifest health, paths; no filesystem browsing |
 | **Run detail** | Step timeline, log, validator evidence, artifacts, retry/re-run controls |
 | **Slices** | Slice table, step progress, duration, artifacts; run/open actions |
@@ -81,6 +81,8 @@ never sends argv.
 - `GET /api/logs/stream` — live job output SSE; `/api/job` remains the polling fallback.
 - `GET /api/catalog` — project catalog payload, or a 503 with an error when the scan fails; manifest health only, not
   engine/build readiness. The browser cannot choose a filesystem root.
+- `GET /api/metrics` — state-derived run/cache/quality metrics (`gypsy.metrics/v1`).
+- `GET /api/assets` — read-only asset registry (`gypsy.asset-registry/v1`) with hashes, duplicates and provenance warnings.
 - `GET /api/runs` — newest-first run summaries from task and toolpack state.
 - `GET /api/run?id=...` — one run's steps, artifacts and validators; the id is a state path under workstream/state.
 - `GET /api/job` — current job output; `POST /api/run` starts a whitelisted action.

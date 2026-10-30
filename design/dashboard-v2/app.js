@@ -288,7 +288,25 @@
     if (c.savedSeconds !== null && c.savedSeconds !== undefined) cells += stat('Saved', secs(c.savedSeconds));
     return '<div class="stats4">' + cells + '</div><p class="lead">' + esc(c.summary) + '</p><div class="src">source: ' + esc(c.source || 'state') + '</div>';
   }
-  function schedulerCard() {
+  function observabilityCard() {
+    var m = (state && state.observability) || {};
+    var tasks = m.tasks || {};
+    var cache = m.cache || {};
+    var counters = cache.counters || {};
+    if (m.error) return emptyState('Metrics unavailable', m.error, '');
+    var cells = stat('Runs', tasks.runs || 0) + stat('Passed', tasks.passed || 0) + stat('Failed', tasks.failed || 0) + stat('Median', secs((tasks.durations || {}).medianSeconds));
+    var extra = 'Cache hit rate: ' + pct(cache.hitRate) + ' · ' + (counters.hits || 0) + ' hits / ' + (counters.misses || 0) + ' misses';
+    if ((m.problems || []).length) extra += ' · ' + m.problems.length + ' state problems';
+    return '<div class="stats4">' + cells + '</div><p class="lead">State-derived run and cache metrics.</p><div class="src">' + esc(extra) + ' · as of ' + esc(m.asOf || '—') + '</div>';
+  }
+  function assetsCard() {
+    var r = (state && state.assetRegistry) || {};
+    if (r.error) return emptyState('Asset registry unavailable', r.error, '');
+    var counts = r.counts || {};
+    var cells = stat('Assets', r.count || 0) + stat('Images', counts.image || 0) + stat('Models', counts.model || 0) + stat('Warnings', (r.warnings || []).length);
+    return '<div class="stats4">' + cells + '</div><p class="lead">Read-only asset scan with hashes, provenance warnings and duplicate detection.</p><div class="src">source: ' + esc(r.generated || 'workstream/assets.py') + '</div>';
+  }
+    function schedulerCard() {
     var s = insight().scheduler || {};
     if (!s.available) {
       var looked = (s.lookedFor || []).map(function (p) { return '<code>' + esc(p) + '</code>'; }).join(', ');
@@ -316,6 +334,8 @@
       insightCard('Quality and gates', 'AUTOMATED EVIDENCE', qualityCard()) +
       insightCard('Execution cache', 'OPT-IN', cacheCard()) +
       insightCard('Parallel scheduler', 'OPT-IN', schedulerCard()) +
+      insightCard('Run metrics', 'STATE-DERIVED', observabilityCard()) +
+      insightCard('Asset registry', 'READ-ONLY', assetsCard()) +
       insightCard('Next actions', 'ACTIONABLE', actions || emptyState('No actions', 'Nothing needs attention in the recorded state.', '') , true) +
       '</div></main>' +
       '<aside class="right"><div class="rpanel"><div class="rpanel-h"><b>Gates</b><span class="right">HONEST STATE</span></div><div class="rpad">' + gatesMarkup() + '</div></div><div class="rpanel"><div class="rpanel-h"><b>How this stays honest</b><span>READ ONLY</span></div><div class="rpad note">Every value comes from task/slice/toolpack state, project manifests, engine probe state and live artifact files. Cache and scheduler cards stay empty until opt-in runs record stats; they never invent hits or workers.</div></div></aside>';

@@ -1105,6 +1105,16 @@ def collect_state():
         "untested": sum(1 for gate in gates if gate.get("status") == "untested"),
     }
     insights = _insights(task, states, gates, runs, metrics)
+    try:
+        import metrics as metrics_spec
+        observability = metrics_spec.collect(STATE)
+    except Exception as exc:
+        observability = {"schema": "gypsy.metrics/v1", "error": type(exc).__name__ + ": " + str(exc)}
+    try:
+        import assets as asset_spec
+        asset_registry = asset_spec.scan()
+    except Exception as exc:
+        asset_registry = {"schema": "gypsy.asset-registry/v1", "error": type(exc).__name__ + ": " + str(exc)}
     return {
         "generated": _utc(),
         "repo": REPO_ROOT.name,
@@ -1124,6 +1134,8 @@ def collect_state():
         "job": _job_public(),
         "runs": runs,
         "insights": insights,
+        "observability": observability,
+        "assetRegistry": asset_registry,
         "cache": insights["cache"],
         "scheduler": insights["scheduler"],
         "commands": [{"id": key, **value} for key, value in COMMANDS.items()],
@@ -1408,6 +1420,20 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.path == "/api/state":
             try:
                 self._json(HTTPStatus.OK, collect_state())
+            except Exception as exc:
+                self._json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": type(exc).__name__ + ": " + str(exc)})
+            return
+        if parsed.path == "/api/metrics":
+            try:
+                import metrics as metrics_spec
+                self._json(HTTPStatus.OK, metrics_spec.collect(STATE))
+            except Exception as exc:
+                self._json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": type(exc).__name__ + ": " + str(exc)})
+            return
+        if parsed.path == "/api/assets":
+            try:
+                import assets as asset_spec
+                self._json(HTTPStatus.OK, asset_spec.scan())
             except Exception as exc:
                 self._json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": type(exc).__name__ + ": " + str(exc)})
             return
