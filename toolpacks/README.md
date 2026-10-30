@@ -22,7 +22,8 @@ A toolpack step can also be declared in a slice:
 | audio.musicgen.json | tools/musicgen/musicgen.ps1 --seed 1234 | artifacts/toolpacks/musicgen.wav | 16-bit PCM WAV, >= 3 s, RMS >= 0.01; seeded runs are byte-identical |
 | mobile.android.json | powershell scripts/build_android.ps1 | build/ProjectGypsy.apk | file >= 20 MB; script asserts package/ABI/signature |
 | leftbehind.unity.json | powershell scripts/build_unity_leftbehind.ps1 then run_unity_leftbehind.ps1 | unity/LeftBehind/Build/LeftBehind.exe, artifacts/leftbehind/{build.log,player.log,frame.png} | build success text, demo marker, 1280×720 PNG |
-| hero.wayfarer.json | Blender generator → validator → Godot capture | assets/hero/{wayfarer.glb,wayfarer.fbx,textures/wayfarer_atlas.png}, artifacts/hero/{generation-report,validation}.json, artifacts/game/frame.png | GLB/FBX/atlas, 20-joint rig and 3 actions, report checks, 1280×720 frame |
+| hero.wayfarer.json | Blender generator → validator → Godot capture | assets/hero/{wayfarer.glb,wayfarer.fbx,textures/wayfarer_atlas.png}, artifacts/hero/{generation-report,validation}.json, artifacts/game/frame.png | GLB/FBX/atlas, 23-joint rig and 3 actions, report checks, 1280×720 frame |
+| quality.visual.json | Godot capture → bench → visual/performance gate | artifacts/game/frame.png, workstream/state/{game-benchmark.json,quality/gate.json} | 1280×720 PNG, benchmark pass, visual/performance gate pass, dimensions |
 
 The art pack regenerates the Blender golden kit, round-trips GLB/FBX, validates glTF and imports
 into Godot 4.7.2. The audio pack uses local MusicGen-small; its weights are CC-BY-NC 4.0 and the
@@ -36,6 +37,9 @@ result is prototype-only until reviewed.
 - Missing artifacts or failed validators fail the action; a failed action stops later actions.
 - State is atomic JSON under workstream/state/toolpacks/ (gitignored); the declared licence, tools
   and argv are copied into every state document.
+- Opt-in action caching is available with a `cache` object: inputs, exact artifacts and tool versions are hashed; only
+  passing actions are stored; a hit restores artifacts and re-runs the validators. `--no-cache`, `--force` and
+  `--parallel N` (1–8) are supported.
 - No retries, no model call, no arbitrary shell.
 
 See [ADR-011](../docs/ADR-011-toolpacks.md) and [PHASE-3-EVIDENCE.md](../docs/PHASE-3-EVIDENCE.md).

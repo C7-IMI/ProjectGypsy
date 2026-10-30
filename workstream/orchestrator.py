@@ -23,8 +23,14 @@ Public API:
 
     HANDLERS
     run_slice(manifest, *, project_root, state_dir, resume=False, force=False,
-              handlers=None, timeout_scale=1.0) -> dict
-    run_task(manifests, *, project_root, state_dir, resume=False, handlers=None) -> dict
+              handlers=None, timeout_scale=1.0, cache=None, cache_enabled=True) -> dict
+    run_task(manifests, *, project_root, state_dir, resume=False, force=False,
+             handlers=None, max_workers=1, cache=None, cache_enabled=True) -> dict
+
+A step may opt into the local content-addressed action cache with a "cache" object
+(see cache.py). Cache hits restore the declared artifacts and skip the handler; misses run
+the handler and store only passing results. run_task(max_workers=N) uses the bounded
+parallel scheduler for independent slices; result order stays deterministic.
 """
 from __future__ import annotations
 
@@ -42,8 +48,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 try:  # imported as workstream.orchestrator
+    from . import cache as cache_spec
     from . import slices as slice_spec
 except ImportError:  # imported with workstream/ on sys.path (the CLI does this)
+    import cache as cache_spec
     import slices as slice_spec
 
 WORKSTREAM_DIR = Path(__file__).resolve().parent
@@ -102,6 +110,20 @@ def _atomic_write_json(path: Path, payload) -> None:
         except OSError:
             pass
         raise
+
+
+def _cache_step_argv(step: dict) -> list:
+    """A stable argv-like identity token for a handler step's declared arguments."""
+    try:
+        args = json.dumps(
+            step.get("args") or {},
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+        )
+    except (TypeError, ValueError):
+        args = repr(step.get("args"))
+    return [str(step.get("kind")), args]
 
 
 def _project_dir(project_root: Path, manifest: dict) -> Path:
@@ -187,6 +209,8 @@ def run_slice(
     force=False,
     handlers=None,
     timeout_scale=1.0,
+    cache=None,
+    cache_enabled=True,
 ) -> dict:
     """Execute one slice manifest and return a JSON-safe run result.
 
@@ -195,11 +219,24 @@ def run_slice(
     its dependents are skipped. With resume=True a step that passed under the same manifest
     SHA-256 is not executed again; force=True ignores existing state entirely.
 
+    A step may opt into the local action cache with a "cache" object declaring inputs and
+    artifacts. A hit restores the declared artifacts and skips the handler; a miss executes
+    and stores only a passing result. cache=ActionCache shares one cache across a parallel
+    task; cache_enabled=False disables it for this run (the CLI --no-cache switch).
+
     Raises slice_spec.SliceError before doing anything when the manifest is invalid.
     """
     if not isinstance(manifest, dict):
         raise slice_spec.SliceError("manifest must be a JSON object")
     errors = slice_spec.validate_manifest(manifest)
+    if not errors:
+        for step in manifest.get("steps") or []:
+            if isinstance(step, dict) and "cache" in step:
+                errors.extend(
+                    cache_spec.validate_config(
+                        step["cache"], label=f"step {step.get('id')!r} cache"
+                    )
+                )
     if errors:
         raise slice_spec.SliceError("invalid slice manifest: " + "; ".join(errors))
     try:
@@ -211,6 +248,11 @@ def run_slice(
 
     project_root = Path(project_root)
     state_dir = Path(state_dir)
+    if cache is not None and not isinstance(cache, cache_spec.ActionCache):
+        raise ValueError("cache must be a cache.ActionCache instance or None")
+    cache_obj = cache if cache is not None else cache_spec.ActionCache(
+        state_dir, enabled=bool(cache_enabled)
+    )
     registry = dict(HANDLERS)
     if handlers:
         registry.update(handlers)
@@ -218,6 +260,18 @@ def run_slice(
     slice_id = manifest["id"]
     order = slice_spec.resolve_order(manifest)
     steps_by_id = {step["id"]: step for step in manifest["steps"]}
+    cache_configs = {}
+    for step in manifest["steps"]:
+        if "cache" not in step:
+            continue
+        try:
+            cache_configs[step["id"]] = cache_spec.resolve_config(
+                step["cache"],
+                project_root=project_root,
+                label=f"step {step['id']!r} cache",
+            )
+        except cache_spec.CacheError as exc:
+            raise slice_spec.SliceError(str(exc)) from exc
     manifest_sha = _manifest_sha256(manifest)
     state_path = slice_spec.step_state_path(state_dir, slice_id)
     started_moment = _utc_now()
@@ -248,6 +302,9 @@ def run_slice(
     step_results = []
     status_by_id = {}
     errors = []
+    cache_hits = 0
+    cache_misses = 0
+    cache_stores = 0
     for step_id in order:
         step = steps_by_id[step_id]
         required = bool(step.get("required", True))
@@ -298,6 +355,70 @@ def run_slice(
             )
             continue
 
+        step_cache = cache_configs.get(step_id)
+        cache_key = None
+        cache_descriptor = None
+        cache_restored = []
+        cache_error = None
+        cache_active = bool(step_cache and step_cache["enabled"] and cache_obj.enabled)
+        if step_cache is not None and not cache_obj.enabled:
+            cache_error = "cache disabled for this run"
+        elif step_cache is not None and not step_cache["enabled"]:
+            cache_error = "cache disabled by the step manifest"
+        if cache_active:
+            cache_inputs = cache_spec.input_hashes(project_root, step_cache["inputs"])
+            cache_key, cache_descriptor = cache_spec.action_key(
+                identity={
+                    "kind": "slice-step",
+                    "slice": slice_id,
+                    "step": step_id,
+                    "stepKind": step["kind"],
+                    "manifestSha256": manifest_sha,
+                },
+                argv=_cache_step_argv(step),
+                cwd=str(project_dir),
+                inputs=cache_inputs,
+                artifacts=step_cache["artifacts"],
+                tool_versions=step_cache["toolVersions"],
+            )
+            if not force:
+                cached_entry = cache_obj.lookup(cache_key)
+                if cached_entry is not None:
+                    restored_ok, restored_paths, restore_error = cache_obj.restore(
+                        cached_entry, project_root
+                    )
+                    if restored_ok:
+                        moment = _iso(_utc_now())
+                        cache_hits += 1
+                        step_results.append(
+                            {
+                                "id": step_id,
+                                "kind": step["kind"],
+                                "status": "passed",
+                                "required": required,
+                                "attempted": False,
+                                "cached": False,
+                                "seconds": 0.0,
+                                "startedAt": moment,
+                                "finishedAt": moment,
+                                "output": "cache hit: restored "
+                                + str(len(restored_paths))
+                                + " artifact(s)",
+                                "error": None,
+                                "exit": 0,
+                                "cache": {
+                                    "key": cache_key,
+                                    "hit": True,
+                                    "stored": False,
+                                    "restored": restored_paths,
+                                    "error": None,
+                                },
+                            }
+                        )
+                        status_by_id[step_id] = "passed"
+                        continue
+                    cache_error = restore_error
+
         timeout = float(step.get("timeout") or slice_spec.DEFAULT_TIMEOUT) * timeout_scale
         context = {
             "project_root": project_root,
@@ -327,22 +448,46 @@ def run_slice(
         status = "passed" if passed else "failed"
         status_by_id[step_id] = status
         moment = _iso(_utc_now())
-        step_results.append(
-            {
-                "id": step_id,
-                "kind": step["kind"],
-                "status": status,
-                "required": required,
-                "attempted": True,
-                "cached": False,
-                "seconds": seconds,
-                "startedAt": _iso(step_started),
-                "finishedAt": moment,
-                "output": output,
-                "error": error,
-                "exit": exit_code,
+        cache_info = None
+        if step_cache is not None:
+            if cache_active:
+                cache_misses += 1
+            cache_stored = False
+            if passed and cache_active and cache_key:
+                stored_entry = cache_obj.store(
+                    cache_key,
+                    descriptor=cache_descriptor,
+                    project_root=project_root,
+                    artifacts=step_cache["artifacts"],
+                    result={"exit": exit_code, "output": _clip(output)},
+                )
+                cache_stored = stored_entry is not None
+                if cache_stored:
+                    cache_stores += 1
+            cache_info = {
+                "key": cache_key,
+                "hit": False,
+                "stored": cache_stored,
+                "restored": [],
+                "error": cache_error,
             }
-        )
+        step_record = {
+            "id": step_id,
+            "kind": step["kind"],
+            "status": status,
+            "required": required,
+            "attempted": True,
+            "cached": False,
+            "seconds": seconds,
+            "startedAt": _iso(step_started),
+            "finishedAt": moment,
+            "output": output,
+            "error": error,
+            "exit": exit_code,
+        }
+        if cache_info is not None:
+            step_record["cache"] = cache_info
+        step_results.append(step_record)
         if not passed:
             errors.append(f"step {step_id!r} failed: {error or 'handler reported failure'}")
 
@@ -366,6 +511,13 @@ def run_slice(
 
     finished_moment = _utc_now()
     duration = round(time.time() - started, 3)
+    cache_summary = {
+        "enabled": cache_obj.enabled,
+        "configuredSteps": len(cache_configs),
+        "hits": cache_hits,
+        "misses": cache_misses,
+        "stores": cache_stores,
+    }
     state_document = {
         "schema": STATE_SCHEMA,
         "slice": slice_id,
@@ -383,6 +535,7 @@ def run_slice(
         "steps": step_results,
         "artifacts": artifacts,
         "ledgerPath": str(ledger_path) if ledger_path else None,
+        "cache": cache_summary,
         "errors": errors,
     }
     _atomic_write_json(state_path, state_document)
@@ -421,13 +574,27 @@ def _report_lines(task_name: str, passed: bool, slices: list, counts: dict, arti
     return lines
 
 
-def run_task(manifests, *, project_root, state_dir, resume=False, force=False, handlers=None) -> dict:
-    """Run several slice manifests in order, writing one aggregate task report.
+def run_task(
+    manifests,
+    *,
+    project_root,
+    state_dir,
+    resume=False,
+    force=False,
+    handlers=None,
+    max_workers=1,
+    cache=None,
+    cache_enabled=True,
+) -> dict:
+    """Run several slice manifests, writing one aggregate task report.
 
     *manifests* may be a mapping (as returned by slices.load_all) or any iterable of
     manifests, iterated in that order. A failed slice stops later slices; their summaries are
-    recorded as not-run. The aggregate is written atomically to
-    <state_dir>/slices/task-<UTC timestamp>.json and its path is returned as statePath.
+    recorded as not-run (sequential) or cancelled after the first failure (parallel).
+    max_workers=1 keeps the original sequential behaviour; 2..8 uses the bounded parallel
+    scheduler for independent slices with deterministic result ordering and logs. The
+    aggregate is written atomically to <state_dir>/slices/task-<UTC timestamp>.json and its
+    path is returned as statePath. A shared ActionCache is passed to every slice.
 
     Raises slice_spec.SliceError before running anything if any manifest is invalid or two
     slices share an id.
@@ -450,9 +617,20 @@ def run_task(manifests, *, project_root, state_dir, resume=False, force=False, h
         if slice_id in seen:
             raise slice_spec.SliceError(f"duplicate slice id {slice_id!r} in task")
         seen.add(slice_id)
+    try:
+        workers = cache_spec.worker_count(max_workers)
+    except cache_spec.CacheError as exc:
+        raise slice_spec.SliceError(str(exc)) from exc
 
     project_root = Path(project_root)
     state_dir = Path(state_dir)
+    if cache is not None and not isinstance(cache, cache_spec.ActionCache):
+        raise ValueError("cache must be a cache.ActionCache instance or None")
+    cache_obj = cache if cache is not None else cache_spec.ActionCache(
+        state_dir, enabled=bool(cache_enabled)
+    )
+    cache_before = cache_obj.counters()
+
     started_moment = _utc_now()
     started = time.time()
     stamp = started_moment.strftime("%Y%m%dT%H%M%SZ")
@@ -463,60 +641,137 @@ def run_task(manifests, *, project_root, state_dir, resume=False, force=False, h
         suffix += 1
     task_name = state_path.stem
 
-    slice_summaries = []
-    artifacts = []
     counts = {"total": 0, "passed": 0, "failed": 0, "skipped": 0}
-    stopped = False
-    failure_reason = None
-    for manifest in sequence:
-        slice_id = manifest["id"]
-        if stopped:
-            slice_summaries.append(
-                {
-                    "slice": slice_id,
-                    "status": "not-run",
-                    "passed": None,
-                    "statePath": None,
-                    "steps": {"total": 0, "passed": 0, "failed": 0, "skipped": 0},
-                    "artifacts": 0,
-                    "durationSeconds": 0.0,
-                    "errors": [],
-                    "note": f"not run: {failure_reason}",
-                }
-            )
-            continue
-        result = run_slice(
-            manifest,
-            project_root=project_root,
-            state_dir=state_dir,
-            resume=resume,
-            force=force,
-            handlers=handlers,
-        )
-        step_counts = _count_statuses(result["steps"])
+    artifacts = []
+    slice_summaries = []
+    cancelled_slices = []
+    parallel_cancelled = False
+
+    def _absorb(result: dict, slice_id: str) -> dict:
+        step_counts = _count_statuses(result.get("steps") or [])
         for key in counts:
             counts[key] += step_counts[key]
-        for artifact in result["artifacts"]:
+        for artifact in result.get("artifacts") or []:
             artifacts.append({"slice": slice_id, **artifact})
-        slice_summaries.append(
-            {
-                "slice": slice_id,
-                "status": "passed" if result["passed"] else "failed",
-                "passed": result["passed"],
-                "statePath": result["statePath"],
-                "steps": step_counts,
-                "artifacts": len(result["artifacts"]),
-                "durationSeconds": result["durationSeconds"],
-                "errors": result["errors"],
-            }
+        return {
+            "slice": slice_id,
+            "status": "passed" if result.get("passed") else "failed",
+            "passed": result.get("passed"),
+            "statePath": result.get("statePath"),
+            "steps": step_counts,
+            "artifacts": len(result.get("artifacts") or []),
+            "durationSeconds": result.get("durationSeconds"),
+            "errors": list(result.get("errors") or []),
+            "cache": result.get("cache"),
+        }
+
+    def _not_run_summary(manifest: dict, note: str) -> dict:
+        return {
+            "slice": manifest["id"],
+            "status": "not-run",
+            "passed": None,
+            "statePath": None,
+            "steps": {"total": 0, "passed": 0, "failed": 0, "skipped": 0},
+            "artifacts": 0,
+            "durationSeconds": 0.0,
+            "errors": [],
+            "note": note,
+            "cache": None,
+        }
+
+    if workers == 1:
+        stopped = False
+        failure_reason = None
+        for manifest in sequence:
+            slice_id = manifest["id"]
+            if stopped:
+                slice_summaries.append(
+                    _not_run_summary(manifest, "not run: " + str(failure_reason))
+                )
+                continue
+            result = run_slice(
+                manifest,
+                project_root=project_root,
+                state_dir=state_dir,
+                resume=resume,
+                force=force,
+                handlers=handlers,
+                cache=cache_obj,
+            )
+            slice_summaries.append(_absorb(result, slice_id))
+            if not result.get("passed"):
+                stopped = True
+                failure_reason = f"slice {slice_id!r} failed"
+    else:
+
+        def _run_slice(index, manifest):
+            try:
+                return run_slice(
+                    manifest,
+                    project_root=project_root,
+                    state_dir=state_dir,
+                    resume=resume,
+                    force=force,
+                    handlers=handlers,
+                    cache=cache_obj,
+                )
+            except Exception as exc:  # a crashed worker becomes deterministic state
+                return {
+                    "slice": manifest.get("id"),
+                    "passed": False,
+                    "statePath": None,
+                    "steps": [],
+                    "artifacts": [],
+                    "durationSeconds": 0.0,
+                    "errors": [f"{type(exc).__name__}: {exc}"],
+                    "cache": None,
+                }
+
+        parallel = cache_spec.run_parallel(
+            sequence, _run_slice, max_workers=workers, cancel_on_failure=True
         )
-        if not result["passed"]:
-            stopped = True
-            failure_reason = f"slice {slice_id!r} failed"
+        parallel_cancelled = bool(parallel["cancelled"])
+        results = parallel["results"]
+        first_failed = None
+        for index, manifest in enumerate(sequence):
+            result = results[index]
+            if result is None:
+                cancelled_slices.append(manifest["id"])
+                note = "not run: cancelled"
+                if first_failed:
+                    note += f" after slice {first_failed!r} failed"
+                slice_summaries.append(_not_run_summary(manifest, note))
+                continue
+            summary = _absorb(result, manifest["id"])
+            slice_summaries.append(summary)
+            if not result.get("passed") and first_failed is None:
+                first_failed = manifest["id"]
 
     duration = round(time.time() - started, 3)
-    passed = not stopped
+    failed = any(summary["status"] == "failed" for summary in slice_summaries)
+    not_run = any(summary["status"] == "not-run" for summary in slice_summaries)
+    passed = not failed and not not_run
     finished_moment = _utc_now()
+    parallel_info = {
+        "requestedWorkers": workers,
+        "workers": workers,
+        "cancelled": parallel_cancelled,
+        "cancelledSlices": cancelled_slices,
+        "log": [
+            f"{summary['slice']}: {summary['status']}" for summary in slice_summaries
+        ],
+    }
+    cache_summary = {
+        "enabled": cache_obj.enabled,
+        **cache_spec.counters_delta(cache_before, cache_obj.counters()),
+    }
+    report = _report_lines(task_name, passed, slice_summaries, counts, artifacts, duration)
+    if workers > 1:
+        report.insert(
+            1,
+            f"parallel: {workers} worker(s), cancelled={parallel_cancelled}"
+            + (" (" + ", ".join(cancelled_slices) + ")" if cancelled_slices else ""),
+        )
     document = {
         "schema": TASK_SCHEMA,
         "task": task_name,
@@ -528,7 +783,9 @@ def run_task(manifests, *, project_root, state_dir, resume=False, force=False, h
         "slices": slice_summaries,
         "steps": counts,
         "artifacts": artifacts,
-        "report": _report_lines(task_name, passed, slice_summaries, counts, artifacts, duration),
+        "parallel": parallel_info,
+        "cache": cache_summary,
+        "report": report,
     }
     _atomic_write_json(state_path, document)
     result = dict(document)

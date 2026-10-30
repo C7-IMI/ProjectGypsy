@@ -13,6 +13,7 @@ import math
 import struct
 import sys
 import tempfile
+import time
 import unittest
 import wave
 import zlib
@@ -875,6 +876,185 @@ class RunToolpackTests(ToolpackCase):
             Path(result["actions"][0]["statePath"]).read_text(encoding="utf-8")
         )
         self.assertEqual(action_state["timeoutSeconds"], 1.0)
+
+
+class CacheParallelTests(ToolpackCase):
+    def counter_argv(
+        self,
+        counter_rel,
+        *,
+        artifact_rel="artifacts/out.bin",
+        payload=b"artifact",
+        fail=False,
+        sleep=0.0,
+    ):
+        lines = ["from pathlib import Path", "import sys", "import time"]
+        if sleep:
+            lines.append(f"time.sleep({sleep})")
+        if counter_rel:
+            lines.extend(
+                [
+                    f"counter = Path({counter_rel!r})",
+                    "counter.write_text((counter.read_text() if counter.exists() else '') + 'x')",
+                ]
+            )
+        lines.extend(
+            [
+                f"artifact = Path({artifact_rel!r})",
+                "artifact.parent.mkdir(parents=True, exist_ok=True)",
+                f"artifact.write_bytes({payload!r})",
+            ]
+        )
+        if fail:
+            lines.append("sys.exit(1)")
+        lines.append("print('TOOLPACK_OK')")
+        return python_argv("\n".join(lines))
+
+    def cached_manifest(self, *, counter_rel="counter.txt", fail=False):
+        action = make_action(
+            "run",
+            argv=self.counter_argv(counter_rel, fail=fail),
+            artifacts=["artifacts/out.bin"],
+            cache={"inputs": [], "artifacts": ["artifacts/out.bin"]},
+        )
+        validators = [
+            {"id": "file", "kind": "file", "artifact": "artifacts/out.bin", "minBytes": 1}
+        ]
+        return make_manifest([action], validators=validators)
+
+    def test_action_cache_hit_skips_command_and_restores_artifact(self):
+        manifest = self.cached_manifest()
+        first = self.run_action(manifest)
+        self.assertTrue(first["passed"], first)
+        self.assertFalse(first["cache"]["hit"])
+        self.assertTrue(first["cache"]["stored"])
+        self.assertEqual((self.project / "counter.txt").read_text(encoding="utf-8"), "x")
+        (self.project / "artifacts" / "out.bin").unlink()
+        second = self.run_action(manifest)
+        self.assertTrue(second["passed"], second)
+        self.assertTrue(second["cache"]["hit"])
+        self.assertEqual(second["cache"]["restored"], ["artifacts/out.bin"])
+        self.assertEqual((self.project / "counter.txt").read_text(encoding="utf-8"), "x")
+        self.assertTrue((self.project / "artifacts" / "out.bin").is_file())
+        self.assertTrue(second["validators"])
+        self.assertTrue(all(validator["passed"] for validator in second["validators"]))
+        action_state = self.read_state(second)
+        self.assertTrue(action_state["cache"]["hit"])
+
+    def test_changed_input_misses(self):
+        manifest = self.cached_manifest()
+        manifest["actions"][0]["cache"] = {
+            "inputs": ["src/in.txt"],
+            "artifacts": ["artifacts/out.bin"],
+        }
+        self.write("src/in.txt", "v1")
+        self.run_action(manifest)
+        self.write("src/in.txt", "v2")
+        changed = self.run_action(manifest)
+        self.assertTrue(changed["passed"])
+        self.assertFalse(changed["cache"]["hit"])
+        self.assertEqual((self.project / "counter.txt").read_text(encoding="utf-8"), "xx")
+
+    def test_failure_is_not_cached(self):
+        manifest = self.cached_manifest(fail=True)
+        first = self.run_action(manifest)
+        self.assertFalse(first["passed"])
+        self.assertFalse(first["cache"]["stored"])
+        second = self.run_action(manifest)
+        self.assertFalse(second["passed"])
+        self.assertFalse(second["cache"]["hit"])
+        self.assertEqual((self.project / "counter.txt").read_text(encoding="utf-8"), "xx")
+
+    def test_force_bypasses_the_lookup(self):
+        manifest = self.cached_manifest()
+        self.run_action(manifest)
+        forced = self.run_action(manifest, force=True)
+        self.assertTrue(forced["passed"])
+        self.assertFalse(forced["cache"]["hit"])
+        self.assertTrue(forced["cache"]["stored"])
+        self.assertEqual((self.project / "counter.txt").read_text(encoding="utf-8"), "xx")
+
+    def test_no_cache_switch_disables_the_cache(self):
+        manifest = self.cached_manifest()
+        first = self.run_action(manifest, cache_enabled=False)
+        self.assertTrue(first["passed"])
+        self.assertFalse(first["cache"]["hit"])
+        self.assertIn("disabled", first["cache"]["error"])
+        self.run_action(manifest, cache_enabled=False)
+        self.assertEqual((self.project / "counter.txt").read_text(encoding="utf-8"), "xx")
+
+    def test_invalid_cache_config_is_rejected(self):
+        action = make_action(
+            "run",
+            argv=self.counter_argv("counter.txt"),
+            cache={"inputs": [], "artifacts": ["../escape.bin"]},
+        )
+        manifest = make_manifest([action])
+        errors = toolpacks.validate_manifest(manifest)
+        self.assertTrue(any("cache" in error for error in errors), errors)
+        with self.assertRaises(toolpacks.ToolpackError):
+            self.run_action(manifest)
+
+    def test_parallel_actions_overlap(self):
+        stamps = self.project / "stamps"
+        actions = []
+        for action_id in ("a", "b"):
+            code = (
+                "import time\n"
+                "from pathlib import Path\n"
+                "time.sleep(0.25)\n"
+                f"Path({str(stamps / (action_id + '.txt'))!r}).parent.mkdir(parents=True, exist_ok=True)\n"
+                f"Path({str(stamps / (action_id + '.txt'))!r}).write_text(str(time.time()))\n"
+                "print('TOOLPACK_OK')\n"
+            )
+            actions.append(make_action(action_id, argv=python_argv(code), timeout=30))
+        result = self.run_toolpack(make_manifest(actions), max_workers=2)
+        self.assertTrue(result["passed"], result)
+        self.assertEqual(result["parallel"]["workers"], 2)
+        first = float((stamps / "a.txt").read_text())
+        second = float((stamps / "b.txt").read_text())
+        self.assertLess(abs(first - second), 0.2)
+
+    def test_parallel_failure_cancels_pending_and_keeps_order(self):
+        actions = [
+            make_action("first", argv=python_argv("import sys; sys.exit(1)")),
+            make_action(
+                "second", argv=python_argv("import time; time.sleep(0.2)"), timeout=10
+            ),
+            make_action("third", argv=python_argv("print('TOOLPACK_OK')")),
+        ]
+        result = self.run_toolpack(make_manifest(actions), max_workers=2)
+        self.assertFalse(result["passed"])
+        self.assertEqual(result["actionOrder"], ["first", "second", "third"])
+        self.assertEqual(
+            [summary["status"] for summary in result["actions"]],
+            ["failed", "passed", "not-run"],
+        )
+        self.assertTrue(result["parallel"]["cancelled"])
+        self.assertEqual(result["parallel"]["cancelledActions"], ["third"])
+        self.assertEqual(
+            result["parallel"]["log"],
+            ["first: failed", "second: passed", "third: not-run"],
+        )
+
+    def test_state_exposes_parallel_and_cache(self):
+        actions = [
+            make_action("first", argv=python_argv("print('TOOLPACK_OK')")),
+            make_action("second", argv=python_argv("print('TOOLPACK_OK')")),
+        ]
+        result = self.run_toolpack(make_manifest(actions), max_workers=2)
+        self.assertTrue(result["passed"])
+        document = self.read_state(result)
+        self.assertEqual(document["parallel"]["workers"], 2)
+        self.assertTrue(document["cache"]["enabled"])
+        self.assertEqual(
+            [summary["cache"] for summary in document["actions"]], [None, None]
+        )
+
+    def test_worker_bounds_are_rejected(self):
+        for bad in (0, 9):
+            with self.assertRaises(toolpacks.ToolpackError):
+                self.run_toolpack(make_manifest(), max_workers=bad)
 
 
 if __name__ == "__main__":

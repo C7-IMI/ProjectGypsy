@@ -12,6 +12,7 @@ the port. Stop with Ctrl+C. The server binds 127.0.0.1 only.
 | View | What it is for |
 | --- | --- |
 | **Overview** (default) | Next best action, pipeline, recent runs, artifacts, readiness checklist, grouped gates |
+| **Insights** | Plain-language engine/default, last-run health, quality/gates, cache, scheduler and next actions |
 | **Run detail** | Step timeline, log, validator evidence, artifacts, retry/re-run controls |
 | **Slices** | Slice table, step progress, duration, artifacts; run/open actions |
 | **Artifacts** | Hashed artifact library with live previews and metadata |
@@ -23,11 +24,13 @@ the port. Stop with Ctrl+C. The server binds 127.0.0.1 only.
 | Command Hybrid (`/classic`) | Command palette, terminal output, selected artifact, gate summary |
 | Director's Table (`/classic`) | Review mode: passed slices, what needs a decision, artifacts, next command |
 
-The operations console is deep-linkable with `?view=overview`, `?view=slices`, `?view=artifacts`, `?view=mission`,
-`?view=commands`, `?view=review` or `?view=run`; run detail opens the newest run and can be selected from any run row.
+The operations console is deep-linkable with `?view=overview`, `?view=insights`, `?view=slices`, `?view=artifacts`,
+`?view=mission`, `?view=commands`, `?view=review` or `?view=run`; run detail opens the newest run and can be selected from any run row. Ctrl/⌘+K focuses search; tablist arrow keys move between views.
 The original four views remain at `/classic` and keep their studio/mission/hybrid/director tabs and localStorage selection.
 
 ![Operations overview](../design/dashboard-v2/live-overview.png)
+
+![Insights](../design/dashboard-v2/live-insights.png)
 
 ![Run detail](../design/dashboard-v2/live-run.png)
 
@@ -64,12 +67,16 @@ Buttons run the same commands as the CLI, after a confirmation that shows the ex
 | Run LeftBehind | slices run leftbehind |
 | LeftBehind build / demo / capture | toolpacks run leftbehind.unity --action <id> |
 
-One action at a time; output appears in the job drawer and is polled until completion. The drawer links to the latest
-Phase-5 evidence. Actions are a fixed server-side whitelist; the browser never sends argv.
+One action at a time; output streams into the job drawer via SSE (`/api/logs/stream`) with `/api/job` polling fallback.
+Failures include a copyable command, a retry action and a run link. Actions are a fixed server-side whitelist; the browser
+never sends argv.
 
 ## State API
 
 - `GET /api/state` — slices, artifacts, gates, phases, machine, metrics, commands and run summaries.
+- `GET /api/insights` — plain-language insights model used by the Insights view.
+- `GET /api/logs/stream` — live job output SSE; `/api/job` remains the polling fallback.
+- `GET /api/catalog` — project catalog (when present) with honest manifest health, not engine readiness.
 - `GET /api/runs` — newest-first run summaries from task and toolpack state.
 - `GET /api/run?id=...` — one run's steps, artifacts and validators; the id is a state path under workstream/state.
 - `GET /api/job` — current job output; `POST /api/run` starts a whitelisted action.

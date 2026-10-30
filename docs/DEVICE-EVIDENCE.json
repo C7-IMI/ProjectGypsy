@@ -1,0 +1,274 @@
+{
+  "schema": "gypsy.device-evidence/v1",
+  "task": "task-18",
+  "owner": "live-dev",
+  "generatedAt": "2026-10-30T05:24:17.3342797-05:00",
+  "result": "pass",
+  "scope": "Android emulator (Gypsy_API35b, API 35 x86_64) with host GPU: boot, ADB, APK install, activity launch, rendered game scene, screenshot, logcat. Not a physical device, not release signing, not touch/input validation, not performance measurement.",
+  "repo": {
+    "head": "677f043082835016f373c5be46d2459cabab8aaf",
+    "note": "No repo code/docs/records were edited by this task; all evidence is under artifacts/device/ (gitignored). docs/DEVICE-LAUNCH.md is Lead-owned and untouched. No commit/push."
+  },
+  "apk": {
+    "path": "build/ProjectGypsy.apk",
+    "bytes": 28449841,
+    "sha256": "AFCC1978057FF6A7D489A5CC50E26367A7E5A18BEB1981E30A7D659B8DA8C7BB",
+    "package": "com.c7imi.projectgypsy",
+    "versionCode": 1,
+    "versionName": "0.1.0",
+    "minSdkVersion": 24,
+    "targetSdkVersion": 36,
+    "nativeCode": [
+      "arm64-v8a"
+    ],
+    "installCommand": "adb install -r build/ProjectGypsy.apk",
+    "installResult": "Success (Incremental Install / Streamed Install)",
+    "installedAt": "2026-10-30T05:17:0x-05:00 on first (SwiftShader) boot; AVD userdata persisted and package was present on the later host-GPU boot"
+  },
+  "host": {
+    "os": "Windows 10.0.26300",
+    "emulator": "37.2.12.0 (build_id 16428233)",
+    "adb": "1.0.41 / 37.0.1-15733141",
+    "accel": "WHPX 10.0.26300 installed and usable",
+    "sdk": "%LOCALAPPDATA%\\Programs\\GameTools\\AndroidSdk",
+    "avd": "Gypsy_API35b (Pixel 6 profile, x86_64, Android 15 / API 35, 1080x2400, 2 GB RAM)",
+    "systemImage": "system-images;android-35;google_apis;x86_64"
+  },
+  "locks": {
+    "priorStaleLocks": [
+      "%USERPROFILE%\\.android\\avd\\Gypsy_API35b.avd\\hardware-qemu.ini.lock (dir with pid file)",
+      "%USERPROFILE%\\.android\\avd\\UBlade2_API35.avd\\hardware-qemu.ini.lock (dir with pid file)",
+      "%USERPROFILE%\\.android\\avd\\UBlade2_API35.avd\\multiinstance.lock (0-byte file)"
+    ],
+    "cleanupGuard": "no emulator/qemu process present at each removal; logs in lock-cleanup.txt / lock-cleanup-2.txt",
+    "afterTeardown": "removed one residual 0-byte Gypsy_API35b multiinstance.lock; then no .lock entries remain"
+  },
+  "boot": {
+    "swiftshaderBootMs": 39460,
+    "hostGpuBootMs": 36013,
+    "commandSwiftshader": "emulator -avd Gypsy_API35b -no-window -gpu swiftshader_indirect -no-audio -no-snapshot -no-boot-anim -no-metrics -port 5554 -verbose",
+    "commandHostGpu": "emulator -avd Gypsy_API35b -no-window -gpu host -no-audio -no-snapshot -no-boot-anim -no-metrics -port 5554 -verbose"
+  },
+  "device": {
+    "adbDevice": "emulator-5554 device product:sdk_gphone64_x86_64 model:sdk_gphone64_x86_64 device:emu64xa",
+    "abilist": "x86_64,arm64-v8a",
+    "release": "15",
+    "sdk": 35,
+    "roKernelQemu": "1",
+    "screen": "Physical size: 1080x2400, density 420 (captured PNG is 2400x1080 landscape)"
+  },
+  "launch": {
+    "activity": "com.c7imi.projectgypsy/com.godot.game.GodotAppLauncher",
+    "command": "adb shell am start -W -n com.c7imi.projectgypsy/com.godot.game.GodotAppLauncher",
+    "amStartResult": "Status: ok; LaunchState: COLD; Activity: com.c7imi.projectgypsy/com.godot.game.GodotApp; TotalTime: 8513 ms; WaitTime: 8552 ms",
+    "appPid": 1545,
+    "renderer": "OpenGL API OpenGL ES 3.1 (4.5.0 NVIDIA 597.30) - Compatibility - Using Device: Google (NVIDIA Corporation) - Android Emulator OpenGL ES Translator (NVIDIA T600 Laptop GPU/PCIe/SSE2)",
+    "engine": "Godot Engine v4.7.2.stable.official.ed1daf0bf",
+    "sceneLoadLog": [
+      "05:21:45.520 OnGodotSetupCompleted",
+      "05:21:46.281 HERO_VISUAL ready clips=[\"idle\", \"reach\", \"run\"] missing=[]",
+      "05:21:46.304 ProjectGypsy Phase-1 slice — WASD to move, Space to jump. Headless demo: '-- --demo'.",
+      "05:21:46.308 OnGodotMainLoopStarted"
+    ],
+    "godotErrorsInFinalLogcat": 0,
+    "fatalExceptions": 0
+  },
+  "screenshots": {
+    "game": {
+      "file": "artifacts/device/screenshot-device-game.png",
+      "bytes": 28564,
+      "sha256": "9ACEC7BADC49F9A2F915F0FAF4D489053C187D304050E0A2233D94F8176F5CD3",
+      "dimensions": "2400x1080",
+      "pixelStats": {
+        "uniqueColors": 580,
+        "channelMean": [
+          10.128,
+          15.658,
+          27.85
+        ],
+        "channelMax": [
+          132,
+          255,
+          255
+        ]
+      },
+      "content": "Rendered Phase-1 slice: hero character (brown coat) centred on platform scene with three cyan crystals; captured after OnGodotMainLoopStarted"
+    },
+    "hostGpuSplash": {
+      "file": "artifacts/device/screenshot-attempt-3-hostgpu.png",
+      "bytes": 35415,
+      "sha256": "4413E6B6F71289DFCD3436E9DD3C3B0AF5AB734BECA85D95DC044A49E0EFE734",
+      "content": "Godot splash screen; captured 25 s after launch before scene load completed"
+    },
+    "swiftshaderBlack": {
+      "file": "artifacts/device/screenshot-attempt-2.png",
+      "bytes": 12652,
+      "sha256": "93399F93442EBA92ADC96DB5B3372E4011E4860F4B402D950415CBACFB6D28E2",
+      "pixelStats": {
+        "uniqueColors": 2,
+        "channelMax": [
+          11,
+          14,
+          23
+        ]
+      },
+      "content": "Black/unrendered frame under -gpu swiftshader_indirect; retained as failure evidence"
+    },
+    "systemCling": {
+      "file": "artifacts/device/screenshot-attempt-1.png",
+      "bytes": 44940,
+      "sha256": "26622181CFE5DB5E16983B955FB0F6DF3724ABB3A08C8B83094951509864EA4B",
+      "content": "Android 'Viewing full screen' confirmation overlay; not game evidence"
+    }
+  },
+  "blockerFoundAndWorkedAround": {
+    "symptom": "Under -gpu swiftshader_indirect the host boots and the app installs/launches but renders black.",
+    "exactError": "E/godot: ERROR: SceneShaderGLES3: Program linking failed: Fragment shader active uniforms exceed GL_MAX_FRAGMENT_UNIFORM_VECTORS (261)",
+    "errorContext": "drivers/gles3/shader_gles3.cpp:262 / _compile_specialization drivers/gles3/shader_gles3.cpp:464; repeated per scene shader",
+    "rendererUnderSwiftShader": "OpenGL ES 3.0 (OpenGL ES 3.0 SwiftShader 4.0.0.1) - Compatibility - Google SwiftShader",
+    "workaround": "-gpu host (NVIDIA T600, OpenGL ES 3.1 via emulator translator): 0 E/godot errors and the scene rendered",
+    "note": "No game code, build config or project setting was changed to work around this."
+  },
+  "teardown": {
+    "emulatorKilled": "adb emu kill",
+    "adbServerStopped": "adb kill-server",
+    "remainingProcesses": "none (no adb/emulator/qemu-system processes)",
+    "locksRemaining": "none"
+  },
+  "limits": [
+    "Emulator only; no physical Android device was attached (adb devices contained only emulator-5554).",
+    "Device requires host GPU (-gpu host) for this Godot gl_compatibility build; SwiftShader cannot link the scene shader.",
+    "APK is arm64-v8a only and ran through the API 35 x86_64 image's arm64 translation (abilist x86_64,arm64-v8a).",
+    "No touch/input validation, no performance measurement, no release-signing verification, no on-device save/load.",
+    "AVD userdata was reused and the secure setting immersive_mode_confirmations=confirmed was set to clear the system cling; no repo config changed.",
+    "Raw evidence lives under gitignored artifacts/device/; docs/DEVICE-LAUNCH.md (Lead-owned) and records were not edited.",
+    "Optional workstream/tests/test_device_evidence.py was not added during wrap-up; add it if the Lead wants automated evidence checks."
+  ],
+  "artifacts": [
+    {
+      "name": "boot-wait.txt",
+      "bytes": 2745,
+      "sha256": "4801D9EDC878C95B788D30AFE0701D0FAA87B140C704249B2040229EBF88114D"
+    },
+    {
+      "name": "device-props-and-install.txt",
+      "bytes": 438,
+      "sha256": "89CEAC45654114635EBABC63988EE18505282D891F0529F91AF2B057712F2122"
+    },
+    {
+      "name": "emulator-hostgpu-stderr.log",
+      "bytes": 4733,
+      "sha256": "68E25E1F5E51A2572BECAF9AFB8DEB95867630E77C9543643431D08B04E53A10"
+    },
+    {
+      "name": "emulator-hostgpu-stdout.log",
+      "bytes": 130176,
+      "sha256": "034603AFFA88931320C0CC8CF9BF3A6F6D9E342A4691AA3C57F6280C841EE8B3"
+    },
+    {
+      "name": "emulator-stderr.log",
+      "bytes": 4733,
+      "sha256": "9F5D4079B6E40C020151182C26832EE038C47AF05D7E99BF21D89475CE083CA0"
+    },
+    {
+      "name": "emulator-stdout.log",
+      "bytes": 139046,
+      "sha256": "4D895472E2A9BEA83AF4BE3ECF07BECB51D9CA20BFD17F480CA2657CF9A1A7CE"
+    },
+    {
+      "name": "final-capture.txt",
+      "bytes": 1071,
+      "sha256": "F74B829658641677232C946DF7CF31578341A8267846ADB0A3D5EAF6FC0506E6"
+    },
+    {
+      "name": "image-stats.txt",
+      "bytes": 371,
+      "sha256": "906F391B05CA340EE0A4136BF881FD765A493855E097E205949AD4B44871316F"
+    },
+    {
+      "name": "launch-attempt-1.txt",
+      "bytes": 16162,
+      "sha256": "DEE10A31834784865BC8E50857E617C46EF37E16A7AF9EE4F1B02BAE357C4FDA"
+    },
+    {
+      "name": "launch-attempt-2.txt",
+      "bytes": 4439,
+      "sha256": "AE4DB4C93808688E3231983C476DB90DB606C7D573FA817A51B2A0DC9294AA0D"
+    },
+    {
+      "name": "launch-attempt-3-hostgpu.txt",
+      "bytes": 2067,
+      "sha256": "20054F5BD9C4BC9EA7F53B2128B5090A40D1A47AA3DACCC9A3F4971C6439C847"
+    },
+    {
+      "name": "launch-status-1.txt",
+      "bytes": 6753,
+      "sha256": "28E3D4D520C21A7E307C34AA59A804A8EAB9BCAD90D444AC2BA6162C5B03D865"
+    },
+    {
+      "name": "lock-cleanup-2.txt",
+      "bytes": 1236,
+      "sha256": "5D797583CB19AE69AED54AF16F3076347F44828C0459B01B386A3E002C991DBB"
+    },
+    {
+      "name": "lock-cleanup.txt",
+      "bytes": 881,
+      "sha256": "FC049A0ACD137B20AA0D63FE3C1B6B3D24AE2AC862335576E4184ED500235499"
+    },
+    {
+      "name": "logcat-device-final.txt",
+      "bytes": 3993670,
+      "sha256": "5E00D31160CC1AD42CD4C646C929523A2867C203A10902A78A58235644BAB821"
+    },
+    {
+      "name": "logcat-full.txt",
+      "bytes": 1357293,
+      "sha256": "3B59BD984CFF6B9E28CD3FDDAEFF8F928D7BFD57FC1894C9693F0200D5F893C5"
+    },
+    {
+      "name": "logcat-hostgpu.txt",
+      "bytes": 1809076,
+      "sha256": "13EE4A23607305EB03C3D5A27EDC07D3D565D208D465DAABDBB6EEA6EDD0C5DD"
+    },
+    {
+      "name": "logcat-launch2.txt",
+      "bytes": 1014958,
+      "sha256": "BE21F98CFF4BE955656130EFB19A59B9307D856BD9AC92FF4AB40F9B00BF9C83"
+    },
+    {
+      "name": "recon.txt",
+      "bytes": 2136,
+      "sha256": "6D23F3B6ADBCCE7747E5748A9A6B763821259816A9F6A4A2F497578B631373F6"
+    },
+    {
+      "name": "screenshot-attempt-1.png",
+      "bytes": 44940,
+      "sha256": "26622181CFE5DB5E16983B955FB0F6DF3724ABB3A08C8B83094951509864EA4B"
+    },
+    {
+      "name": "screenshot-attempt-2.png",
+      "bytes": 12652,
+      "sha256": "93399F93442EBA92ADC96DB5B3372E4011E4860F4B402D950415CBACFB6D28E2"
+    },
+    {
+      "name": "screenshot-attempt-3-hostgpu.png",
+      "bytes": 35415,
+      "sha256": "4413E6B6F71289DFCD3436E9DD3C3B0AF5AB734BECA85D95DC044A49E0EFE734"
+    },
+    {
+      "name": "screenshot-device-game.png",
+      "bytes": 28564,
+      "sha256": "9ACEC7BADC49F9A2F915F0FAF4D489053C187D304050E0A2233D94F8176F5CD3"
+    },
+    {
+      "name": "teardown-lock-and-image-stats.txt",
+      "bytes": 399,
+      "sha256": "B001A99E5E5ED3C93D2F4CBF2DA3D84B550823902DBC7353992C165DEBE114B8"
+    },
+    {
+      "name": "teardown.txt",
+      "bytes": 3503,
+      "sha256": "14BEF87ED391CD61193FC5C27B27EB597372C8DE8322C0928B6EAD839448958D"
+    }
+  ]
+}

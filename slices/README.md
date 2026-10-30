@@ -16,11 +16,17 @@ Godot; the CLI surface in ADR-010 is a thin wrapper on top of their functions.
 | [mobile.json](mobile.json) | mobile (project: repository root) | Android APK toolpack | build/ProjectGypsy.apk |
 | [leftbehind.json](leftbehind.json) | leftbehind (project: repository root) | Unity build → demo → capture toolpack | artifacts/leftbehind/{build.log,player.log,frame.png} |
 | [hero.json](hero.json) | hero (project: repository root) | Wayfarer generate → validate → capture toolpack | assets/hero/{wayfarer.glb,wayfarer.fbx}, artifacts/game/frame.png |
+| [visual.json](visual.json) | visual (opt-in, project: repository root) | quality.visual capture → bench → visual/performance gate | artifacts/game/frame.png, workstream/state/quality/gate.json, benchmark JSON |
 
 The slices are independent manifests: phase1 proves the game vertical slice again from a clean state; quality proves
 the pack check list, the workstream unit tests and the records guard; toolpacks proves golden import + audio; mobile
-builds the Android APK; leftbehind proves the Unity second engine; hero proves the Wayfarer character pipeline. A task
-runs them in manifest order and stops at the first failing slice; quality does not require Godot, only Python and git.
+builds the Android APK; leftbehind proves the Unity second engine; hero proves the Wayfarer character pipeline; visual proves the tracked
+baseline and performance budget. A task runs them in manifest order and stops at the first failing slice; quality does
+not require Godot, only Python and git. `visual` is opt-in but `--all` still selects every manifest.
+
+Steps and actions may opt into the local action cache with a `cache` object (`enabled`, `inputs`, `artifacts`,
+`toolVersions`). `--no-cache` disables it for a run, `--force` bypasses a lookup, and `--parallel N` bounds independent
+work (1–8; opt-in). See [`workstream/cache.py`](../workstream/cache.py).
 
 ## Schema: gypsy.slice/v1
 

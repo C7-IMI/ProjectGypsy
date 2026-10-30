@@ -47,7 +47,23 @@
       "timeout": 120,
       "artifacts": [
         "artifacts/hero/validation.json"
-      ]
+      ],
+      "cache": {
+        "enabled": true,
+        "inputs": [
+          "assets/hero/wayfarer.glb",
+          "assets/hero/wayfarer_lod1.glb",
+          "assets/hero/wayfarer_lod2.glb",
+          "assets/hero/wayfarer.fbx",
+          "assets/hero/textures/wayfarer_atlas.png",
+          "assets/hero/textures/wayfarer_normal.png",
+          "assets/hero/textures/wayfarer_roughmetal.png",
+          "scripts/hero/validate_wayfarer.py"
+        ],
+        "artifacts": [
+          "artifacts/hero/validation.json"
+        ]
+      }
     },
     {
       "id": "systems",

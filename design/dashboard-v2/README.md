@@ -26,7 +26,19 @@ four-view app remains available at `/classic`.
 - Right rail keeps **selected artifact** and **gates**, grouped as Passing / Needs attention / Blocked.
 - Gates explicitly say there is no approval queue; evidence is the review surface.
 
-### 2. Remaining console screens — live-mission.png, live-commands.png, live-review.png, live-slices.png, live-artifacts.png
+### 2. Insights — live-insights.png
+
+![Insights](live-insights.png)
+
+- Plain-language summary of the recorded state, with no second evidence model.
+- Engine default: this checkout's Godot manifest, the LeftBehind Unity proof, and the ADR-018 default for new projects.
+- Last run health, quality/gates, execution-cache hits/misses, and parallel-scheduler state.
+- Cache and scheduler cards stay explicitly empty until opt-in runs record stats; hits/misses are never inferred from
+  resume state.
+- Next-action rows carry a real whitelisted command and/or a view link; blocked rows say "no local action" instead of
+  offering a dead control.
+
+### 3. Remaining console screens — live-mission.png, live-commands.png, live-review.png, live-slices.png, live-artifacts.png
 
 - Mission: phase ladder, machine, engine posture, grouped gates.
 - Commands: the fixed whitelist with argv, run/copy and latest job output.
@@ -34,7 +46,7 @@ four-view app remains available at `/classic`.
 - Slices: table of declared slices with run/open actions.
 - Artifacts: hashed artifact library with live previews.
 
-### 3. Run detail — run-detail.png
+### 4. Run detail — run-detail.png
 
 ![Run detail](run-detail.png)
 
@@ -69,10 +81,16 @@ four-view app remains available at `/classic`.
 - Retry buttons map to real commands; no per-step argv is accepted from the browser.
 - Data comes from task/slice/toolpack state; no second evidence model.
 - Localhost-only and token protections remain.
+- Insights tab at ?view=insights; deep links support ?view=run&id=<state path>.
+- Job output streams over SSE (GET /api/logs/stream) with an automatic polling fallback (/api/job). Failures show a
+  copyable command and a link to the latest run; no retry is invented per step.
+- Keyboard/focus: tablist arrow-key navigation, Ctrl/⌘+K search, visible :focus-visible rings, skip link, aria-live
+  job/toast regions.
+- Responsive: insights and action rows reflow at 1200 px; single-column cards and compact tabs below 760 px.
 
 ## Current data used in the mockups
 
 5 slices (phase1, quality, toolpacks, leftbehind, mobile) · 182 tests · 46 capabilities · 2 gates needing attention
 (device launch untested, UE5 hardware-blocked) · LeftBehind Unity 6 PASS.
 
-Live screenshots: `live-overview.png` and `live-run.png`.
+Live screenshots (1600×1000, captured by headless Chromium against the local server and real state): `live-overview.png`, `live-insights.png` and `live-run.png`.

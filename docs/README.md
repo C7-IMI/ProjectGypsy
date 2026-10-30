@@ -18,6 +18,7 @@
 | [ADR-014-local-dashboard.md](ADR-014-local-dashboard.md) | local operations console: overview/run detail/mission/commands/review/slices/artifacts; classic four views; token actions, localhost safety |
 | [ADR-016-self-extension.md](ADR-016-self-extension.md) | safe isolated self-extension: manifest/capability validation, dry-run, review gate, lockfile, disable/remove/reload, negative tests |
 | [ADR-018-unity-default.md](ADR-018-unity-default.md) | Stage A: Unity 6000.6.7f1/PC is the default for new projects; current Godot game remains legacy until Stage B |
+| [ADR-019-cache-quality.md](ADR-019-cache-quality.md) | action cache, opt-in parallel execution, visual/perf gates, catalog and dashboard insights |
 | [ADR-017-hero-character-pipeline.md](ADR-017-hero-character-pipeline.md) | first hero character: art direction, Blender generator, 20-joint rig, idle/run/reach, atlas, GLB/FBX, Godot integration and validation |
 | [ART-DIRECTION.md](ART-DIRECTION.md) | Wayfarer art direction, palette, silhouette, rig/animation set and validation contract |
 | [ADR-015-actionforge-toolkit.md](ADR-015-actionforge-toolkit.md) | reusable toolkit/plugin registry, ActionForge CC0 rig/animation fetch, licence/provenance, network and path safety, what stays manual |
@@ -33,7 +34,11 @@
 | [DEVICE-LAUNCH.md](DEVICE-LAUNCH.md) | Android emulator attempt, exact host block and retry path |
 | [UNITY-PORT-INSTRUCTIONS.md](UNITY-PORT-INSTRUCTIONS.md) | Stage B Unity migration/port instructions for UltraBlade 2 |
 | [IMPROVEMENT-ROADMAP.md](IMPROVEMENT-ROADMAP.md) | research-backed roadmap: cache/scheduler, QA, asset graph, DX, observability, agent safety |
-| [DASHBOARD.md](DASHBOARD.md) | launch/use guide for the operations console and classic views |
+| [UPGRADE-REPORT-2026-10-30.md](UPGRADE-REPORT-2026-10-30.md) | implementation report: cache, parallel, quality gates, catalog, UI, device/Unity evidence and limits |
+| [DASHBOARD.md](DASHBOARD.md) | launch/use guide for the operations console, Insights and classic views |
+| [DEVICE-LAUNCH.md](DEVICE-LAUNCH.md) | emulator launch PASS (physical device untested), evidence and limits |
+| [DEVICE-EVIDENCE.json](DEVICE-EVIDENCE.json) | machine-readable emulator evidence and screenshot hash |
+| [evidence/unity-hero-import-report.json](evidence/unity-hero-import-report.json) | Unity 6000.6.7f1 hero FBX import proof |
 | [GYPSY-AGENT-GUIDE.md](GYPSY-AGENT-GUIDE.md) | instructions for coding agents using Gypsy on new or existing projects |
 | [../extensions/README.md](../extensions/README.md) | extension schema, commands, safety model and limitations |
 

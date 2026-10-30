@@ -1,0 +1,15 @@
+{
+  "schema": "gypsy.baseline/v1",
+  "id": "game-frame",
+  "baseline": "game-frame.png",
+  "source": "artifacts\\game\\frame.png",
+  "sourceSha256": "683277ccb92a63e13067e20183d933f86fc9af181177c7e467102ce0c4ce0231",
+  "baselineSha256": "683277ccb92a63e13067e20183d933f86fc9af181177c7e467102ce0c4ce0231",
+  "dimensions": {
+    "width": 1280,
+    "height": 720,
+    "mode": "RGB"
+  },
+  "updatedAt": "2026-10-30T10:15:34+00:00",
+  "note": "Tracked visual baseline for the hero slice. Regenerate deliberately with 'python scripts/quality_gate.py --update-baseline' after reviewing the new frame."
+}

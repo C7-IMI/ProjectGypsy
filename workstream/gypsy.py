@@ -13,6 +13,9 @@ Usage:
     python workstream/gypsy.py toolkit list|show|probe|capabilities [--json]
     python workstream/gypsy.py toolkit actionforge catalog|fetch [--json]
     python workstream/gypsy.py extension list|show|validate|test|register|disable|remove|run|reload [--json]
+    python workstream/gypsy.py slices list|plan|run|status [--parallel N] [--no-cache] [--force] [--json]
+    python workstream/gypsy.py toolpacks list|check|run [--action NAME] [--parallel N] [--no-cache] [--force] [--json]
+    python workstream/gypsy.py cache stats|list|clear [--yes] [--json]
     python workstream/gypsy.py project init --path DIR [--engine ID] [--version VER] [--targets pc,mobile] [--force]
     python workstream/gypsy.py project show [--path DIR] [--json]
     python workstream/gypsy.py check [--project DIR] [--json]
@@ -728,6 +731,22 @@ def print_human_engines(probe: dict):
             print(f"  {item['source']} -> {item['path']} ({item['reason']})")
 
 
+def _print_cache_and_parallel(result, indent=""):
+    cache = result.get("cache") or {}
+    if cache:
+        print(
+            f"{indent}cache: enabled={cache.get('enabled')} hits={cache.get('hits')} "
+            f"misses={cache.get('misses')} stores={cache.get('stores')} "
+            f"restores={cache.get('restores')}"
+        )
+    parallel = result.get("parallel") or {}
+    if parallel and (parallel.get("workers", 1) > 1 or parallel.get("cancelled")):
+        print(
+            f"{indent}parallel: workers={parallel.get('workers')} "
+            f"cancelled={parallel.get('cancelled')}"
+        )
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(prog="gypsy", description="Gypsy Studio workstream CLI")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -818,7 +837,9 @@ def main(argv=None) -> int:
             slices_cmd.add_argument("slice_ids", nargs="*")
             slices_cmd.add_argument("--all", action="store_true")
             slices_cmd.add_argument("--resume", action="store_true")
-            slices_cmd.add_argument("--force", action="store_true")
+            slices_cmd.add_argument("--force", action="store_true", help="bypass the cache lookup and re-run")
+            slices_cmd.add_argument("--parallel", type=int, default=1, help="opt-in parallel workers for independent slices (1-8)")
+            slices_cmd.add_argument("--no-cache", action="store_true", help="disable the action cache for this run")
         if name == "status":
             slices_cmd.add_argument("slice_id", nargs="?")
 
@@ -832,6 +853,24 @@ def main(argv=None) -> int:
         if name == "run":
             toolpack_cmd.add_argument("toolpack_id")
             toolpack_cmd.add_argument("--action", default=None)
+            toolpack_cmd.add_argument("--force", action="store_true", help="bypass the cache lookup and re-run")
+            toolpack_cmd.add_argument("--parallel", type=int, default=1, help="opt-in parallel workers for independent actions (1-8)")
+            toolpack_cmd.add_argument("--no-cache", action="store_true", help="disable the action cache for this run")
+
+    catalog_parser = sub.add_parser("catalog", help="read-only project catalog")
+    catalog_parser.add_argument("--root", default=str(REPO_ROOT), help="root to scan (default: repository)")
+    catalog_parser.add_argument("--state", default=None, help="optional catalog state path")
+    catalog_parser.add_argument("--save-state", action="store_true", help="write the scan to state for comparison")
+    catalog_parser.add_argument("--json", action="store_true")
+
+    cache_parser = sub.add_parser("cache", help="local content-addressed action cache")
+    cache_sub = cache_parser.add_subparsers(dest="cache_command", required=True)
+    for name in ("stats", "list", "clear"):
+        cache_cmd = cache_sub.add_parser(name)
+        cache_cmd.add_argument("--state-dir", default=None)
+        cache_cmd.add_argument("--json", action="store_true")
+        if name == "clear":
+            cache_cmd.add_argument("--yes", action="store_true", help="confirm clearing entries and blobs")
 
     extension_parser = sub.add_parser(
         "extension", help="isolated declarative extensions (ADR-003 self-extension)"
@@ -1154,6 +1193,20 @@ def main(argv=None) -> int:
                     return 0 if data.get("ok") else 1
                 return 0 if data.get("passed") else 1
 
+        if args.command == "catalog":
+            import catalog
+            from pathlib import Path as _Path
+
+            data = catalog.discover(_Path(args.root))
+            if args.save_state:
+                state_path = _Path(args.state) if args.state else None
+                data["statePath"] = str(catalog.save_state(data, state_path))
+            if args.json:
+                print(json.dumps(data, indent=2))
+            else:
+                print(catalog.render_catalog(data))
+            return 1 if catalog.health_problems(data) else 0
+
         if args.command == "console":
             import console as console_mod
             from pathlib import Path as _Path
@@ -1214,14 +1267,33 @@ def main(argv=None) -> int:
                 if args.toolpack_id not in manifests:
                     raise GypsyError(f"unknown toolpack {args.toolpack_id!r}; have: {', '.join(manifests)}")
                 manifest = manifests[args.toolpack_id]
-                if args.action:
-                    result = toolpack_spec.run_action(manifest, args.action, project_root=REPO_ROOT, state_dir=state_dir)
-                else:
-                    result = toolpack_spec.run_toolpack(manifest, project_root=REPO_ROOT, state_dir=state_dir)
+                cache_enabled = not args.no_cache
+                try:
+                    if args.action:
+                        result = toolpack_spec.run_action(
+                            manifest,
+                            args.action,
+                            project_root=REPO_ROOT,
+                            state_dir=state_dir,
+                            cache_enabled=cache_enabled,
+                            force=args.force,
+                        )
+                    else:
+                        result = toolpack_spec.run_toolpack(
+                            manifest,
+                            project_root=REPO_ROOT,
+                            state_dir=state_dir,
+                            max_workers=args.parallel,
+                            cache_enabled=cache_enabled,
+                            force=args.force,
+                        )
+                except toolpack_spec.ToolpackError as exc:
+                    raise GypsyError(str(exc)) from exc
                 if args.json:
                     print(json.dumps(result, indent=2))
                 else:
                     print(f"toolpack {result.get('toolpack')}: passed={result.get('passed')} artifacts={len(result.get('artifacts', []))} state={result.get('statePath')}")
+                    _print_cache_and_parallel(result, indent="  ")
                     for error in result.get("errors", []):
                         print(f"  ERROR {error}")
                 return 0 if result.get("passed") else 1
@@ -1273,11 +1345,30 @@ def main(argv=None) -> int:
                 missing = [slice_id for slice_id in ids if slice_id not in manifests]
                 if missing:
                     raise GypsyError(f"unknown slice(s): {', '.join(missing)}")
-                if len(ids) == 1 and (args.force or manifests[ids[0]].get("project")):
-                    # run_slice supports force; a task does not need it (default is a clean rerun).
-                    result = run_slice(manifests[ids[0]], project_root=REPO_ROOT, state_dir=state_dir, resume=args.resume, force=args.force if len(ids) == 1 else False)
-                else:
-                    result = run_task([manifests[slice_id] for slice_id in ids], project_root=REPO_ROOT, state_dir=state_dir, resume=args.resume, force=args.force)
+                cache_enabled = not args.no_cache
+                try:
+                    if len(ids) == 1 and (args.force or manifests[ids[0]].get("project")):
+                        # run_slice supports force; a task does not need it (default is a clean rerun).
+                        result = run_slice(
+                            manifests[ids[0]],
+                            project_root=REPO_ROOT,
+                            state_dir=state_dir,
+                            resume=args.resume,
+                            force=args.force,
+                            cache_enabled=cache_enabled,
+                        )
+                    else:
+                        result = run_task(
+                            [manifests[slice_id] for slice_id in ids],
+                            project_root=REPO_ROOT,
+                            state_dir=state_dir,
+                            resume=args.resume,
+                            force=args.force,
+                            max_workers=args.parallel,
+                            cache_enabled=cache_enabled,
+                        )
+                except slice_spec.SliceError as exc:
+                    raise GypsyError(str(exc)) from exc
                 if args.json:
                     print(json.dumps(result, indent=2))
                 else:
@@ -1287,6 +1378,7 @@ def main(argv=None) -> int:
                             print(f"  {summary['slice']}: {summary['status']}")
                     else:
                         print(f"slice {result.get('slice')}: passed={result.get('passed')} steps={len(result.get('steps', []))} artifacts={len(result.get('artifacts', []))}")
+                    _print_cache_and_parallel(result, indent="  ")
                     if result.get("errors"):
                         for error in result["errors"]:
                             print(f"  ERROR {error}")
@@ -1314,6 +1406,60 @@ def main(argv=None) -> int:
                         for step in data["steps"]:
                             print(f"  {step['id']}: {step['status']} {step.get('seconds', '')}s")
                 return 0
+        if args.command == "cache":
+            import cache as cache_spec
+            from pathlib import Path as _Path
+
+            state_dir = _Path(args.state_dir) if args.state_dir else STATE_DIR
+            cache_obj = cache_spec.ActionCache(state_dir)
+            if args.cache_command == "stats":
+                data = cache_obj.stats()
+                if args.json:
+                    print(json.dumps(data, indent=2))
+                else:
+                    counters = data["counters"]
+                    print(f"cache: {data['cacheDir']} (enabled={data['enabled']})")
+                    print(
+                        f"  entries={data['entries']} blobs={data['blobs']} "
+                        f"blobBytes={data['blobBytes']} hits={counters['hits']} "
+                        f"misses={counters['misses']} stores={counters['stores']} "
+                        f"restores={counters['restores']}"
+                    )
+                return 0
+            if args.cache_command == "list":
+                entries = cache_obj.entries()
+                data = {
+                    "schema": cache_spec.SCHEMA,
+                    "cacheDir": str(cache_obj.cache_dir),
+                    "entries": entries,
+                }
+                if args.json:
+                    print(json.dumps(data, indent=2))
+                else:
+                    print(f"cache entries: {len(entries)} in {cache_obj.cache_dir}")
+                    for entry in entries:
+                        print(
+                            f"  {entry['key'][:16]}... artifacts={entry['artifacts']} "
+                            f"bytes={entry['bytes']} created={entry['createdAt']}"
+                        )
+                return 0
+            if not args.yes:
+                raise GypsyError(
+                    "cache clear removes every cached entry and blob; pass --yes to confirm"
+                )
+            try:
+                data = cache_obj.clear()
+            except cache_spec.CacheError as exc:
+                raise GypsyError(str(exc)) from exc
+            if args.json:
+                print(json.dumps(data, indent=2))
+            else:
+                print(
+                    f"cache cleared: {data['entries']} entries, {data['blobs']} blobs "
+                    f"({data['blobBytes']} bytes) from {data['cacheDir']}"
+                )
+            return 0
+
         if args.command == "check":
             result = check_all(args.project)
             if args.json:

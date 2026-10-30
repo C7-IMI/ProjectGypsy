@@ -1,0 +1,24 @@
+{
+  "schema": "gypsy.project/v1",
+  "name": "<PROJECT_NAME>",
+  "engine": {
+    "id": "unity",
+    "version": "<UNITY_VERSION>",
+    "adapter": "unity-6"
+  },
+  "targets": [
+    "pc"
+  ],
+  "paths": {
+    "game": "<PROJECT_GAME_DIR>",
+    "artifacts": "<PROJECT_ARTIFACTS_DIR>"
+  },
+  "created": "<ISO-8601 TIMESTAMP>",
+  "decisions": [
+    {
+      "date": "<ISO-8601 TIMESTAMP>",
+      "decision": "engine unity <UNITY_VERSION> (adapter unity-6), target pc",
+      "reason": "new projects default to Unity 6000.6.7f1 / PC (ADR-018); replace with the installed version the project actually pins"
+    }
+  ]
+}

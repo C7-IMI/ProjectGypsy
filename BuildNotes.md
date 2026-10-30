@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.26.006
+Current version: 2026.10.30.007
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,21 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.30.007
+
+**Build the roadmap P0: execution cache, opt-in parallelism, quality gates, catalog and Insights UI; close device/Unity import evidence.**
+
+- Date: 2026-10-30
+- Commit: this change.
+- Change: content-addressed local action cache and bounded parallel scheduler (workstream/cache.py; slices/toolpacks
+  --parallel/--no-cache/--force; cache stats/list/clear); visual/performance quality gates and opt-in visual slice;
+  project catalog + gypsy catalog CLI, API and Unity/Godot golden-path templates; Insights/live-log/actionable-error
+  dashboard; emulator launch evidence; Unity hero FBX import proof; extension temp-cleanup hardening; docs/ADR-019 and
+  records.
+- Verification: 412 tests OK (3 skipped), check_all 6/6; real cache hit 0.0 s vs 0.188 s; quality gate
+  changed 0/921600 with median 2.811 s, p95 2.811 s, GPU 0.87 ms, frames 143; emulator boot/install/launch/render +
+  screenshot/logcat; Unity import UNITY_HERO_IMPORT_OK bones=23.
 
 ## 2026.10.26.006
 

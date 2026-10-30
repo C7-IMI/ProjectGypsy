@@ -8,7 +8,7 @@ Generated 2026-10-26T03:16:43-05:00 by scripts/import_matrix.py. This is Phase-0
 | Engine | Version | glTF/GLB | FBX | Status | Evidence / reason |
 | --- | --- | --- | --- | --- | --- |
 | Godot | 4.7.2 | PASS | not supported natively | PASS | headless --import + scene assertions: {"lod_set": {"animations": 0, "loaded": true, "meshes": 4}, "morph_face": {"animations": 0, "loaded": true, "meshes": 1}, "rigged_character": {"animations": 3, "loaded": true, "meshes": 1}, "static_cube": {"animations": 0, "loaded": true, "meshes": 1}} |
-| Unity | 6000.6.7f1 | blocked | blocked | not run: adapter pending | Unity licence is proven (batchmode smoke); no Unity import/build adapter is implemented |
+| Unity | 6000.6.7f1 | not tested natively | PASS (hero FBX) | partial: Unity hero import proven; generic matrix/GLB not run | batchmode import of `assets/hero/wayfarer.fbx`: 23 bones incl. cape_a/b/c, idle/run/reach, Smile blend shape, 4 materials, atlas+normal 512×512, height 1.9055 m; `UNITY_HERO_IMPORT_OK`; see docs/evidence/unity-hero-import-report.json |
 | UE5 | 5.8.4 | blocked | blocked | blocked: hardware gate | GPU VRAM 4.0 GB is below the 8 GB declared minimum |
 | Flax | 1.13 | not tested | not tested | experimental: not tested | experimental adapter; no headless build/run demonstrated |
 
@@ -57,13 +57,13 @@ checked by the engine import test rather than treated as a pass by itself.
 | glTF export | GLB, apply modifiers, Y-up, animations, morphs, skins, NLA strips, force sampling |
 | FBX export | FBX 7400, -Z forward / Y up, apply scale all, no leaf bones, bake animation via NLA strips |
 | Godot | 4.7.2, headless import + scripted scene assertions |
-| Unity | licence proven; import adapter not run |
+| Unity | 6000.6.7f1; hero FBX batchmode import PASS; generic matrix not run |
 | Unreal | 5.8.4, hardware gate fails (4 GB VRAM / free disk) -> blocked |
 | Flax | 1.13, experimental -> not tested |
 
 ## Not tested / next
 
-- Unity import: licence is proven, but no adapter was run; UE5 remains hardware-blocked; re-run after adapters exist.
+- Unity hero FBX import is proven (23 bones, 3 clips, Smile, 4 materials, 512² atlas/normal, height 1.9055 m); the generic Unity import matrix and GLB path are not run. UE5 remains hardware-blocked. Reproduce with `powershell -File scripts/unity_hero_import.ps1`; report at docs/evidence/unity-hero-import-report.json.
 - Flax import: no demonstrated headless path.
 - Add-on smoke tests (Rigify, retopo/UV add-ons): not yet automated; ADR-006 records the policy.
 - Material/texture channel round-trip: the golden assets use simple Principled materials; a texture-embedded case is next.

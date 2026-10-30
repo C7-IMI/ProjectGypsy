@@ -52,7 +52,10 @@ Phase 0 + 1 + 2 + 3 + 4 + 5 exist: engine/tool probes, hardware gates, manifests
 headless demo/export/capture, a manifest-driven slice orchestrator with state and artifact hashes, toolpacks with
 validators/provenance for golden Blender->Godot import and local MusicGen audio, a read-only terminal console, records
 and the pack check list, the ADRs, MCP/ComfyUI/Poly Haven tooling and the installed toolchain. Also present: a live
-watcher, performance baseline, a signed Android debug APK (not device-tested), the Gypsy Studio operations console, the
-LeftBehind Unity 6 second-engine slice, the first hero art/character pipeline (Wayfarer with runtime LOD, driven Smile and spring cape) and safe self-extension. Not
-built yet: tested device launch; UE5 is hardware-blocked. See `docs/PHASE-5-EVIDENCE.md`,
-`docs/ADR-017-hero-character-pipeline.md`, `docs/PHASE-6-GATE.md` and `DEFERRED.md`.
+watcher, performance baseline, a signed Android debug APK with a verified **emulator launch** (physical device still
+untested), the Gypsy Studio operations console with **Insights**, live logs and cache/scheduler cards, the LeftBehind
+Unity 6 second-engine slice, the first hero art/character pipeline (Wayfarer with runtime LOD, driven Smile and spring
+cape), a **content-addressed action cache**, opt-in parallel slices/actions, **visual/performance quality gates**, a
+**project catalog with Unity/Godot golden-path templates**, Unity hero FBX import proof and safe self-extension. UE5 is
+hardware-blocked. See `docs/PHASE-5-EVIDENCE.md`, `docs/ADR-017-hero-character-pipeline.md`,
+`docs/ADR-019-cache-quality.md`, `docs/DEVICE-LAUNCH.md`, `docs/PHASE-6-GATE.md` and `DEFERRED.md`.

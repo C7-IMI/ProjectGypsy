@@ -1,0 +1,24 @@
+{
+  "schema": "gypsy.project/v1",
+  "name": "<PROJECT_NAME>",
+  "engine": {
+    "id": "godot",
+    "version": "<GODOT_VERSION>",
+    "adapter": "godot-4"
+  },
+  "targets": [
+    "pc"
+  ],
+  "paths": {
+    "game": "<PROJECT_GAME_DIR>",
+    "artifacts": "<PROJECT_ARTIFACTS_DIR>"
+  },
+  "created": "<ISO-8601 TIMESTAMP>",
+  "decisions": [
+    {
+      "date": "<ISO-8601 TIMESTAMP>",
+      "decision": "engine godot <GODOT_VERSION> (adapter godot-4), target pc",
+      "reason": "the operator explicitly chose Godot for this project (ADR-009); new projects default to Unity (ADR-018), so record why this project differs"
+    }
+  ]
+}

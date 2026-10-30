@@ -84,8 +84,16 @@ Public API:
     load_manifest(path) -> dict
     validate_manifest(manifest) -> list[str]
     load_all(directory) -> dict[str, dict]
-    run_action(manifest, action_id, *, project_root, state_dir, timeout_scale=1.0) -> dict
-    run_toolpack(manifest, *, project_root, state_dir, timeout_scale=1.0) -> dict
+    run_action(manifest, action_id, *, project_root, state_dir, timeout_scale=1.0,
+               cache=None, cache_enabled=True, force=False) -> dict
+    run_toolpack(manifest, *, project_root, state_dir, timeout_scale=1.0, max_workers=1,
+                 cache=None, cache_enabled=True, force=False) -> dict
+
+An action may opt into the local content-addressed action cache with a "cache" object
+(inputs, artifacts, optional toolVersions). A hit restores the declared artifacts and re-runs
+the validators instead of the command; only a passing action is cached. run_toolpack(
+max_workers=N) runs actions with the bounded parallel scheduler (opt-in for independent
+actions) and keeps deterministic action order.
 """
 from __future__ import annotations
 
@@ -104,6 +112,11 @@ import wave
 from datetime import datetime, timezone
 from pathlib import Path
 
+try:  # imported as workstream.toolpacks
+    from . import cache as cache_spec
+except ImportError:  # imported with workstream/ on sys.path (the CLI does this)
+    import cache as cache_spec
+
 SCHEMA = "gypsy.toolpack/v1"
 STATE_SCHEMA = "gypsy.toolpack-state/v1"
 DEFAULT_TIMEOUT = 300.0
@@ -114,7 +127,7 @@ GLOB_CHARS = frozenset("*?[")
 MANIFEST_KEYS = frozenset(
     {"schema", "id", "name", "tools", "license", "actions", "validators"}
 )
-ACTION_KEYS = frozenset({"id", "argv", "cwd", "timeout", "artifacts", "args"})
+ACTION_KEYS = frozenset({"id", "argv", "cwd", "timeout", "artifacts", "args", "cache"})
 VALIDATOR_COMMON_KEYS = frozenset({"id", "kind", "artifact"})
 VALIDATOR_KIND_KEYS = {
     "file": frozenset({"minBytes"}),
@@ -337,6 +350,10 @@ def _validate_action(action, index: int, seen_ids: set) -> list:
 
     if "args" in action and not isinstance(action["args"], dict):
         errors.append(f"{label}: args must be an object")
+    if "cache" in action:
+        errors.extend(
+            cache_spec.validate_config(action["cache"], label=f"{label}: cache")
+        )
     return errors
 
 
@@ -896,6 +913,19 @@ def _toolpack_state_path(state_dir: Path, toolpack_id: str, run_id: str) -> Path
 # -- public runners ----------------------------------------------------------
 
 
+def _cache_action_argv(action: dict) -> list:
+    try:
+        args = json.dumps(
+            action.get("args") or {},
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+        )
+    except (TypeError, ValueError):
+        args = repr(action.get("args"))
+    return [str(token) for token in action.get("argv") or []] + [args]
+
+
 def run_action(
     manifest,
     action_id,
@@ -903,14 +933,21 @@ def run_action(
     project_root,
     state_dir,
     timeout_scale=1.0,
+    cache=None,
+    cache_enabled=True,
+    force=False,
 ) -> dict:
     """Execute one action of *manifest* and return a JSON-safe result dict.
 
     The command runs with shell=False, then the declared artifacts are hashed and the
     toolpack validators that target them are run. Durable provenance is written atomically
     to <state_dir>/toolpacks/<toolpack>-<action>-<runId>.json and returned as statePath.
-    Raises ToolpackError for an invalid manifest or an unknown action id; a failed command
-    is a result with passed=False, never an exception.
+    An action with a "cache" object is cached by identity/argv/cwd/platform/tool versions/
+    input hashes: a hit restores the declared artifacts and re-runs the validators instead of
+    the command, and only a passing action is stored. cache=ActionCache shares one cache
+    across a parallel run; cache_enabled=False disables it; force=True bypasses the lookup.
+    Raises ToolpackError for an invalid manifest, an invalid cache config or an unknown action
+    id; a failed command is a result with passed=False, never an exception.
     """
     _require_valid(manifest)
     scale = _positive_scale(timeout_scale)
@@ -927,6 +964,22 @@ def run_action(
 
     project_root = Path(project_root).resolve()
     state_dir = Path(state_dir)
+    if cache is not None and not isinstance(cache, cache_spec.ActionCache):
+        raise ValueError("cache must be a cache.ActionCache instance or None")
+    cache_obj = cache if cache is not None else cache_spec.ActionCache(
+        state_dir, enabled=bool(cache_enabled)
+    )
+    cache_config = None
+    if action.get("cache") is not None:
+        try:
+            cache_config = cache_spec.resolve_config(
+                action["cache"],
+                project_root=project_root,
+                label=f"action {action_id!r} cache",
+            )
+        except cache_spec.CacheError as exc:
+            raise ToolpackError(str(exc)) from exc
+
     started_moment = _utc_now()
     started_clock = time.time()
     run_id = _run_id(started_moment)
@@ -938,6 +991,104 @@ def run_action(
             f"action {action_id!r}: cwd {cwd_rel!r} escapes the project root"
         )
     timeout = float(action.get("timeout") or DEFAULT_TIMEOUT) * scale
+    manifest_sha = _manifest_sha256(manifest)
+
+    cache_key = None
+    cache_descriptor = None
+    cache_restored = []
+    cache_error = None
+    cache_active = bool(
+        cache_config and cache_config["enabled"] and cache_obj.enabled
+    )
+    if cache_config is not None and not cache_obj.enabled:
+        cache_error = "cache disabled for this run"
+    elif cache_config is not None and not cache_config["enabled"]:
+        cache_error = "cache disabled by the action manifest"
+    if cache_active:
+        cache_inputs = cache_spec.input_hashes(
+            project_root, cache_config["inputs"]
+        )
+        cache_key, cache_descriptor = cache_spec.action_key(
+            identity={
+                "kind": "toolpack-action",
+                "toolpack": toolpack_id,
+                "action": action_id,
+                "manifestSha256": manifest_sha,
+            },
+            argv=_cache_action_argv(action),
+            cwd=cwd_rel,
+            inputs=cache_inputs,
+            artifacts=cache_config["artifacts"],
+            tool_versions=cache_config["toolVersions"],
+            extra={"tools": manifest.get("tools")},
+        )
+        if not force:
+            cached_entry = cache_obj.lookup(cache_key)
+            if cached_entry is not None:
+                restored_ok, restored_paths, restore_error = cache_obj.restore(
+                    cached_entry, project_root
+                )
+                if restored_ok:
+                    artifacts = _expand_artifacts(
+                        action.get("artifacts") or [], project_root
+                    )
+                    validators = _run_validators(
+                        manifest.get("validators") or [], artifacts, project_root
+                    )
+                    if all(item["passed"] for item in validators):
+                        finished_moment = _utc_now()
+                        stored_result = cached_entry.get("result") or {}
+                        hit_document = {
+                            "schema": STATE_SCHEMA,
+                            "scope": "action",
+                            "toolpack": toolpack_id,
+                            "toolpackName": manifest.get("name"),
+                            "action": action_id,
+                            "runId": run_id,
+                            "manifestSha256": manifest_sha,
+                            "generated": _iso(finished_moment),
+                            "startedAt": _iso(started_moment),
+                            "finishedAt": _iso(finished_moment),
+                            "durationSeconds": round(time.time() - started_clock, 3),
+                            "passed": True,
+                            "timedOut": False,
+                            "seconds": 0.0,
+                            "timeoutSeconds": timeout,
+                            "command": {
+                                "argv": list(action["argv"]),
+                                "cwd": cwd_rel,
+                                "cacheHit": True,
+                            },
+                            "exit": 0,
+                            "stdout": stored_result.get("stdout")
+                            or "cache hit: restored "
+                            + str(len(restored_paths))
+                            + " artifact(s)",
+                            "stderr": stored_result.get("stderr") or "",
+                            "args": action.get("args") or {},
+                            "artifacts": artifacts,
+                            "validators": validators,
+                            "license": manifest.get("license"),
+                            "tools": manifest.get("tools"),
+                            "cache": {
+                                "key": cache_key,
+                                "hit": True,
+                                "stored": False,
+                                "restored": restored_paths,
+                                "error": None,
+                            },
+                            "errors": [],
+                        }
+                        state_path = _action_state_path(
+                            state_dir, toolpack_id, action_id, run_id
+                        )
+                        _atomic_write_json(state_path, hit_document)
+                        hit_result = dict(hit_document)
+                        hit_result["statePath"] = str(state_path)
+                        return hit_result
+                    cache_error = "restored artifacts failed validators"
+                else:
+                    cache_error = restore_error
 
     if cwd_path.is_dir():
         command = _execute(action["argv"], cwd_path, timeout)
@@ -972,6 +1123,31 @@ def run_action(
         errors.append("failed validator(s): " + "; ".join(failed_validators))
     passed = not errors
 
+    cache_info = None
+    if cache_config is not None:
+        cache_stored = False
+        if passed and cache_active and cache_key:
+            stored_entry = cache_obj.store(
+                cache_key,
+                descriptor=cache_descriptor,
+                project_root=project_root,
+                artifacts=cache_config["artifacts"],
+                result={
+                    "exit": command["exit"],
+                    "stdout": command["stdout"],
+                    "stderr": command["stderr"],
+                    "seconds": command["seconds"],
+                },
+            )
+            cache_stored = stored_entry is not None
+        cache_info = {
+            "key": cache_key,
+            "hit": False,
+            "stored": cache_stored,
+            "restored": [],
+            "error": cache_error,
+        }
+
     document = {
         "schema": STATE_SCHEMA,
         "scope": "action",
@@ -979,7 +1155,7 @@ def run_action(
         "toolpackName": manifest.get("name"),
         "action": action_id,
         "runId": run_id,
-        "manifestSha256": _manifest_sha256(manifest),
+        "manifestSha256": manifest_sha,
         "generated": _iso(_utc_now()),
         "startedAt": _iso(started_moment),
         "finishedAt": _iso(_utc_now()),
@@ -1002,11 +1178,45 @@ def run_action(
         "tools": manifest.get("tools"),
         "errors": errors,
     }
+    if cache_info is not None:
+        document["cache"] = cache_info
     state_path = _action_state_path(state_dir, toolpack_id, action_id, run_id)
     _atomic_write_json(state_path, document)
     result = dict(document)
     result["statePath"] = str(state_path)
     return result
+
+
+def _action_summary(action_id, result=None, *, note=None) -> dict:
+    if result is None:
+        return {
+            "action": action_id,
+            "status": "not-run",
+            "passed": None,
+            "exit": None,
+            "seconds": 0.0,
+            "timedOut": False,
+            "statePath": None,
+            "artifacts": 0,
+            "validators": 0,
+            "label": note or "not run",
+            "errors": [],
+            "cache": None,
+        }
+    return {
+        "action": action_id,
+        "status": "passed" if result.get("passed") else "failed",
+        "passed": result.get("passed"),
+        "exit": result.get("exit"),
+        "seconds": result.get("seconds"),
+        "timedOut": result.get("timedOut"),
+        "statePath": result.get("statePath"),
+        "artifacts": len(result.get("artifacts") or []),
+        "validators": len(result.get("validators") or []),
+        "label": None,
+        "errors": list(result.get("errors") or []),
+        "cache": result.get("cache"),
+    }
 
 
 def run_toolpack(
@@ -1015,18 +1225,35 @@ def run_toolpack(
     project_root,
     state_dir,
     timeout_scale=1.0,
+    max_workers=1,
+    cache=None,
+    cache_enabled=True,
+    force=False,
 ) -> dict:
-    """Run every action of *manifest* in order and return one aggregate result dict.
+    """Run every action of *manifest* and return one aggregate result dict.
 
-    A failed action stops later actions; their summaries are recorded as not-run. Action
-    state documents are written per action and one aggregate document (the run's one
-    statePath) carries the artifact ledger and the per-action summaries. Raises
+    max_workers=1 keeps manifest order and stops at the first failed action (later actions
+    are not-run). max_workers=2..8 runs the actions through the bounded parallel scheduler,
+    which is opt-in for independent actions: results keep manifest order and a failure
+    cancels actions that have not started yet. Action state documents are written per action
+    and one aggregate document (the run's one statePath) carries the artifact ledger, the
+    per-action summaries, the parallel status and the cache counter delta. Raises
     ToolpackError for an invalid manifest before running anything.
     """
     _require_valid(manifest)
     scale = _positive_scale(timeout_scale)
+    try:
+        workers = cache_spec.worker_count(max_workers)
+    except cache_spec.CacheError as exc:
+        raise ToolpackError(str(exc)) from exc
     project_root = Path(project_root).resolve()
     state_dir = Path(state_dir)
+    if cache is not None and not isinstance(cache, cache_spec.ActionCache):
+        raise ValueError("cache must be a cache.ActionCache instance or None")
+    cache_obj = cache if cache is not None else cache_spec.ActionCache(
+        state_dir, enabled=bool(cache_enabled)
+    )
+    cache_before = cache_obj.counters()
     started_moment = _utc_now()
     started_clock = time.time()
     run_id = _run_id(started_moment)
@@ -1037,61 +1264,108 @@ def run_toolpack(
     artifacts = []
     validators = []
     errors = []
-    stopped = False
-    failure_reason = None
-    for action in actions:
-        action_id = action["id"]
-        if stopped:
-            summaries.append(
-                {
-                    "action": action_id,
-                    "status": "not-run",
-                    "passed": None,
+    cancelled_actions = []
+    parallel_cancelled = False
+
+    def _absorb(action_id: str, result: dict) -> None:
+        for entry in result.get("artifacts") or []:
+            artifacts.append({"action": action_id, **entry})
+        for validator in result.get("validators") or []:
+            validators.append({"action": action_id, **validator})
+        if not result.get("passed"):
+            errors.append(
+                f"action {action_id!r} failed: "
+                + "; ".join(result.get("errors") or [])
+            )
+
+    if workers == 1:
+        stopped = False
+        failure_reason = None
+        for action in actions:
+            action_id = action["id"]
+            if stopped:
+                summaries.append(
+                    _action_summary(
+                        action_id, note="not run: " + str(failure_reason)
+                    )
+                )
+                continue
+            result = run_action(
+                manifest,
+                action_id,
+                project_root=project_root,
+                state_dir=state_dir,
+                timeout_scale=scale,
+                cache=cache_obj,
+                force=force,
+            )
+            summaries.append(_action_summary(action_id, result))
+            _absorb(action_id, result)
+            if not result["passed"]:
+                stopped = True
+                failure_reason = f"action {action_id!r} failed"
+    else:
+
+        def _run_action(index, action):
+            try:
+                return run_action(
+                    manifest,
+                    action["id"],
+                    project_root=project_root,
+                    state_dir=state_dir,
+                    timeout_scale=scale,
+                    cache=cache_obj,
+                    force=force,
+                )
+            except Exception as exc:  # a crashed worker becomes deterministic state
+                return {
+                    "action": action["id"],
+                    "passed": False,
                     "exit": None,
                     "seconds": 0.0,
                     "timedOut": False,
+                    "artifacts": [],
+                    "validators": [],
+                    "errors": [f"{type(exc).__name__}: {exc}"],
                     "statePath": None,
-                    "artifacts": 0,
-                    "validators": 0,
-                    "label": "not run: " + str(failure_reason),
-                    "errors": [],
+                    "cache": None,
                 }
-            )
-            continue
-        result = run_action(
-            manifest,
-            action_id,
-            project_root=project_root,
-            state_dir=state_dir,
-            timeout_scale=scale,
-        )
-        summaries.append(
-            {
-                "action": action_id,
-                "status": "passed" if result["passed"] else "failed",
-                "passed": result["passed"],
-                "exit": result["exit"],
-                "seconds": result["seconds"],
-                "timedOut": result["timedOut"],
-                "statePath": result["statePath"],
-                "artifacts": len(result["artifacts"]),
-                "validators": len(result["validators"]),
-                "label": None,
-                "errors": list(result["errors"]),
-            }
-        )
-        for entry in result["artifacts"]:
-            artifacts.append({"action": action_id, **entry})
-        for validator in result["validators"]:
-            validators.append({"action": action_id, **validator})
-        if not result["passed"]:
-            stopped = True
-            failure_reason = f"action {action_id!r} failed"
-            errors.append(
-                f"action {action_id!r} failed: " + "; ".join(result["errors"])
-            )
 
+        parallel = cache_spec.run_parallel(
+            actions, _run_action, max_workers=workers, cancel_on_failure=True
+        )
+        parallel_cancelled = bool(parallel["cancelled"])
+        results = parallel["results"]
+        first_failed = None
+        for index, action in enumerate(actions):
+            action_id = action["id"]
+            result = results[index]
+            if result is None:
+                cancelled_actions.append(action_id)
+                note = "not run: cancelled"
+                if first_failed:
+                    note += f" after action {first_failed!r} failed"
+                summaries.append(_action_summary(action_id, note=note))
+                continue
+            summaries.append(_action_summary(action_id, result))
+            _absorb(action_id, result)
+            if not result.get("passed") and first_failed is None:
+                first_failed = action_id
+
+    failed = any(summary["status"] == "failed" for summary in summaries)
+    not_run = any(summary["status"] == "not-run" for summary in summaries)
     finished_moment = _utc_now()
+    parallel_info = {
+        "requestedWorkers": workers,
+        "workers": workers,
+        "cancelled": parallel_cancelled,
+        "cancelledActions": cancelled_actions,
+        "log": [f"{summary['action']}: {summary['status']}" for summary in summaries],
+    }
+    cache_summary = {
+        "enabled": cache_obj.enabled,
+        **cache_spec.counters_delta(cache_before, cache_obj.counters()),
+    }
     document = {
         "schema": STATE_SCHEMA,
         "scope": "toolpack",
@@ -1103,12 +1377,14 @@ def run_toolpack(
         "startedAt": _iso(started_moment),
         "finishedAt": _iso(finished_moment),
         "durationSeconds": round(time.time() - started_clock, 3),
-        "passed": not stopped,
+        "passed": not failed and not not_run,
         "timeoutScale": scale,
         "actionOrder": [action["id"] for action in actions],
         "actions": summaries,
         "artifacts": artifacts,
         "validators": validators,
+        "parallel": parallel_info,
+        "cache": cache_summary,
         "license": manifest.get("license"),
         "tools": manifest.get("tools"),
         "errors": errors,

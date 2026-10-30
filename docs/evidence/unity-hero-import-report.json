@@ -1,0 +1,218 @@
+{
+    "schema": "gypsy.unity.hero-import/v1",
+    "generatedUtc": "2026-10-30T10:24:30.2075876Z",
+    "unityVersion": "6000.6.7f1",
+    "projectPath": "C:\\OneDrive\\OneDrive - Cyber 7 Group\\GHRepo\\Games\\ProjectGypsy\\unity\\LeftBehind",
+    "sourceFbx": "C:\\OneDrive\\OneDrive - Cyber 7 Group\\GHRepo\\Games\\ProjectGypsy\\assets\\hero\\wayfarer.fbx",
+    "sourceFbxBytes": 1149484,
+    "sourceFbxSha256": "97e8c7f95ba7faecedddc2fd9bb3238ed0e16251b74076947005bfb032ed6286",
+    "importedAssetPath": "Assets/Editor/HeroImportProofTemp/wayfarer.fbx",
+    "importer": {
+        "animationType": "Generic",
+        "importAnimation": true,
+        "importBlendShapes": true,
+        "importMaterials": true,
+        "useFileScale": false,
+        "globalScale": 1.0,
+        "scaleRetry": false
+    },
+    "passed": true,
+    "checks": [
+        {
+            "name": "source fbx exists",
+            "passed": true,
+            "expected": "file at C:\\OneDrive\\OneDrive - Cyber 7 Group\\GHRepo\\Games\\ProjectGypsy\\assets\\hero\\wayfarer.fbx",
+            "actual": "exists"
+        },
+        {
+            "name": "source fbx is non-empty",
+            "passed": true,
+            "expected": "> 100000 bytes",
+            "actual": "1149484 bytes"
+        },
+        {
+            "name": "model importer available",
+            "passed": true,
+            "expected": "ModelImporter",
+            "actual": "ok"
+        },
+        {
+            "name": "bone count is 23",
+            "passed": true,
+            "expected": "23",
+            "actual": "23 bones"
+        },
+        {
+            "name": "cape bone chain present",
+            "passed": true,
+            "expected": "cape_a, cape_b, cape_c",
+            "actual": "present"
+        },
+        {
+            "name": "Smile blend shape present",
+            "passed": true,
+            "expected": "Smile",
+            "actual": "Smile"
+        },
+        {
+            "name": "animation clip idle",
+            "passed": true,
+            "expected": "idle clip",
+            "actual": "__preview__idle length=3.000s curves=241"
+        },
+        {
+            "name": "animation clip run",
+            "passed": true,
+            "expected": "run clip",
+            "actual": "__preview__run length=1.000s curves=241"
+        },
+        {
+            "name": "animation clip reach",
+            "passed": true,
+            "expected": "reach clip",
+            "actual": "__preview__reach length=2.000s curves=241"
+        },
+        {
+            "name": "materials imported",
+            "passed": true,
+            "expected": "Wayfarer_Cloth,Wayfarer_Leather,Wayfarer_Skin,Wayfarer_Accent",
+            "actual": "Wayfarer_Skin,Wayfarer_Cloth,Wayfarer_Leather,Wayfarer_Accent"
+        },
+        {
+            "name": "atlas texture imported",
+            "passed": true,
+            "expected": "wayfarer_atlas",
+            "actual": "wayfarer_atlas,wayfarer_normal"
+        },
+        {
+            "name": "normal map imported",
+            "passed": true,
+            "expected": "wayfarer_normal",
+            "actual": "wayfarer_atlas,wayfarer_normal"
+        },
+        {
+            "name": "imported texture maps are at least 256px",
+            "passed": true,
+            "expected": ">=256x256",
+            "actual": "wayfarer_atlas=512x512,wayfarer_normal=512x512"
+        },
+        {
+            "name": "height is human scale in metres",
+            "passed": true,
+            "expected": "1.70-2.10 m",
+            "actual": "1.906 m"
+        },
+        {
+            "name": "feet rest near the origin",
+            "passed": true,
+            "expected": "|minY| <= 0.15 m",
+            "actual": "minY=0.000 m"
+        },
+        {
+            "name": "mesh has triangle geometry",
+            "passed": true,
+            "expected": ">=500 triangles",
+            "actual": "1126 triangles"
+        }
+    ],
+    "model": {
+        "importedAssetPath": "Assets/Editor/HeroImportProofTemp/wayfarer.fbx",
+        "boneCount": 23,
+        "bones": [
+            "root",
+            "hips",
+            "spine",
+            "chest",
+            "neck",
+            "head",
+            "shoulder.R",
+            "upper_arm.R",
+            "forearm.R",
+            "hand.R",
+            "shoulder.L",
+            "upper_arm.L",
+            "forearm.L",
+            "hand.L",
+            "cape_a",
+            "cape_b",
+            "cape_c",
+            "thigh.R",
+            "shin.R",
+            "foot.R",
+            "thigh.L",
+            "shin.L",
+            "foot.L"
+        ],
+        "missingCapeBones": [],
+        "blendShapes": [
+            "Smile"
+        ],
+        "clips": [
+            {
+                "name": "__preview__idle",
+                "lengthSeconds": 3.0,
+                "curves": 241
+            },
+            {
+                "name": "__preview__run",
+                "lengthSeconds": 1.0,
+                "curves": 241
+            },
+            {
+                "name": "__preview__reach",
+                "lengthSeconds": 2.0,
+                "curves": 241
+            },
+            {
+                "name": "run",
+                "lengthSeconds": 1.0,
+                "curves": 241
+            },
+            {
+                "name": "reach",
+                "lengthSeconds": 2.0,
+                "curves": 241
+            },
+            {
+                "name": "idle",
+                "lengthSeconds": 3.0,
+                "curves": 241
+            }
+        ],
+        "materials": [
+            "Wayfarer_Skin",
+            "Wayfarer_Cloth",
+            "Wayfarer_Leather",
+            "Wayfarer_Accent"
+        ],
+        "textures": [
+            {
+                "name": "wayfarer_atlas",
+                "width": 512,
+                "height": 512,
+                "source": "extracted"
+            },
+            {
+                "name": "wayfarer_normal",
+                "width": 512,
+                "height": 512,
+                "source": "extracted"
+            }
+        ],
+        "triangleCount": 1126,
+        "heightMeters": 1.905499815940857,
+        "bounds": {
+            "sizeX": 0.5680000185966492,
+            "sizeY": 1.905499815940857,
+            "sizeZ": 0.4864128828048706,
+            "minY": -0.0004999637603759766
+        }
+    },
+    "notes": [
+        "Unity 6000.6.7f1 project=C:\\OneDrive\\OneDrive - Cyber 7 Group\\GHRepo\\Games\\ProjectGypsy\\unity\\LeftBehind",
+        "source bytes=1149484 sha256=97e8c7f95ba7faecedddc2fd9bb3238ed0e16251b74076947005bfb032ed6286",
+        "textures extracted from the embedded FBX media: 2",
+        "roughmetal map is glTF-only; the FBX material model carries the atlas and normal map."
+    ],
+    "errors": []
+}

@@ -9,12 +9,12 @@ Recorded 2026-10-26. Phase-5 proof for [ADR-013](ADR-013-phase5-mobile-live-perf
 | Android APK export | PASS — build/ProjectGypsy.apk, 28,305,095 bytes, SHA-256 f48e40d936cdba73434198e63e067b27f737b9bf0e64b18a3095d8f2b2f822fd (this build; debug APK bytes are build-instance/timestamp specific, package/cert stable) |
 | APK package | PASS — com.c7imi.projectgypsy, versionName 0.1.0, native-code arm64-v8a |
 | APK signature | PASS — CN=Android Debug, cert SHA-256 140c76ffd9cedc7192a80967a1cd47b93b082c9638a1f590f8539fddc559d581 |
-| On-device launch | NOT TESTED — no Android device/emulator; the Android emulator package install attempt failed with a corrupt ZIP (unknown archive) before any AVD existed; not claimed |
+| On-device launch | **PASS (emulator)** — Gypsy_API35b API 35 booted with host GPU, APK installed, activity launched, game rendered, screenshot/logcat captured. Physical device not tested. Evidence: docs/DEVICE-LAUNCH.md, docs/DEVICE-EVIDENCE.json, docs/evidence/device-game.png |
 | Live watcher | PASS — 34 tests; real --once demo run 2.726 s, exit 0 |
 | Performance | PASS — 3 demos: 2.612/2.602/2.605 s, median 2.605 s, p95 2.605 s, frames=143, GPU render 0.56 ms/frame |
-| Budgets | PASS — median <=5 s, p95 <=8 s, GPU <=16.67 ms/frame |
+| Budgets | PASS — median <=5 s, p95 <=8 s, GPU <=16.67 ms/frame; visual gate changedRatio 0/921600 against tracked baseline |
 | Second engine | **PASS** — LeftBehind Unity 6 slice builds, runs `GYPSY_DEMO_OK collected=3 frames=74`, and captures a 1280×720 frame; UE5/Flax remain blocked |
-| Tests / capabilities | 172 tests; 42 capability manifests |
+| Tests / capabilities | 412 tests; 50 capability manifests |
 
 ## Mobile toolchain
 
@@ -48,8 +48,8 @@ not gameplay FPS.
 | Unreal Engine 5.8.4 | probe gate: GPU VRAM 4.0 GB below the 8 GB minimum (free D: 60.0 GB meets 60) | BLOCKED (hardware) |
 | Flax 1.13 | probe notes: experimental adapter; no headless build/run demonstrated | BLOCKED (no proven path) |
 
-Therefore the ADR-003 Phase-5 second-engine gate "same slice runs on two engines" is met by Godot + LeftBehind/Unity; the mobile device launch remains untested, and UE5/Flax remain blocked.
-Mobile package gate and live/perf gates are met; device launch is unverified.
+Therefore the ADR-003 Phase-5 second-engine gate "same slice runs on two engines" is met by Godot + LeftBehind/Unity; the mobile emulator launch passes, and UE5/Flax remain blocked.
+Mobile package, emulator launch, live and perf gates are met. Physical-device, input, audio, rotation and device-performance checks remain unverified.
 
 ## Commands
 
@@ -61,8 +61,8 @@ Mobile package gate and live/perf gates are met; device launch is unverified.
 
 ## Limits
 
-- APK not launched on a device/emulator; no Android performance or input validation.
+- Emulator launch passes; physical-device, touch/input, audio, rotation, suspend/resume and on-device performance remain untested.
 - Debug keystore only; no release signing.
 - Watcher is not hot reload; .godot churn can retrigger it.
 - Benchmark is prototype-scale and machine-specific.
-- Unity second-engine slice is proven by LeftBehind; device launch remains untested; UE5 and Flax remain blocked. Phase 6 is recorded in PHASE-6-GATE.md.
+- Unity second-engine slice is proven by LeftBehind; Unity hero FBX import is proven separately (UNITY_HERO_IMPORT_OK); UE5 and Flax remain blocked. Phase 6 is recorded in PHASE-6-GATE.md.

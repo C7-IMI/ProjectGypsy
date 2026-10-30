@@ -415,5 +415,17 @@ Each entry has:
 
 ---
 
-Next prompt number: 41. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 41 - 2026-10-30
+
+- Request: Build the research recommendations, upgrade the UI for review, use slices/subagents, install/configure what
+  is needed, elevate as necessary, and keep going until all buildable work is done.
+- Status: Completed for the software-buildable P0; external hardware/provider gates remain explicit.
+- Version: 2026.10.30.007
+- Evidence: action cache/parallel scheduler, visual/performance gates, catalog/templates, Insights/live-log UI,
+  emulator launch (docs/DEVICE-LAUNCH.md + docs/DEVICE-EVIDENCE.json), Unity hero import
+  (docs/evidence/unity-hero-import-report.json), ADR-019.
+
+---
+
+Next prompt number: 42. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

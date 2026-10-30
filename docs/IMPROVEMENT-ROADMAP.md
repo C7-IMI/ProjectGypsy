@@ -5,6 +5,8 @@ Unity 6000.6.7f1 is the default for new projects (Stage A), the ProjectGypsy gam
 LeftBehind proves Windows Unity build/demo/capture, the hero pipeline has runtime LOD/Smile/cape systems, and safe
 self-extension exists. There are 6 slices, 50 capabilities and 282 tests.
 
+**Implementation 2026-10-30:** the P0 set is implemented and verified — action-level cache and opt-in parallel execution, visual/performance quality gates, project catalog with Unity/Godot templates, Insights/live-log dashboard, Unity hero import proof and Android emulator launch. See [ADR-019](ADR-019-cache-quality.md). The P1/P2 items below remain a roadmap, not claims.
+
 The guidance below is deliberately about the **production system**, not about adding more one-off game features.
 
 ## Executive summary — the ten highest-leverage changes

@@ -1,0 +1,150 @@
+{
+  "schema": "gypsy.toolpack/v1",
+  "id": "quality.visual",
+  "name": "Visual regression and performance-budget gate",
+  "tools": [
+    "Python 3.14 (stdlib + Pillow 12.0.0 for the visual diff)",
+    "Godot 4.7.2 (windowed capture and headless demo benchmark)"
+  ],
+  "license": "Pillow HPND; Godot MIT; the tracked baseline frame is an original in-repo capture. Prototype evidence, not a commercial asset.",
+  "actions": [
+    {
+      "id": "capture",
+      "argv": [
+        "python",
+        "workstream/gypsy.py",
+        "game",
+        "capture",
+        "--path",
+        "game"
+      ],
+      "cwd": ".",
+      "timeout": 300,
+      "artifacts": [
+        "artifacts/game/frame.png"
+      ],
+      "args": {
+        "note": "real windowed Godot movie-maker capture; frame.png is the visual-gate candidate"
+      }
+    },
+    {
+      "id": "bench",
+      "argv": [
+        "python",
+        "workstream/gypsy.py",
+        "game",
+        "bench",
+        "--runs",
+        "3"
+      ],
+      "cwd": ".",
+      "timeout": 600,
+      "artifacts": [
+        "workstream/state/game-benchmark.json"
+      ],
+      "args": {
+        "note": "three headless demo runs plus a rendered capture; writes the performance-gate input"
+      }
+    },
+    {
+      "id": "gate",
+      "argv": [
+        "python",
+        "scripts/quality_gate.py",
+        "--frame",
+        "artifacts/game/frame.png",
+        "--baseline",
+        "assets/test/baselines/game-frame.png",
+        "--bench",
+        "workstream/state/game-benchmark.json",
+        "--report",
+        "workstream/state/quality/gate.json",
+        "--required-frames",
+        "143"
+      ],
+      "cwd": ".",
+      "timeout": 180,
+      "artifacts": [
+        "workstream/state/quality/gate.json"
+      ],
+      "args": {
+        "note": "fails when the changed-pixel ratio or any performance budget is over threshold"
+      },
+      "cache": {
+        "enabled": true,
+        "inputs": [
+          "scripts/quality_gate.py",
+          "assets/test/baselines/game-frame.png",
+          "assets/test/baselines/game-frame.json",
+          "artifacts/game/frame.png",
+          "workstream/state/game-benchmark.json"
+        ],
+        "artifacts": [
+          "workstream/state/quality/gate.json"
+        ]
+      }
+    }
+  ],
+  "validators": [
+    {
+      "id": "frame-size",
+      "kind": "png",
+      "artifact": "artifacts/game/frame.png",
+      "minWidth": 1280,
+      "minHeight": 720
+    },
+    {
+      "id": "bench-passed",
+      "kind": "json",
+      "artifact": "workstream/state/game-benchmark.json",
+      "checks": [
+        {
+          "path": "passed",
+          "equals": true
+        },
+        {
+          "path": "captureGpuMsPerFrame",
+          "exists": true
+        },
+        {
+          "path": "demos",
+          "exists": true
+        }
+      ]
+    },
+    {
+      "id": "gate-passed",
+      "kind": "json",
+      "artifact": "workstream/state/quality/gate.json",
+      "checks": [
+        {
+          "path": "passed",
+          "equals": true
+        },
+        {
+          "path": "visual.passed",
+          "equals": true
+        },
+        {
+          "path": "performance.passed",
+          "equals": true
+        }
+      ]
+    },
+    {
+      "id": "gate-dimensions",
+      "kind": "json",
+      "artifact": "workstream/state/quality/gate.json",
+      "checks": [
+        {
+          "path": "visual.dimensions.width",
+          "equals": 1280
+        },
+        {
+          "path": "visual.changedRatio",
+          "exists": true
+        }
+      ]
+    }
+  ]
+}

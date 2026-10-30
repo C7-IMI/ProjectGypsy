@@ -1,0 +1,23 @@
+{
+  "schema": "gypsy.slice/v1",
+  "id": "visual",
+  "project": ".",
+  "description": "Opt-in visual regression + performance budget quality gate (Pillow, Godot capture/bench); not part of check_all or the default quality slice.",
+  "artifacts": [
+    "artifacts/game/frame.png",
+    "workstream/state/game-benchmark.json",
+    "workstream/state/quality/gate.json"
+  ],
+  "steps": [
+    {
+      "id": "quality",
+      "kind": "toolpack",
+      "needs": [],
+      "required": true,
+      "timeout": 900,
+      "args": {
+        "toolpack": "quality.visual"
+      }
+    }
+  ]
+}

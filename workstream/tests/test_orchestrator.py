@@ -11,6 +11,8 @@ import hashlib
 import json
 import sys
 import tempfile
+import threading
+import time
 import unittest
 from pathlib import Path
 
@@ -57,6 +59,30 @@ class FakeHandlers:
         if step["id"] in self.failures:
             return {"passed": False, "output": "boom " + step["id"]}
         return {"passed": True, "output": "ok " + step["id"]}
+
+    def registry(self):
+        return {"tests": self}
+
+
+class CountingHandler:
+    """Writes one artifact per call and records execution; optionally fails."""
+
+    def __init__(self, artifact, *, fail=False, sleep=0.0):
+        self.artifact = Path(artifact) if artifact else None
+        self.fail = fail
+        self.sleep = sleep
+        self.calls = 0
+
+    def __call__(self, step, context):
+        self.calls += 1
+        if self.sleep:
+            time.sleep(self.sleep)
+        if self.fail:
+            return {"passed": False, "output": "boom"}
+        if self.artifact is not None:
+            self.artifact.parent.mkdir(parents=True, exist_ok=True)
+            self.artifact.write_bytes(b"generated")
+        return {"passed": True, "output": "ok"}
 
     def registry(self):
         return {"tests": self}
@@ -222,7 +248,10 @@ class ManifestFileTests(unittest.TestCase):
         cls.manifests = slices.load_all(REPO_ROOT / "slices")
 
     def test_repository_manifests_load_and_validate(self):
-        self.assertEqual(set(self.manifests), {"phase1", "quality", "toolpacks", "mobile", "leftbehind", "hero"})
+        self.assertEqual(
+            set(self.manifests),
+            {"phase1", "quality", "toolpacks", "mobile", "leftbehind", "hero", "visual"},
+        )
         for slice_id, manifest in self.manifests.items():
             self.assertEqual(slices.validate_manifest(manifest), [], slice_id)
             self.assertEqual(manifest["schema"], "gypsy.slice/v1")
@@ -529,6 +558,193 @@ class RunTaskTests(OrchestratorCase):
             )
         self.assertEqual(fake.calls, [])
         self.assertFalse(self.state.exists())
+
+
+class CacheParallelTests(OrchestratorCase):
+    def _cached_manifest(self, *, slice_id="cached", cache=None):
+        (self.project / "src").mkdir(parents=True, exist_ok=True)
+        (self.project / "src" / "in.txt").write_text("v1", encoding="utf-8")
+        step = make_step("build", timeout=10)
+        step["cache"] = cache or {
+            "inputs": ["src/in.txt"],
+            "artifacts": ["out/a.bin"],
+        }
+        return make_manifest([step], slice_id=slice_id, artifacts=["out/a.bin"])
+
+    def test_cache_hit_skips_handler_and_restores_artifact(self):
+        handler = CountingHandler(self.project / "out" / "a.bin")
+        manifest = self._cached_manifest()
+        first = self.run_manifest(manifest, handlers=handler.registry())
+        self.assertTrue(first["passed"])
+        self.assertEqual(handler.calls, 1)
+        self.assertEqual(first["cache"]["stores"], 1)
+        self.assertTrue(first["steps"][0]["cache"]["stored"])
+        (self.project / "out" / "a.bin").unlink()
+        second = self.run_manifest(manifest, handlers=handler.registry())
+        self.assertTrue(second["passed"])
+        self.assertEqual(handler.calls, 1)  # the handler was not called again
+        self.assertTrue((self.project / "out" / "a.bin").is_file())
+        self.assertEqual(second["cache"]["hits"], 1)
+        self.assertTrue(second["steps"][0]["cache"]["hit"])
+        self.assertEqual(second["steps"][0]["cache"]["restored"], ["out/a.bin"])
+        state = self.load_state("cached")
+        self.assertEqual(state["cache"]["hits"], 1)
+        self.assertTrue(state["steps"][0]["cache"]["hit"])
+
+    def test_changed_input_misses_and_reruns(self):
+        handler = CountingHandler(self.project / "out" / "a.bin")
+        manifest = self._cached_manifest()
+        self.run_manifest(manifest, handlers=handler.registry())
+        (self.project / "src" / "in.txt").write_text("v2", encoding="utf-8")
+        changed = self.run_manifest(manifest, handlers=handler.registry())
+        self.assertTrue(changed["passed"])
+        self.assertEqual(handler.calls, 2)
+        self.assertFalse(changed["steps"][0]["cache"]["hit"])
+        self.assertEqual(changed["cache"]["stores"], 1)
+
+    def test_failure_is_not_cached(self):
+        handler = CountingHandler(None, fail=True)
+        manifest = self._cached_manifest()
+        first = self.run_manifest(manifest, handlers=handler.registry())
+        self.assertFalse(first["passed"])
+        self.assertFalse(first["steps"][0]["cache"]["stored"])
+        self.assertEqual(first["cache"]["stores"], 0)
+        second = self.run_manifest(manifest, handlers=handler.registry())
+        self.assertFalse(second["passed"])
+        self.assertEqual(handler.calls, 2)  # a failure must be retried, never cached
+
+    def test_force_bypasses_the_lookup_and_updates_the_entry(self):
+        handler = CountingHandler(self.project / "out" / "a.bin")
+        manifest = self._cached_manifest()
+        self.run_manifest(manifest, handlers=handler.registry())
+        forced = self.run_manifest(manifest, handlers=handler.registry(), force=True)
+        self.assertTrue(forced["passed"])
+        self.assertEqual(handler.calls, 2)
+        self.assertFalse(forced["steps"][0]["cache"]["hit"])
+        self.assertTrue(forced["steps"][0]["cache"]["stored"])
+        hit = self.run_manifest(manifest, handlers=handler.registry())
+        self.assertEqual(handler.calls, 2)
+        self.assertTrue(hit["steps"][0]["cache"]["hit"])
+
+    def test_no_cache_switch_disables_the_cache(self):
+        handler = CountingHandler(self.project / "out" / "a.bin")
+        manifest = self._cached_manifest()
+        first = self.run_manifest(
+            manifest, handlers=handler.registry(), cache_enabled=False
+        )
+        self.assertTrue(first["passed"])
+        self.assertFalse(first["cache"]["enabled"])
+        self.assertIn("disabled", first["steps"][0]["cache"]["error"])
+        second = self.run_manifest(
+            manifest, handlers=handler.registry(), cache_enabled=False
+        )
+        self.assertTrue(second["passed"])
+        self.assertEqual(handler.calls, 2)
+
+    def test_invalid_cache_config_is_a_slice_error(self):
+        handler = CountingHandler(self.project / "out" / "a.bin")
+        manifest = self._cached_manifest(
+            cache={"inputs": [], "artifacts": ["../escape.bin"]}
+        )
+        with self.assertRaises(slices.SliceError):
+            self.run_manifest(manifest, handlers=handler.registry())
+        self.assertEqual(handler.calls, 0)
+
+    def _plain_manifest(self, slice_id):
+        return make_manifest([make_step("run", timeout=10)], slice_id=slice_id)
+
+    def test_parallel_slices_overlap_and_keep_order(self):
+        lock = threading.Lock()
+        active = 0
+        peak = 0
+
+        def handler(step, context):
+            nonlocal active, peak
+            with lock:
+                active += 1
+                peak = max(peak, active)
+            time.sleep(0.15)
+            with lock:
+                active -= 1
+            return {"passed": True}
+
+        manifests = [self._plain_manifest("s1"), self._plain_manifest("s2")]
+        task = orchestrator.run_task(
+            manifests,
+            project_root=self.project,
+            state_dir=self.state,
+            handlers={"tests": handler},
+            max_workers=2,
+        )
+        self.assertTrue(task["passed"], task)
+        self.assertGreaterEqual(peak, 2)
+        self.assertEqual(
+            [summary["slice"] for summary in task["slices"]], ["s1", "s2"]
+        )
+        self.assertEqual(
+            [summary["status"] for summary in task["slices"]], ["passed", "passed"]
+        )
+        self.assertEqual(task["parallel"]["workers"], 2)
+        self.assertFalse(task["parallel"]["cancelled"])
+        self.assertEqual(task["parallel"]["log"], ["s1: passed", "s2: passed"])
+
+    def test_parallel_failure_cancels_pending_and_keeps_order(self):
+        def handler(step, context):
+            if context["slice_id"] == "s1":
+                return {"passed": False, "output": "boom"}
+            time.sleep(0.1)
+            return {"passed": True}
+
+        manifests = [
+            self._plain_manifest("s1"),
+            self._plain_manifest("s2"),
+            self._plain_manifest("s3"),
+        ]
+        task = orchestrator.run_task(
+            manifests,
+            project_root=self.project,
+            state_dir=self.state,
+            handlers={"tests": handler},
+            max_workers=2,
+        )
+        self.assertFalse(task["passed"])
+        self.assertEqual(
+            [summary["status"] for summary in task["slices"]],
+            ["failed", "passed", "not-run"],
+        )
+        self.assertTrue(task["parallel"]["cancelled"])
+        self.assertEqual(task["parallel"]["cancelledSlices"], ["s3"])
+        self.assertEqual(
+            task["parallel"]["log"], ["s1: failed", "s2: passed", "s3: not-run"]
+        )
+
+    def test_parallel_worker_bounds_are_rejected(self):
+        manifests = [self._plain_manifest("s1")]
+        for bad in (0, 9):
+            with self.assertRaises(slices.SliceError):
+                orchestrator.run_task(
+                    manifests,
+                    project_root=self.project,
+                    state_dir=self.state,
+                    handlers={"tests": FakeHandlers().registry()["tests"]},
+                    max_workers=bad,
+                )
+
+    def test_task_state_exposes_parallel_and_cache(self):
+        manifests = [self._plain_manifest("s1"), self._plain_manifest("s2")]
+        task = orchestrator.run_task(
+            manifests,
+            project_root=self.project,
+            state_dir=self.state,
+            handlers={"tests": FakeHandlers().registry()["tests"]},
+            max_workers=2,
+        )
+        self.assertTrue(task["passed"])
+        self.assertEqual(task["parallel"]["workers"], 2)
+        self.assertTrue(task["cache"]["enabled"])
+        document = json.loads(Path(task["statePath"]).read_text(encoding="utf-8"))
+        self.assertIn("parallel", document)
+        self.assertIn("cache", document)
 
 
 class DefaultHandlerTests(OrchestratorCase):

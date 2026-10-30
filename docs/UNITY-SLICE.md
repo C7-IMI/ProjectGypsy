@@ -43,9 +43,15 @@ The build wrapper waits for `LEFTBEHIND_BUILD Succeeded`; the demo wrapper asser
 **Proved:** the same gameplay contract (move, collect three, camera, deterministic marker) runs on a second engine,
 builds to a Windows player, and renders a frame. This satisfies the ADR-003 Phase-5 second-engine portion of the gate.
 
-**Not proved:** Unity asset import of the Blender golden kit (the import matrix remains Godot-only), hero art,
-character pipeline, mobile Unity, playmode editor tests, performance profiling, or that LeftBehind is the final game
-name/content. The Unity project uses procedural primitives for this port; it is a technical proof, not the art slice.
+**Not proved:** a generic import matrix for the Blender golden kit (the matrix still covers Godot), scene/animator wiring
+of the imported hero, mobile Unity, playmode editor tests, performance profiling, or that LeftBehind is the final game
+name/content. The Unity project uses procedural primitives for the gameplay proof, not the art slice.
+
+**Hero import proof (separate):** `scripts/unity_hero_import.ps1` runs a Unity 6000.6.7f1 batchmode import of
+`assets/hero/wayfarer.fbx` and reports `UNITY_HERO_IMPORT_OK passed=True bones=23`: 23 bones including cape_a/b/c,
+idle/run/reach clips, Smile blend shape, 4 materials, 512×512 atlas/normal maps, height 1.9055 m. Report:
+[evidence/unity-hero-import-report.json](evidence/unity-hero-import-report.json). It is an import proof, not a scene or
+animator integration.
 
 ## Project manifest
 

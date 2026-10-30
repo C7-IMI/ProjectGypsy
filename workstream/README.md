@@ -36,8 +36,10 @@ python workstream/gypsy.py project init --path game --engine godot --version 4.7
 python workstream/gypsy.py project show [--path game]
 python workstream/gypsy.py check [--project .] [--json]
 python workstream/gypsy.py game demo|build|capture|verify [--path game]
-python workstream/gypsy.py slices list|plan|run|status [--all] [--resume] [--force]
-python workstream/gypsy.py toolpacks list|check|run [--action]
+python workstream/gypsy.py slices list|plan|run|status [--all] [--resume] [--force] [--parallel N] [--no-cache]
+python workstream/gypsy.py toolpacks list|check|run [--action] [--parallel N] [--force] [--no-cache]
+python workstream/gypsy.py cache stats|list|clear [--json] [--yes]
+python workstream/gypsy.py catalog [--root DIR] [--json] [--save-state]
 python workstream/gypsy.py console board|preview|diff [--json]
 python workstream/gypsy.py game bench [--runs 3]
 python workstream/gypsy.py dashboard [--port 8765] [--no-open]
@@ -60,14 +62,21 @@ python -m unittest discover -s workstream/tests -v
 - Godot headless smoke test (the reference adapter).
 - Phase-1 game adapter: headless demo, Windows export, exported-binary demo, windowed movie capture.
 - Phase-2 orchestrator: gypsy.slice/v1 manifests (`slices/`), ordered/dependent steps, resumable state, artifact
-  SHA-256 ledger, multi-slice task report and the `slices` CLI.
+  SHA-256 ledger, multi-slice task report, opt-in parallel scheduling and a content-addressed action cache
+  (`cache.py`, `gypsy cache stats|list|clear`).
 - Phase-3 toolpacks: gypsy.toolpack/v1 manifests (`toolpacks/`), explicit argv actions, file/json/text/WAV/PNG/GLB
-  validators, artifact hashes and provenance; real packs for golden Blender->Godot import, MusicGen audio and Android APK.
+  validators, artifact hashes and provenance, opt-in action caching and bounded parallel actions; real packs for golden
+  Blender->Godot import, MusicGen audio, Android APK and visual/performance quality gates.
 - Reusable toolkit registry (`toolkit.py`, `toolkits/`): validated plugins, offline list/show/capabilities/catalog, and
   the ActionForge adapter (`toolkit actionforge fetch`) which fetches CC0 rig/animation GLBs with GLB validation,
   project-root confinement, atomic writes, SHA-256 provenance and `NOTICE.md` ([ADR-015](../docs/ADR-015-actionforge-toolkit.md)).
-- Phase-5 live watcher (mtime/debounce, no hot reload), performance baseline with budgets, and mobile package gate.
+- Phase-5 live watcher (mtime/debounce, no hot reload), performance baseline with budgets, mobile package gate and a
+  verified emulator launch (physical device still untested).
 - Phase-4 console: read-only terminal board, artifact preview and git diff; no writes, no server, no new capability.
+- Dashboard: Overview/Insights/Slices/Artifacts/Runs/Mission/Commands/Review, live logs via SSE with polling fallback,
+  cache/scheduler cards with honest empty states, and actionable failures.
+- Project catalog: read-only discovery of `project.gypsy.json` manifests with health, duplicate detection and an optional
+  state file; golden-path Unity/Godot templates under `templates/`.
 
 ## What is not built yet
 

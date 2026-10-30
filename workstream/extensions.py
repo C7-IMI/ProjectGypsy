@@ -1781,7 +1781,7 @@ def _execute_contained(plan: dict) -> dict:
     exit_code = None
     popen_error = None
     stdout = stderr = ""
-    with tempfile.TemporaryDirectory(prefix="gypsy-extension-run-") as capture_dir:
+    with tempfile.TemporaryDirectory(prefix="gypsy-extension-run-", ignore_cleanup_errors=True) as capture_dir:
         stdout_path = Path(capture_dir) / "stdout.bin"
         stderr_path = Path(capture_dir) / "stderr.bin"
         try:
