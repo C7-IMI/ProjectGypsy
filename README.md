@@ -53,9 +53,10 @@ headless demo/export/capture, a manifest-driven slice orchestrator with state an
 validators/provenance for golden Blender->Godot import and local MusicGen audio, a read-only terminal console, records
 and the pack check list, the ADRs, MCP/ComfyUI/Poly Haven tooling and the installed toolchain. Also present: a live
 watcher, performance baseline, a signed Android debug APK with a verified **emulator launch** (physical device still
-untested), the Gypsy Studio operations console with **Insights**, live logs and cache/scheduler cards, the LeftBehind
+untested), the Gypsy Studio operations console with **Insights**, **Projects**, live logs and cache/scheduler cards, the LeftBehind
 Unity 6 second-engine slice, the first hero art/character pipeline (Wayfarer with runtime LOD, driven Smile and spring
 cape), a **content-addressed action cache**, opt-in parallel slices/actions, **visual/performance quality gates**, a
-**project catalog with Unity/Godot golden-path templates**, Unity hero FBX import proof and safe self-extension. UE5 is
+**project catalog with Unity/Godot golden-path templates**, an authenticated loopback **remote action cache**, Unity
+hero FBX import proof and safe self-extension. UE5 is
 hardware-blocked. See `docs/PHASE-5-EVIDENCE.md`, `docs/ADR-017-hero-character-pipeline.md`,
 `docs/ADR-019-cache-quality.md`, `docs/DEVICE-LAUNCH.md`, `docs/PHASE-6-GATE.md` and `DEFERRED.md`.

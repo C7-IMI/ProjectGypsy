@@ -19,6 +19,7 @@
 | [ADR-016-self-extension.md](ADR-016-self-extension.md) | safe isolated self-extension: manifest/capability validation, dry-run, review gate, lockfile, disable/remove/reload, negative tests |
 | [ADR-018-unity-default.md](ADR-018-unity-default.md) | Stage A: Unity 6000.6.7f1/PC is the default for new projects; current Godot game remains legacy until Stage B |
 | [ADR-019-cache-quality.md](ADR-019-cache-quality.md) | action cache, opt-in parallel execution, visual/perf gates, catalog and dashboard insights |
+| [ADR-020-remote-cache.md](ADR-020-remote-cache.md) | loopback-first authenticated remote action cache; local remains primary |
 | [ADR-017-hero-character-pipeline.md](ADR-017-hero-character-pipeline.md) | first hero character: art direction, Blender generator, 20-joint rig, idle/run/reach, atlas, GLB/FBX, Godot integration and validation |
 | [ART-DIRECTION.md](ART-DIRECTION.md) | Wayfarer art direction, palette, silhouette, rig/animation set and validation contract |
 | [ADR-015-actionforge-toolkit.md](ADR-015-actionforge-toolkit.md) | reusable toolkit/plugin registry, ActionForge CC0 rig/animation fetch, licence/provenance, network and path safety, what stays manual |

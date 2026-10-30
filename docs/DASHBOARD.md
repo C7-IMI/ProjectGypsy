@@ -13,6 +13,7 @@ the port. Stop with Ctrl+C. The server binds 127.0.0.1 only.
 | --- | --- |
 | **Overview** (default) | Next best action, pipeline, recent runs, artifacts, readiness checklist, grouped gates |
 | **Insights** | Plain-language engine/default, last-run health, quality/gates, cache, scheduler and next actions |
+| **Projects** | Read-only project catalog: engine/version, targets, manifest health, paths; no filesystem browsing |
 | **Run detail** | Step timeline, log, validator evidence, artifacts, retry/re-run controls |
 | **Slices** | Slice table, step progress, duration, artifacts; run/open actions |
 | **Artifacts** | Hashed artifact library with live previews and metadata |
@@ -25,12 +26,14 @@ the port. Stop with Ctrl+C. The server binds 127.0.0.1 only.
 | Director's Table (`/classic`) | Review mode: passed slices, what needs a decision, artifacts, next command |
 
 The operations console is deep-linkable with `?view=overview`, `?view=insights`, `?view=slices`, `?view=artifacts`,
-`?view=mission`, `?view=commands`, `?view=review` or `?view=run`; run detail opens the newest run and can be selected from any run row. Ctrl/⌘+K focuses search; tablist arrow keys move between views.
+`?view=mission`, `?view=commands`, `?view=review`, `?view=projects` or `?view=run`; run detail opens the newest run and can be selected from any run row. Ctrl/⌘+K focuses search; tablist arrow keys move between views.
 The original four views remain at `/classic` and keep their studio/mission/hybrid/director tabs and localStorage selection.
 
 ![Operations overview](../design/dashboard-v2/live-overview.png)
 
 ![Insights](../design/dashboard-v2/live-insights.png)
+
+![Projects](../design/dashboard-v2/live-projects.png)
 
 ![Run detail](../design/dashboard-v2/live-run.png)
 
@@ -76,7 +79,8 @@ never sends argv.
 - `GET /api/state` — slices, artifacts, gates, phases, machine, metrics, commands and run summaries.
 - `GET /api/insights` — plain-language insights model used by the Insights view.
 - `GET /api/logs/stream` — live job output SSE; `/api/job` remains the polling fallback.
-- `GET /api/catalog` — project catalog (when present) with honest manifest health, not engine readiness.
+- `GET /api/catalog` — project catalog payload, or a 503 with an error when the scan fails; manifest health only, not
+  engine/build readiness. The browser cannot choose a filesystem root.
 - `GET /api/runs` — newest-first run summaries from task and toolpack state.
 - `GET /api/run?id=...` — one run's steps, artifacts and validators; the id is a state path under workstream/state.
 - `GET /api/job` — current job output; `POST /api/run` starts a whitelisted action.

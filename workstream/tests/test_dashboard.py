@@ -15,6 +15,7 @@ from unittest import mock
 WORKSTREAM = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(WORKSTREAM))
 
+import catalog  # noqa: E402
 import dashboard  # noqa: E402
 import gypsy  # noqa: E402
 
@@ -162,6 +163,25 @@ class ServerTests(unittest.TestCase):
         status, body = self.get("/api/artifact?raw=1&path=artifacts/game/frame.png")
         self.assertEqual(status, 200)
         self.assertTrue(body.startswith(b"\x89PNG"))
+
+    def test_catalog_endpoint(self):
+        status, body = self.get("/api/catalog")
+        self.assertEqual(status, 200)
+        payload = json.loads(body)
+        self.assertEqual(payload["schema"], catalog.SCHEMA)
+        self.assertGreaterEqual(payload["count"], 2)
+        paths = [entry["path"] for entry in payload["projects"]]
+        self.assertIn("game", paths)
+        self.assertIn("unity/LeftBehind", paths)
+        # A browser query parameter must not redirect the scan outside the checkout.
+        status, body = self.get("/api/catalog?root=C:\\Windows")
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(body)["root"], str(dashboard.REPO_ROOT))
+        with mock.patch.object(dashboard, "collect_catalog", return_value=(None, "scan boom")):
+            with self.assertRaises(urllib.error.HTTPError) as failure:
+                self.get("/api/catalog")
+        self.assertEqual(failure.exception.code, 503)
+        self.assertIn("scan boom", failure.exception.read().decode("utf-8"))
 
 
 # -- Phase-4 dashboard upgrade: insights, cache, scheduler, SSE, remediation -
@@ -565,3 +585,112 @@ class FrontendContractTests(unittest.TestCase):
         self.assertIn("@media(max-width:1200px)", css)
         self.assertIn("@media(max-width:760px)", css)
         self.assertIn(".actionrow", css)
+
+
+# -- Projects view: catalog API and frontend contract (task-20) --------------
+
+
+class CatalogTests(unittest.TestCase):
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        self.root = Path(self._tmp.name)
+
+    def test_real_catalog_payload_is_read_only_and_honest(self):
+        payload, error = dashboard.collect_catalog()
+        self.assertIsNone(error)
+        self.assertIsNotNone(payload)
+        self.assertEqual(payload["schema"], catalog.SCHEMA)
+        self.assertEqual(payload["count"], len(payload["projects"]))
+        self.assertGreaterEqual(payload["count"], 2)
+        self.assertEqual(catalog.validate_catalog(payload), [])
+        self.assertEqual(payload["duplicates"], {})
+        self.assertTrue(payload["root"])
+        by_path = {entry["path"]: entry for entry in payload["projects"]}
+        self.assertIn("game", by_path)
+        self.assertIn("unity/LeftBehind", by_path)
+        for entry in payload["projects"]:
+            self.assertIn(entry["health"], catalog.HEALTH_STATES)
+            self.assertTrue(entry["name"])
+            self.assertTrue(entry["engine"])
+            self.assertTrue(entry["version"])
+            self.assertIsInstance(entry["targets"], list)
+            manifest = Path(dashboard.REPO_ROOT) / entry["manifest"]
+            self.assertTrue(manifest.is_file(), entry["manifest"])
+            self.assertEqual(manifest.name, catalog.MANIFEST_NAME)
+        top_level = {entry["path"].split("/")[0] for entry in payload["projects"]}
+        self.assertNotIn("templates", top_level)
+
+    def test_empty_root_reports_no_projects(self):
+        payload, error = dashboard.collect_catalog(self.root)
+        self.assertIsNone(error)
+        self.assertEqual(payload["count"], 0)
+        self.assertEqual(payload["projects"], [])
+        self.assertEqual(payload["duplicates"], {})
+        self.assertEqual(payload["counts"], {"ok": 0, "warning": 0, "invalid": 0})
+
+    def test_invalid_manifest_is_reported_not_invented(self):
+        folder = self.root / "broken"
+        folder.mkdir()
+        (folder / catalog.MANIFEST_NAME).write_text("{not json", encoding="utf-8")
+        payload, error = dashboard.collect_catalog(self.root)
+        self.assertIsNone(error)
+        self.assertEqual(payload["count"], 1)
+        entry = payload["projects"][0]
+        self.assertEqual(entry["health"], "invalid")
+        self.assertEqual(entry["name"], "broken")
+        self.assertTrue(entry["errors"])
+        self.assertEqual(payload["counts"]["invalid"], 1)
+
+    def test_template_manifest_is_not_a_project(self):
+        folder = self.root / "templates" / "godot-project"
+        folder.mkdir(parents=True)
+        (folder / "project.gypsy.template.json").write_text(json.dumps({
+            "schema": catalog.PROJECT_SCHEMA,
+            "name": "Template",
+            "engine": {"id": "godot", "version": "4.7.2", "adapter": "godot-4"},
+            "targets": ["pc"],
+            "paths": {"game": "game", "artifacts": "artifacts"},
+        }), encoding="utf-8")
+        payload, error = dashboard.collect_catalog(self.root)
+        self.assertIsNone(error)
+        self.assertEqual(payload["count"], 0)
+
+    def test_missing_root_is_an_error_not_an_empty_catalog(self):
+        payload, error = dashboard.collect_catalog(self.root / "missing")
+        self.assertIsNone(payload)
+        self.assertIn("not a directory", error)
+
+
+class ProjectsFrontendContractTests(unittest.TestCase):
+    def read(self, name):
+        return (Path(dashboard.V2_ASSETS) / name).read_text(encoding="utf-8")
+
+    def test_index_has_projects_tab(self):
+        html = self.read("index.html")
+        self.assertIn('data-view="projects"', html)
+        self.assertIn(">Projects</button>", html)
+        self.assertIn('role="tablist"', html)
+
+    def test_app_js_has_projects_view_and_real_actions(self):
+        js = self.read("app.js")
+        for token in (
+            "renderProjects",
+            "/api/catalog",
+            "catalog-refresh",
+            "No projects found",
+            "Catalog scan failed",
+            "Manifest health only",
+            "Copy manifest",
+            "Copy scan root",
+            "project.gypsy.json",
+            "There is no open-folder",
+            "'projects'",
+        ):
+            self.assertIn(token, js)
+
+    def test_app_css_has_projects_styles(self):
+        css = self.read("app.css")
+        self.assertIn(".proj-table", css)
+        self.assertIn(".proj-wrap", css)
+        self.assertIn("proj-path", css)

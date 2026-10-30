@@ -87,5 +87,16 @@ button:focus-visible,a:focus-visible,input:focus-visible,[tabindex]:focus-visibl
 .recover.bad{border-color:#5b2b2b;background:#170f10}
 .check .chk-d{display:none}
 @media(max-width:1200px){.insights{grid-template-columns:1fr}.icard.wide{grid-column:auto}.abtns{max-width:100%;flex-direction:row;flex-wrap:wrap;justify-content:flex-start}.actionrow{flex-wrap:wrap}}
+
+/* -- Projects view (task-20) ----------------------------------------------- */
+.proj-wrap{overflow:auto}
+.proj-table td{white-space:normal;vertical-align:top}
+.proj-table .proj-path{font:8.5px/1.4 var(--mono);color:#7fa9a5;word-break:break-all;max-width:230px}
+.proj-table tr.proj-detail td{border-bottom:1px solid #1a2a34;background:#08121a;padding-top:2px;padding-bottom:6px}
+.proj-table tr.proj-detail .warnline{margin:2px 0}
+.warnline.bad{color:var(--red)}
+.proj-table .rowactions{white-space:nowrap}
+@media(max-width:1200px){.proj-table .proj-path{max-width:150px}}
+@media(max-width:760px){.proj-table th:nth-child(7),.proj-table td:nth-child(7){display:none}.proj-table .proj-path{max-width:110px}}
 @media(max-width:760px){.skip{display:none}.top{gap:8px}.brand{min-width:auto}.metrics{grid-template-columns:1fr 1fr}.insights{gap:8px}.icard-h{flex-wrap:wrap}.icard-h span{text-align:left}.stats4{grid-template-columns:1fr 1fr}.abtns{max-width:100%}.head h1{font-size:18px}}
 

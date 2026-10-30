@@ -122,6 +122,28 @@ def _count_capabilities():
     return len(list((REPO_ROOT / "workstream" / "capabilities").glob("*.json")))
 
 
+def collect_catalog(root=None):
+    """Read-only project catalog for the dashboard.
+
+    Scans project.gypsy.json manifests under the repository root (or an explicit root for
+    tests) with workstream/catalog.py. The browser never supplies a root: /api/catalog always
+    scans the checkout so the view cannot be turned into a filesystem browser. Returns
+    (payload, None) on success or (None, human-readable error) on failure.
+    """
+    try:
+        import catalog as catalog_spec
+    except Exception as exc:  # noqa: BLE001 - report, never crash the dashboard
+        return None, "catalog module unavailable: " + type(exc).__name__ + ": " + str(exc)
+    try:
+        payload = catalog_spec.discover(root if root is not None else REPO_ROOT)
+    except Exception as exc:  # noqa: BLE001 - CatalogError or an OS scan failure
+        return None, type(exc).__name__ + ": " + str(exc)
+    problems = catalog_spec.validate_catalog(payload)
+    if problems:
+        return None, "catalog payload is not trustworthy: " + "; ".join(problems[:5])
+    return payload, None
+
+
 def _tests_from_states(states):
     for data in states.values():
         if data.get("slice") != "quality":
@@ -1390,11 +1412,11 @@ class Handler(BaseHTTPRequestHandler):
                 self._json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": type(exc).__name__ + ": " + str(exc)})
             return
         if parsed.path == "/api/catalog":
-            try:
-                import catalog as catalog_spec
-                self._json(HTTPStatus.OK, catalog_spec.discover(REPO_ROOT))
-            except Exception as exc:
-                self._json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": type(exc).__name__ + ": " + str(exc)})
+            payload, error = collect_catalog()
+            if error is not None:
+                self._json(HTTPStatus.SERVICE_UNAVAILABLE, {"available": False, "error": error})
+            else:
+                self._json(HTTPStatus.OK, payload)
             return
         if parsed.path == "/api/insights":
             try:

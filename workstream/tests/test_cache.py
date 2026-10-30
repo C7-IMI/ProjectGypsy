@@ -9,12 +9,14 @@ from __future__ import annotations
 import contextlib
 import io
 import json
+import os
 import sys
 import tempfile
 import threading
 import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 WORKSTREAM = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(WORKSTREAM))
@@ -559,6 +561,37 @@ class CliTests(Case):
         )
         self.assertEqual(code, 1)
         self.assertIn("max_workers", err)
+
+
+class RemoteConfigTests(Case):
+    def test_local_only_cache_reports_remote_disabled(self):
+        env = {
+            name: value
+            for name, value in os.environ.items()
+            if name not in ("GYPSY_REMOTE_CACHE_URL", "GYPSY_REMOTE_CACHE_TOKEN")
+        }
+        with mock.patch.dict(os.environ, env, clear=True):
+            cache_obj, key, summary = seed(self.project, self.state)
+        self.assertIsNotNone(summary)
+        self.assertIsNone(cache_obj.remote)
+        stats = cache_obj.stats()
+        self.assertFalse(stats["remote"]["enabled"])
+        self.assertIsNone(stats["remote"]["url"])
+        self.assertEqual(stats["counters"]["remoteHits"], 0)
+        self.assertEqual(stats["counters"]["remoteStores"], 0)
+        self.assertEqual(stats["counters"]["remoteErrors"], 0)
+
+    def test_invalid_remote_environment_is_loud(self):
+        with mock.patch.dict(
+            os.environ,
+            {
+                "GYPSY_REMOTE_CACHE_URL": "not-a-url",
+                "GYPSY_REMOTE_CACHE_TOKEN": "abcdefgh",
+            },
+            clear=False,
+        ):
+            with self.assertRaises(cache.CacheError):
+                cache.ActionCache(self.state)
 
 
 if __name__ == "__main__":

@@ -16,6 +16,9 @@
   var jobStream = null;
   var jobTransport = null;
   var jobFinished = false;
+  var catalogData = null;
+  var catalogError = null;
+  var catalogLoading = false;
   var RUN_ALL = 'python workstream/gypsy.py slices run --all';
   var ENGINE_LABELS = { godot: 'Godot', unity: 'Unity', ue5: 'Unreal Engine 5', flax: 'Flax' };
 
@@ -155,7 +158,7 @@
     }
     var gatesAttention = ((state.metrics && state.metrics.blocked) || 0) + ((state.metrics && state.metrics.untested) || 0);
     return '<aside class="rail" aria-label="Sections">' +
-      '<div class="label">Workspace</div>' + nav('overview', 'Overview') + nav('insights', 'Insights', (nextActions().length || null)) + nav('slices', 'Slices', (state.slices || []).length) + nav('artifacts', 'Artifacts', (state.artifacts || []).length) + nav('run', 'Runs', (state.runs || []).length) +
+      '<div class="label">Workspace</div>' + nav('overview', 'Overview') + nav('insights', 'Insights', (nextActions().length || null)) + nav('projects', 'Projects', (catalogData && typeof catalogData.count === 'number' ? catalogData.count : null)) + nav('slices', 'Slices', (state.slices || []).length) + nav('artifacts', 'Artifacts', (state.artifacts || []).length) + nav('run', 'Runs', (state.runs || []).length) +
       '<div class="label">Console</div>' + nav('mission', 'Mission', state.metrics.untested || 0) + nav('commands', 'Commands') + nav('review', 'Review', state.metrics.blocked || 0) +
       '<div class="label">Quality</div><button class="nav" data-view="review"><span class="i"></span>Gates<span class="count">' + gatesAttention + '</span></button>' +
       '<a class="nav" href="/classic" style="text-decoration:none"><span class="i"></span>Classic views</a>' +
@@ -443,6 +446,88 @@
       '<div class="bottomgrid"><div class="recover"><b>Run state is derived</b><p>Every row comes from the latest slice state; old runs remain available in the Runs view.</p></div><div class="recover"><b>Failures are explicit</b><p>A failed slice stops later steps; open Run detail for logs and retry controls.</p></div></div></main>' +
       '<aside class="right"><div class="rpanel"><div class="rpanel-h"><b>Pipeline</b><span>ORDERED</span></div><div class="rpad" style="display:flex;flex-direction:column;gap:5px">' + ((state.slices || []).map(function (s) { return '<div class="gate"><span class="d" style="background:' + (s.passed ? 'var(--green)' : 'var(--red)') + '"></span><div class="g"><b>' + esc(s.id) + '</b><p>' + esc(secs(s.seconds)) + ' · ' + esc(s.status) + '</p></div></div>'; }).join('') || '<div class="note">No slices yet.</div>') + '</div></div></aside>';
   }
+  function healthBadge(health) {
+    if (health === 'ok') return badge('pass', 'OK');
+    if (health === 'warning') return badge('untested', 'WARNING');
+    if (health === 'invalid') return badge('failed', 'INVALID');
+    return badge('ready', String(health || 'unknown').toUpperCase());
+  }
+  function loadCatalog() {
+    catalogLoading = true;
+    catalogError = null;
+    if (view === 'projects') renderProjects();
+    return fetch('/api/catalog', { cache: 'no-store' }).then(function (res) {
+      return res.json().then(function (body) { return { ok: res.ok, status: res.status, body: body }; }).catch(function () {
+        return { ok: res.ok, status: res.status, body: null };
+      });
+    }).then(function (result) {
+      catalogLoading = false;
+      if (!result.ok) {
+        catalogError = (result.body && result.body.error) || ('catalog HTTP ' + result.status);
+        catalogData = null;
+      } else {
+        catalogData = result.body;
+        catalogError = null;
+      }
+      if (view === 'projects') renderProjects();
+    }).catch(function (err) {
+      catalogLoading = false;
+      catalogError = err.message || String(err);
+      catalogData = null;
+      if (view === 'projects') renderProjects();
+    });
+  }
+  function projectRow(entry) {
+    var details = '';
+    (entry.warnings || []).forEach(function (warning) { details += '<div class="warnline">warning: ' + esc(warning) + '</div>'; });
+    (entry.errors || []).forEach(function (error) { details += '<div class="warnline bad">error: ' + esc(error) + '</div>'; });
+    if (entry.duplicate) details += '<div class="warnline">duplicate project name</div>';
+    var row = '<tr class="proj-row"><td class="runname">' + esc(entry.name) + '</td><td>' + esc(engineLabel(entry.engine)) + '</td><td class="t-mono">' + esc(entry.version || '—') + '</td><td>' + esc((entry.targets || []).join(', ') || '—') + '</td><td>' + healthBadge(entry.health) + '</td><td class="t-mono proj-path" title="' + esc(entry.path) + '">' + esc(entry.path) + '</td><td class="t-mono proj-path" title="' + esc(entry.manifest) + '">' + esc(entry.manifest) + '</td><td style="text-align:right;white-space:nowrap">' + copyButton(entry.manifest, 'Copy manifest') + '</td></tr>';
+    return row + (details ? '<tr class="proj-detail"><td colspan="8">' + details + '</td></tr>' : '');
+  }
+  function renderProjects() {
+    shell.className = 'body';
+    var rail = railMarkup('projects');
+    var head = '<div class="head"><div><h1>Projects</h1><p>Read-only catalog of project.gypsy.json manifests under the checkout</p></div><div class="actions"><button class="btn small ghost" id="catalog-refresh" title="Re-scan project.gypsy.json manifests read-only">Scan again</button>' + (catalogData ? copyButton(catalogData.root, 'Copy scan root') : '') + '</div></div>';
+    if (catalogLoading && !catalogData && !catalogError) {
+      shell.innerHTML = rail + '<main class="main">' + head + '<div class="loading" role="status">Scanning project.gypsy.json manifests (read-only)…</div></main>';
+      return;
+    }
+    if (!catalogData && !catalogError) {
+      catalogLoading = true;
+      shell.innerHTML = rail + '<main class="main">' + head + '<div class="loading" role="status">Scanning project.gypsy.json manifests (read-only)…</div></main>';
+      loadCatalog();
+      return;
+    }
+    if (catalogError) {
+      shell.innerHTML = rail + '<main class="main">' + head +
+        emptyState('Catalog scan failed', catalogError + ' Nothing is substituted: no fake projects are shown.', '<button class="btn small" id="catalog-refresh">Retry scan</button>') +
+        '<div class="runs"><div class="runs-h"><b>What this view does</b><span>READ ONLY</span></div><div class="rpad note">The dashboard calls workstream/catalog.py discover() in-process; it never writes state and the browser never supplies a scan root. Manifest health is not build health.</div></div></main>' +
+        '<aside class="right"><div class="rpanel"><div class="rpanel-h"><b>Error</b><span>REPORTED</span></div><div class="rpad note">' + esc(catalogError) + '</div></div></aside>';
+      return;
+    }
+    var counts = catalogData.counts || {};
+    var duplicates = catalogData.duplicates || {};
+    var scanErrors = catalogData.errors || [];
+    var projects = (catalogData.projects || []).filter(function (entry) {
+      if (!searchQuery) return true;
+      var haystack = ((entry.name || '') + ' ' + (entry.path || '') + ' ' + (entry.manifest || '') + ' ' + (entry.engine || '')).toLowerCase();
+      return haystack.indexOf(searchQuery.toLowerCase()) >= 0;
+    });
+    var rows = projects.map(projectRow).join('');
+    if (!rows) {
+      rows = '<tr><td colspan="8">' + emptyState(searchQuery ? 'No projects match the search' : 'No projects found', searchQuery ? 'Clear the search to list every discovered project manifest.' : 'No project.gypsy.json manifest was found under ' + (catalogData.root || 'the checkout') + '. Templates use project.gypsy.template.json and are deliberately not projects.', copyButton('python workstream/gypsy.py project init --path <dir>', 'Copy init command') + copyButton(catalogData.root || '', 'Copy scan root')) + '</td></tr>';
+    }
+    var duplicateMarkup = Object.keys(duplicates).length ? '<div class="runs" style="margin-top:12px"><div class="runs-h"><b>Duplicate project names</b><span>NEEDS A DECISION</span></div><div class="rpad">' + Object.keys(duplicates).map(function (name) { return '<div class="warnline">' + esc(name) + ': ' + esc((duplicates[name] || []).join(', ')) + '</div>'; }).join('') + '</div></div>' : '';
+    var scanErrorMarkup = scanErrors.length ? '<div class="runs" style="margin-top:12px"><div class="runs-h"><b>Scan errors</b><span>PARTIAL</span></div><div class="rpad">' + scanErrors.map(function (error) { return '<div class="warnline bad">' + esc(error) + '</div>'; }).join('') + '</div></div>' : '';
+    shell.innerHTML = rail + '<main class="main">' + head +
+      '<div class="metrics">' + metricCard('Projects', catalogData.count || 0, 'project.gypsy.json manifests', catalogData.count ? '● DISCOVERED' : 'NONE', catalogData.count ? 'pass' : 'warn') + metricCard('Healthy', counts.ok || 0, 'manifest health ok', '') + metricCard('Warnings', counts.warning || 0, 'valid with warnings', '') + metricCard('Invalid', counts.invalid || 0, 'schema or JSON errors', '', counts.invalid ? 'fail' : 'pass') + '</div>' +
+      '<div class="runs proj-wrap"><div class="runs-h"><b>Project manifests</b><span>' + projects.length + ' shown · ' + (catalogData.count || 0) + ' discovered</span></div><table class="proj-table"><thead><tr><th>Project</th><th>Engine</th><th>Version</th><th>Targets</th><th>Health</th><th>Project path</th><th>Manifest path</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      '<div class="bottomgrid"><div class="recover"><b>Manifest health only</b><p>Health validates the manifest file (schema and warnings). It is not engine readiness, licence state or build health; run gypsy check, engines probe and real slices for those.</p></div><div class="recover"><b>No fake projects</b><p>Only files named project.gypsy.json are listed; templates use project.gypsy.template.json and are ignored. Every row is a file on disk.</p></div></div>' +
+      duplicateMarkup + scanErrorMarkup +
+      '</main><aside class="right"><div class="rpanel"><div class="rpanel-h"><b>Scan</b><span>READ ONLY</span></div><div class="rpad">' + kv('root', catalogData.root || '—') + kv('generated', catalogData.generated || '—') + '<div class="note" style="margin-top:7px">The scan is in-process via workstream/catalog.py discover(). It writes nothing; Refresh re-runs the scan.</div></div></div><div class="rpanel"><div class="rpanel-h"><b>Actions</b><span>LOCAL</span></div><div class="rpad" style="display:flex;flex-direction:column;gap:5px"><button class="btn small ghost" id="catalog-refresh">Refresh scan</button>' + copyButton(catalogData.root || '', 'Copy scan root') + '<div class="note">There is no open-folder or editor action: the dashboard does not expose a file browser. Paths are copyable instead.</div></div></div></aside>';
+  }
+
   function renderArtifacts() {
     shell.className = 'body';
     shell.innerHTML = railMarkup('artifacts') +
@@ -459,6 +544,7 @@
     });
     if (view === 'run') renderRun();
     else if (view === 'insights') renderInsights();
+    else if (view === 'projects') renderProjects();
     else if (view === 'mission') renderMission();
     else if (view === 'commands') renderCommands();
     else if (view === 'review') renderReview();
@@ -674,11 +760,12 @@
     if (ev.target.closest('#modal-cancel') || ev.target.id === 'modal') { document.getElementById('modal').classList.remove('show'); return; }
     if (ev.target.closest('#modal-run')) { runPending(); return; }
     if (ev.target.closest('#job-close')) { document.getElementById('job').classList.remove('show'); stopJobStream(); return; }
-    if (ev.target.closest('#refresh')) { loadState(); return; }
+    if (ev.target.closest('#catalog-refresh')) { loadCatalog(); return; }
+    if (ev.target.closest('#refresh')) { if (view === 'projects') { loadCatalog(); } else { loadState(); } return; }
     if (ev.target.closest('#run-all')) { showModal('run_all'); return; }
   });
   var searchInput = document.getElementById('search');
-  if (searchInput) searchInput.addEventListener('input', function () { searchQuery = searchInput.value.trim(); if (view === 'overview' || view === 'slices' || view === 'artifacts') render(); });
+  if (searchInput) searchInput.addEventListener('input', function () { searchQuery = searchInput.value.trim(); if (view === 'overview' || view === 'slices' || view === 'artifacts' || view === 'projects') render(); });
   document.addEventListener('keydown', function (ev) {
     if (ev.key === 'Escape') {
       document.getElementById('modal').classList.remove('show');
@@ -708,7 +795,7 @@
     }
   });
   var query = new URLSearchParams(location.search);
-  var allowedViews = ['overview', 'insights', 'run', 'mission', 'commands', 'review', 'slices', 'artifacts'];
+  var allowedViews = ['overview', 'insights', 'projects', 'run', 'mission', 'commands', 'review', 'slices', 'artifacts'];
   var queryView = query.get('view');
   view = allowedViews.indexOf(queryView) >= 0 ? queryView : 'overview';
   selectedRunId = query.get('id') || null;

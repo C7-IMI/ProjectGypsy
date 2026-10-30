@@ -38,7 +38,19 @@ four-view app remains available at `/classic`.
 - Next-action rows carry a real whitelisted command and/or a view link; blocked rows say "no local action" instead of
   offering a dead control.
 
-### 3. Remaining console screens — live-mission.png, live-commands.png, live-review.png, live-slices.png, live-artifacts.png
+### 3. Projects — live-projects.png
+
+![Projects](live-projects.png)
+
+- Read-only catalog of every `project.gypsy.json` under the checkout, via `workstream/catalog.py` `discover()`.
+- Per project: name, engine and version, targets, manifest health, project path and manifest path.
+- Manifest health only (schema/warnings), stated explicitly as not engine readiness, licence state or build health.
+- Honest loading, empty ("no project.gypsy.json found") and error states; a failed scan never shows fake projects.
+- **Scan again** re-runs the read-only scan; manifest paths and the scan root are copyable. There is no open-folder or
+  editor action: the dashboard does not expose a file browser (documented in the view).
+- Templates (`project.gypsy.template.json`) are never listed as projects; duplicates are flagged with both paths.
+
+### 4. Remaining console screens — live-mission.png, live-commands.png, live-review.png, live-slices.png, live-artifacts.png
 
 - Mission: phase ladder, machine, engine posture, grouped gates.
 - Commands: the fixed whitelist with argv, run/copy and latest job output.
@@ -46,7 +58,7 @@ four-view app remains available at `/classic`.
 - Slices: table of declared slices with run/open actions.
 - Artifacts: hashed artifact library with live previews.
 
-### 4. Run detail — run-detail.png
+### 5. Run detail — run-detail.png
 
 ![Run detail](run-detail.png)
 
@@ -87,10 +99,16 @@ four-view app remains available at `/classic`.
 - Keyboard/focus: tablist arrow-key navigation, Ctrl/⌘+K search, visible :focus-visible rings, skip link, aria-live
   job/toast regions.
 - Responsive: insights and action rows reflow at 1200 px; single-column cards and compact tabs below 760 px.
+- Projects tab at ?view=projects: GET /api/catalog exposes workstream/catalog.py's read-only scan; the browser cannot
+  supply a scan root, so the view never becomes a filesystem browser. Refresh re-scans; no open-folder action exists.
+- Projects tests cover real, empty, invalid-manifest and template-only roots, plus the endpoint's error and no-root-
+  override behaviour.
 
-## Current data used in the mockups
+## Current data
 
-5 slices (phase1, quality, toolpacks, leftbehind, mobile) · 182 tests · 46 capabilities · 2 gates needing attention
-(device launch untested, UE5 hardware-blocked) · LeftBehind Unity 6 PASS.
+Screenshots are captured from the local checkout at capture time; they are not hand-built data. The Projects view
+lists only manifests that exist on disk (currently the Godot project and LeftBehind), and it states that health is
+manifest health only.
 
-Live screenshots (1600×1000, captured by headless Chromium against the local server and real state): `live-overview.png`, `live-insights.png` and `live-run.png`.
+Live screenshots (1600×1000, captured by headless Chromium against the local server and real state): `live-overview.png`,
+`live-insights.png`, `live-projects.png` and `live-run.png`.

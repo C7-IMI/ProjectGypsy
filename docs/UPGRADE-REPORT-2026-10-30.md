@@ -56,6 +56,16 @@ emulator scope.
 
 ![Run detail](../design/dashboard-v2/live-run.png)
 
+## P1 increment (same day)
+
+- **Authenticated loopback remote action cache** (ADR-020): fresh local cache miss **0.178 s**, then a fresh second
+  state directory **0.0 s remote hit**, restoring artifacts/hero/validation.json; server 1 entry/1 blob/2 puts/2 gets.
+- **Projects dashboard view**: real catalog (ProjectGypsy Godot 4.7.2, LeftBehind Unity 6000.6.7f1), health/paths,
+  read-only scan and copy actions; Chromium screenshot live-projects.png.
+- Slice-step cache cwd made checkout-relative so the same cache descriptor can match across different absolute checkout
+  roots.
+- Full suite after this increment: **456 tests OK (3 skipped)**.
+
 ## Remaining external gates (not software-buildable here)
 
 The following remain **blocked by hardware, accounts/spend, or a missing upstream capability**. They are not silently

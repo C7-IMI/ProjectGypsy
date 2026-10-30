@@ -43,6 +43,7 @@ import uuid
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urlsplit
 
 SCHEMA = "gypsy.cache/v1"
 ENTRY_SCHEMA = "gypsy.cache-entry/v1"
@@ -273,10 +274,53 @@ def action_key(
 # -- the cache ---------------------------------------------------------------
 
 
-class ActionCache:
-    """A local content-addressed action cache rooted at <state_dir>/cache."""
+def _remote_module():
+    try:  # imported as workstream.cache
+        from . import remote_cache as module
+    except ImportError:  # imported with workstream/ on sys.path
+        try:
+            import remote_cache as module
+        except ImportError:
+            return None
+    return module
 
-    def __init__(self, state_dir, *, enabled: bool = True):
+
+def _remote_client_from_env():
+    """Build a RemoteCacheClient only when both remote-cache env variables are set."""
+    module = _remote_module()
+    if module is None:
+        return None
+    config = module.config_from_env()
+    if config is None:
+        return None
+    try:
+        return module.RemoteCacheClient(config["url"], config["token"])
+    except module.RemoteCacheError as exc:
+        raise CacheError(
+            "invalid remote cache configuration: " + str(exc)
+        ) from exc
+
+
+def _safe_url(url):
+    if not url:
+        return None
+    parts = urlsplit(str(url))
+    host = parts.hostname or ""
+    port = ":" + str(parts.port) if parts.port else ""
+    path = parts.path.rstrip("/")
+    return parts.scheme + "://" + host + port + path
+
+
+class ActionCache:
+    """A local content-addressed action cache rooted at <state_dir>/cache.
+
+    The local cache is always primary. When remote is given (or both remote-cache env
+    variables are set), a local miss falls back to the remote cache and a successful local
+    store is pushed best-effort to it. Remote failures never fail a run; they are counted
+    and reported honestly in stats(). Pass remote=False to force local-only behaviour.
+    """
+
+    def __init__(self, state_dir, *, enabled: bool = True, remote=None):
         self.state_dir = Path(state_dir)
         self.cache_dir = self.state_dir / "cache"
         self.entries_dir = self.cache_dir / "entries"
@@ -284,6 +328,19 @@ class ActionCache:
         self.stats_path = self.cache_dir / "stats.json"
         self.enabled = bool(enabled)
         self._lock = threading.Lock()
+        self._last_remote_error = None
+        if remote is None:
+            self.remote = _remote_client_from_env()
+        elif remote is False:
+            self.remote = None
+        else:
+            self.remote = remote
+        if self.remote is not None:
+            required = ("get_entry", "put_entry", "get_blob", "put_blob", "status")
+            if not all(callable(getattr(self.remote, name, None)) for name in required):
+                raise CacheError(
+                    "remote must provide get_entry/put_entry/get_blob/put_blob/status"
+                )
 
     # -- stats ---------------------------------------------------------
     def _load_stats(self) -> dict:
@@ -294,6 +351,9 @@ class ActionCache:
             "stores": 0,
             "restores": 0,
             "bytesStored": 0,
+            "remoteHits": 0,
+            "remoteStores": 0,
+            "remoteErrors": 0,
             "lastUpdated": None,
         }
         if not self.stats_path.is_file():
@@ -304,7 +364,16 @@ class ActionCache:
             return default
         if not isinstance(data, dict) or data.get("schema") != STATS_SCHEMA:
             return default
-        for key in ("hits", "misses", "stores", "restores", "bytesStored"):
+        for key in (
+            "hits",
+            "misses",
+            "stores",
+            "restores",
+            "bytesStored",
+            "remoteHits",
+            "remoteStores",
+            "remoteErrors",
+        ):
             if not isinstance(data.get(key), int):
                 data[key] = default[key]
         return data
@@ -326,7 +395,16 @@ class ActionCache:
         stats = self._load_stats()
         return {
             key: int(stats.get(key, 0))
-            for key in ("hits", "misses", "stores", "restores", "bytesStored")
+            for key in (
+                "hits",
+                "misses",
+                "stores",
+                "restores",
+                "bytesStored",
+                "remoteHits",
+                "remoteStores",
+                "remoteErrors",
+            )
         }
 
     def stats(self) -> dict:
@@ -351,8 +429,37 @@ class ActionCache:
             "entries": entries,
             "blobs": blobs,
             "blobBytes": blob_bytes,
+            "remote": self.remote_info(),
             "lastUpdated": self._load_stats().get("lastUpdated"),
         }
+
+    def remote_info(self, *, ping=False) -> dict:
+        """Token-free description of the remote cache configuration and counters."""
+        info = {
+            "enabled": self.remote is not None,
+            "url": _safe_url(getattr(self.remote, "url", None)),
+            "counters": {
+                "hits": self.counters()["remoteHits"],
+                "stores": self.counters()["remoteStores"],
+                "errors": self.counters()["remoteErrors"],
+            },
+            "lastError": self._last_remote_error,
+        }
+        if ping and self.remote is not None:
+            info["status"] = self.remote.status()
+        return info
+
+    def remote_status(self) -> dict:
+        """A live (network) status for the CLI; disabled remote returns a reason."""
+        if self.remote is None:
+            return {
+                "enabled": False,
+                "reason": "remote cache is not configured (set GYPSY_REMOTE_CACHE_URL and GYPSY_REMOTE_CACHE_TOKEN)",
+            }
+        status = dict(self.remote.status())
+        status["enabled"] = True
+        status["url"] = _safe_url(status.get("url") or getattr(self.remote, "url", None))
+        return status
 
     # -- entries -------------------------------------------------------
     def _entry_path(self, key: str) -> Path:
@@ -361,45 +468,127 @@ class ActionCache:
     def _blob_path(self, digest: str) -> Path:
         return self.blobs_dir / digest
 
-    def lookup(self, key: str):
-        """Return a verified entry for *key*, or None (and count the miss)."""
-        if not self.enabled:
-            return None
-        path = self._entry_path(key)
-        if not path.is_file():
-            self._bump(misses=1)
-            return None
-        try:
-            entry = json.loads(path.read_text(encoding="utf-8-sig"))
-        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
-            self._bump(misses=1)
-            return None
+    @staticmethod
+    def _entry_matches(entry, key) -> bool:
         if (
             not isinstance(entry, dict)
             or entry.get("schema") != ENTRY_SCHEMA
             or entry.get("key") != key
             or not isinstance(entry.get("artifacts"), list)
         ):
-            self._bump(misses=1)
-            return None
+            return False
         for artifact in entry["artifacts"]:
             if not isinstance(artifact, dict):
-                self._bump(misses=1)
-                return None
+                return False
             digest = artifact.get("sha256")
-            blob = self._blob_path(str(digest))
-            if not isinstance(digest, str) or not blob.is_file():
-                self._bump(misses=1)
+            if not isinstance(digest, str) or len(digest) != 64:
+                return False
+            if isinstance(artifact.get("bytes"), bool) or not isinstance(
+                artifact.get("bytes"), int
+            ):
+                return False
+        return True
+
+    def _lookup_local(self, key):
+        path = self._entry_path(key)
+        if not path.is_file():
+            return None
+        try:
+            entry = json.loads(path.read_text(encoding="utf-8-sig"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+            return None
+        if not self._entry_matches(entry, key):
+            return None
+        for artifact in entry["artifacts"]:
+            digest = artifact["sha256"]
+            blob = self._blob_path(digest)
+            if not blob.is_file():
                 return None
             try:
-                if blob.stat().st_size != artifact.get("bytes") or _sha256_file(blob) != digest:
-                    self._bump(misses=1)
+                if (
+                    blob.stat().st_size != artifact["bytes"]
+                    or _sha256_file(blob) != digest
+                ):
                     return None
             except OSError:
-                self._bump(misses=1)
                 return None
-        self._bump(hits=1)
         return entry
+
+    def _fetch_remote_entry(self, key):
+        """Materialise a remote entry and its blobs locally; None on any failure."""
+        try:
+            entry = self.remote.get_entry(key)
+        except Exception as exc:  # remote failures never break a run
+            self._last_remote_error = _clip(str(exc), 300)
+            self._bump(remoteErrors=1)
+            return None
+        if entry is None:
+            return None
+        if not self._entry_matches(entry, key):
+            self._last_remote_error = "remote entry failed local validation"
+            self._bump(remoteErrors=1)
+            return None
+        for artifact in entry["artifacts"]:
+            digest = artifact["sha256"]
+            blob = self._blob_path(digest)
+            if blob.is_file():
+                try:
+                    if (
+                        blob.stat().st_size == artifact["bytes"]
+                        and _sha256_file(blob) == digest
+                    ):
+                        continue
+                except OSError:
+                    pass
+            try:
+                data = self.remote.get_blob(digest)
+            except Exception as exc:
+                self._last_remote_error = _clip(str(exc), 300)
+                self._bump(remoteErrors=1)
+                return None
+            if (
+                data is None
+                or len(data) != artifact["bytes"]
+                or _sha256_bytes(data) != digest
+            ):
+                self._last_remote_error = (
+                    "remote blob missing or failed SHA-256 verification"
+                )
+                self._bump(remoteErrors=1)
+                return None
+            try:
+                _atomic_write_bytes(blob, data)
+            except OSError as exc:
+                self._last_remote_error = _clip(
+                    "could not materialise remote blob: " + str(exc), 300
+                )
+                self._bump(remoteErrors=1)
+                return None
+        try:
+            _atomic_write_json(self._entry_path(key), entry)
+        except OSError as exc:
+            self._last_remote_error = _clip(
+                "could not store remote entry locally: " + str(exc), 300
+            )
+            self._bump(remoteErrors=1)
+            return None
+        return entry
+
+    def lookup(self, key: str):
+        """Return a verified entry (local first, then remote), or None; count hit/miss."""
+        if not self.enabled:
+            return None
+        entry = self._lookup_local(key)
+        if entry is not None:
+            self._bump(hits=1)
+            return entry
+        if self.remote is not None:
+            remote_entry = self._fetch_remote_entry(key)
+            if remote_entry is not None:
+                self._bump(hits=1, remoteHits=1)
+                return remote_entry
+        self._bump(misses=1)
+        return None
 
     def store(
         self,
@@ -449,7 +638,24 @@ class ActionCache:
         except OSError:
             return None
         self._bump(stores=1, bytesStored=stored_bytes)
+        if self.remote is not None:
+            self._push_remote(key, entries)
         return {"key": key, "createdAt": created, "artifacts": entries}
+
+    def _push_remote(self, key: str, artifacts) -> None:
+        """Best-effort push of blobs then the entry; failures are counted, not raised."""
+        try:
+            for artifact in artifacts:
+                digest = artifact["sha256"]
+                data = self._blob_path(digest).read_bytes()
+                self.remote.put_blob(digest, data)
+            entry = json.loads(self._entry_path(key).read_text(encoding="utf-8-sig"))
+            self.remote.put_entry(key, entry)
+        except Exception as exc:
+            self._last_remote_error = _clip(str(exc), 300)
+            self._bump(remoteErrors=1)
+            return
+        self._bump(remoteStores=1)
 
     def restore(self, entry, project_root):
         """Restore an entry's artifacts; return (ok, restored_paths, error)."""

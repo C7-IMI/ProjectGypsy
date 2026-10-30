@@ -85,6 +85,7 @@ In this order:
    [`docs/ADR-017-hero-character-pipeline.md`](./docs/ADR-017-hero-character-pipeline.md),
    [`docs/ADR-018-unity-default.md`](./docs/ADR-018-unity-default.md),
    [`docs/ADR-019-cache-quality.md`](./docs/ADR-019-cache-quality.md),
+   [`docs/ADR-020-remote-cache.md`](./docs/ADR-020-remote-cache.md),
    [`docs/UNITY-SLICE.md`](./docs/UNITY-SLICE.md),
    [`docs/ENGINE-SMOKE.md`](./docs/ENGINE-SMOKE.md), [`docs/IMPORT-MATRIX.md`](./docs/IMPORT-MATRIX.md),
    the PHASE-1..5 evidence files and [`docs/PHASE-6-GATE.md`](./docs/PHASE-6-GATE.md).
@@ -142,7 +143,8 @@ with demo/export/capture, a manifest-driven slice orchestrator with state/artifa
 validators/provenance, a read-only terminal console, a live watcher, a performance baseline, a signed Android debug
 APK, the Gypsy Studio operations console and classic four-view dashboard; **LeftBehind** proves the same slice on Unity 6
 (build, demo and capture); an action-level content cache, opt-in parallel execution, visual/performance quality gates, a
-project catalog with golden-path templates, and the Insights/live-log dashboard; records and the one pack check list; the
+project catalog with golden-path templates, the Projects/Insights/live-log dashboard and an authenticated loopback
+remote action cache; records and the one pack check list; the
 ADRs; a golden Blender import matrix; MCP/ComfyUI/Poly Haven tooling, the safe self-extension pipeline and the first hero
 art/character pipeline (runtime LOD, driven Smile, spring cape). The Android **emulator launch passes** (boot, install,
 launch, render, screenshot, logcat); a physical device, touch/audio/rotation/performance and release signing remain

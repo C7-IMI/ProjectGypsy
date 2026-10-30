@@ -112,6 +112,16 @@ def _atomic_write_json(path: Path, payload) -> None:
         raise
 
 
+def _cache_relative_cwd(project_root, project_dir) -> str:
+    """Stable cwd for cache keys across checkouts with different absolute roots."""
+    root = Path(project_root).resolve()
+    target = Path(project_dir).resolve()
+    try:
+        return target.relative_to(root).as_posix() or "."
+    except ValueError:
+        return "."
+
+
 def _cache_step_argv(step: dict) -> list:
     """A stable argv-like identity token for a handler step's declared arguments."""
     try:
@@ -376,7 +386,7 @@ def run_slice(
                     "manifestSha256": manifest_sha,
                 },
                 argv=_cache_step_argv(step),
-                cwd=str(project_dir),
+                cwd=_cache_relative_cwd(project_root, project_dir),
                 inputs=cache_inputs,
                 artifacts=step_cache["artifacts"],
                 tool_versions=step_cache["toolVersions"],

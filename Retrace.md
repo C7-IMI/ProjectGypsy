@@ -427,5 +427,14 @@ Each entry has:
 
 ---
 
-Next prompt number: 42. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 42 - 2026-10-30
+
+- Request: Use the recommendations; build the remote cache/worker-path increment before considering agent memory.
+- Status: Remote action cache and Projects view implemented; local bounded worker pool remains the execution path.
+- Version: 2026.10.30.008
+- Evidence: ADR-020, remote cache 0.178 s miss vs 0.0 s fresh-checkout hit, 456 tests, Projects screenshot.
+
+---
+
+Next prompt number: 43. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

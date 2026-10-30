@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.30.007
+Current version: 2026.10.30.008
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,19 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.30.008
+
+**P1 increment: authenticated remote action cache and Projects dashboard view; cache cwd normalized across checkouts.**
+
+- Date: 2026-10-30
+- Commit: this change.
+- Change: workstream/remote_cache.py loopback-first HTTP cache (bearer token, exact entry/blob resources, SHA-256
+  verification both ways, bounded bodies, no shell); ActionCache local-first remote fallback/push with counters/status;
+  cache serve/remote CLI; Projects view and /api/catalog dashboard surface; slice-step cache cwd made checkout-relative.
+- Verification: full suite **456 tests OK (3 skipped)**; check_all 6/6; remote round trip 0.178 s miss then
+  **0.0 s hit** from a fresh local cache with server stats 1 entry/1 blob/2 puts/2 gets; Projects view 2 real manifests,
+  Chromium screenshot; no TLS/remote execution claimed.
 
 ## 2026.10.30.007
 

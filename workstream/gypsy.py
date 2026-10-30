@@ -16,6 +16,8 @@ Usage:
     python workstream/gypsy.py slices list|plan|run|status [--parallel N] [--no-cache] [--force] [--json]
     python workstream/gypsy.py toolpacks list|check|run [--action NAME] [--parallel N] [--no-cache] [--force] [--json]
     python workstream/gypsy.py cache stats|list|clear [--yes] [--json]
+    python workstream/gypsy.py cache serve [--host 127.0.0.1] [--port 8767] [--root DIR]
+    python workstream/gypsy.py cache remote [--url URL] [--json]
     python workstream/gypsy.py project init --path DIR [--engine ID] [--version VER] [--targets pc,mobile] [--force]
     python workstream/gypsy.py project show [--path DIR] [--json]
     python workstream/gypsy.py check [--project DIR] [--json]
@@ -871,6 +873,22 @@ def main(argv=None) -> int:
         cache_cmd.add_argument("--json", action="store_true")
         if name == "clear":
             cache_cmd.add_argument("--yes", action="store_true", help="confirm clearing entries and blobs")
+    cache_serve = cache_sub.add_parser(
+        "serve", help="run the loopback authenticated HTTP remote cache server"
+    )
+    cache_serve.add_argument("--host", default="127.0.0.1", help="loopback address only")
+    cache_serve.add_argument("--port", type=int, default=8767)
+    cache_serve.add_argument("--root", default=None, help="storage root (default <state-dir>/remote-cache)")
+    cache_serve.add_argument("--token-env", default="GYPSY_REMOTE_CACHE_TOKEN")
+    cache_serve.add_argument("--max-entry-bytes", type=int, default=None)
+    cache_serve.add_argument("--max-blob-bytes", type=int, default=None)
+    cache_serve.add_argument("--json", action="store_true")
+    cache_remote = cache_sub.add_parser(
+        "remote", help="report the configured remote cache status"
+    )
+    cache_remote.add_argument("--url", default=None, help="override GYPSY_REMOTE_CACHE_URL")
+    cache_remote.add_argument("--token-env", default="GYPSY_REMOTE_CACHE_TOKEN")
+    cache_remote.add_argument("--json", action="store_true")
 
     extension_parser = sub.add_parser(
         "extension", help="isolated declarative extensions (ADR-003 self-extension)"
@@ -1410,7 +1428,103 @@ def main(argv=None) -> int:
             import cache as cache_spec
             from pathlib import Path as _Path
 
-            state_dir = _Path(args.state_dir) if args.state_dir else STATE_DIR
+            state_dir = (
+                _Path(args.state_dir) if getattr(args, "state_dir", None) else STATE_DIR
+            )
+            if args.cache_command == "serve":
+                import remote_cache as remote_spec
+
+                token = os.environ.get(args.token_env, "")
+                if not token:
+                    raise GypsyError(
+                        args.token_env
+                        + " must be set to a non-empty bearer token to serve the remote cache"
+                    )
+                root = _Path(args.root) if args.root else state_dir / "remote-cache"
+                limits = {}
+                if args.max_entry_bytes is not None:
+                    limits["max_entry_bytes"] = args.max_entry_bytes
+                if args.max_blob_bytes is not None:
+                    limits["max_blob_bytes"] = args.max_blob_bytes
+                try:
+                    server = remote_spec.RemoteCacheServer(
+                        root,
+                        token=token,
+                        host=args.host,
+                        port=args.port,
+                        **limits,
+                    ).start()
+                except remote_spec.RemoteCacheError as exc:
+                    raise GypsyError(str(exc)) from exc
+                print(
+                    "remote cache listening on "
+                    + server.url
+                    + " (loopback, bearer token required)"
+                )
+                try:
+                    server.serve_forever()
+                except KeyboardInterrupt:
+                    pass
+                finally:
+                    server.stop()
+                return 0
+            if args.cache_command == "remote":
+                import remote_cache as remote_spec
+
+                env = dict(os.environ)
+                if args.url:
+                    env[remote_spec.ENV_URL] = args.url
+                token_value = os.environ.get(args.token_env, "")
+                if token_value:
+                    env[remote_spec.ENV_TOKEN] = token_value
+                config = remote_spec.config_from_env(env)
+                if config is None:
+                    data = {
+                        "schema": remote_spec.SCHEMA,
+                        "enabled": False,
+                        "reason": "set "
+                        + remote_spec.ENV_URL
+                        + " and "
+                        + args.token_env
+                        + " to enable the remote cache",
+                        "env": remote_spec.env_summary(env),
+                    }
+                    if args.json:
+                        print(json.dumps(data, indent=2))
+                    else:
+                        print("remote cache: disabled (" + data["reason"] + ")")
+                    return 0
+                client = remote_spec.RemoteCacheClient(config["url"], config["token"])
+                data = client.status()
+                if args.json:
+                    print(json.dumps(data, indent=2))
+                else:
+                    state = "ok" if data.get("reachable") and data.get("authenticated") else "NOT OK"
+                    print(
+                        "remote cache: "
+                        + data.get("url", config["url"])
+                        + " | reachable="
+                        + str(data.get("reachable"))
+                        + " authenticated="
+                        + str(data.get("authenticated"))
+                        + " | "
+                        + state
+                    )
+                    stats = data.get("stats") or {}
+                    if stats:
+                        print(
+                            "  entries="
+                            + str(stats.get("entries"))
+                            + " blobs="
+                            + str(stats.get("blobs"))
+                            + " puts="
+                            + str(stats.get("puts"))
+                            + " gets="
+                            + str(stats.get("gets"))
+                        )
+                    if data.get("error"):
+                        print("  ERROR " + str(data["error"]))
+                return 0 if data.get("reachable") and data.get("authenticated") else 1
             cache_obj = cache_spec.ActionCache(state_dir)
             if args.cache_command == "stats":
                 data = cache_obj.stats()
@@ -1425,6 +1539,20 @@ def main(argv=None) -> int:
                         f"misses={counters['misses']} stores={counters['stores']} "
                         f"restores={counters['restores']}"
                     )
+                    remote = data.get("remote") or {}
+                    if remote.get("enabled"):
+                        remote_counters = remote.get("counters") or {}
+                        print(
+                            f"  remote: {remote.get('url')} hits={remote_counters.get('hits')} "
+                            f"stores={remote_counters.get('stores')} errors={remote_counters.get('errors')}"
+                        )
+                        if remote.get("lastError"):
+                            print(f"    lastError: {remote['lastError']}")
+                    else:
+                        print(
+                            "  remote: disabled (set GYPSY_REMOTE_CACHE_URL and "
+                            "GYPSY_REMOTE_CACHE_TOKEN to enable it)"
+                        )
                 return 0
             if args.cache_command == "list":
                 entries = cache_obj.entries()
