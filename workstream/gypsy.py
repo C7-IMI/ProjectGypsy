@@ -859,6 +859,11 @@ def main(argv=None) -> int:
             toolpack_cmd.add_argument("--parallel", type=int, default=1, help="opt-in parallel workers for independent actions (1-8)")
             toolpack_cmd.add_argument("--no-cache", action="store_true", help="disable the action cache for this run")
 
+    asset_graph_parser = sub.add_parser("asset-graph", help="asset dependency graph and byte budgets")
+    asset_graph_parser.add_argument("--dependencies", default=None, help="dependency sidecar path")
+    asset_graph_parser.add_argument("--write", action="store_true", help="write workstream/state/assets/graph.json")
+    asset_graph_parser.add_argument("--json", action="store_true")
+
     provenance_parser = sub.add_parser("provenance", help="signed artifact provenance and SBOM")
     provenance_sub = provenance_parser.add_subparsers(dest="provenance_command", required=True)
     provenance_sign = provenance_sub.add_parser("sign", help="hash and HMAC-sign declared artifacts")
@@ -1235,6 +1240,19 @@ def main(argv=None) -> int:
                 if data.get("dryRun"):
                     return 0 if data.get("ok") else 1
                 return 0 if data.get("passed") else 1
+
+        if args.command == "asset-graph":
+            import asset_graph as graph_spec
+
+            data = graph_spec.build_graph(dependencies=args.dependencies)
+            if args.write:
+                path = graph_spec.save_state(data)
+                data["statePath"] = str(path)
+            if args.json:
+                print(json.dumps(data, indent=2))
+            else:
+                print(graph_spec.render_summary(data))
+            return 1 if graph_spec.problems(data) else 0
 
         if args.command == "provenance":
             import provenance as provenance_spec

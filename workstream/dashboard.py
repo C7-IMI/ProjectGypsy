@@ -1047,6 +1047,23 @@ def _run_detail(run_id, state_root=None):
     }
 
 
+def _asset_graph_summary():
+    try:
+        import asset_graph as graph_spec
+        graph = graph_spec.build_graph()
+    except Exception as exc:
+        return {"available": False, "error": type(exc).__name__ + ": " + str(exc)}
+    budgets = graph.get("budgets") or {}
+    return {
+        "available": True,
+        "counts": graph.get("counts") or {},
+        "budgetStatus": budgets.get("status"),
+        "budgetFindings": budgets.get("findings") or [],
+        "warnings": graph.get("warnings") or [],
+        "errors": graph.get("errors") or [],
+    }
+
+
 def _provenance_summary():
     document = _read_json(STATE / "provenance" / "artifacts.json")
     sbom = _read_json(STATE / "provenance" / "sbom.json")
@@ -1166,6 +1183,7 @@ def collect_state():
         "observability": observability,
         "assetRegistry": asset_registry,
         "provenance": _provenance_summary(),
+        "assetGraph": _asset_graph_summary(),
         "cache": insights["cache"],
         "scheduler": insights["scheduler"],
         "commands": [{"id": key, **value} for key, value in COMMANDS.items()],
@@ -1452,6 +1470,9 @@ class Handler(BaseHTTPRequestHandler):
                 self._json(HTTPStatus.OK, collect_state())
             except Exception as exc:
                 self._json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": type(exc).__name__ + ": " + str(exc)})
+            return
+        if parsed.path == "/api/asset-graph":
+            self._json(HTTPStatus.OK, _asset_graph_summary())
             return
         if parsed.path == "/api/provenance":
             self._json(HTTPStatus.OK, _provenance_summary())

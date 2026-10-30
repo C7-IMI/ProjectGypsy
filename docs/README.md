@@ -22,6 +22,7 @@
 | [ADR-020-remote-cache.md](ADR-020-remote-cache.md) | loopback-first authenticated remote action cache; local remains primary |
 | [ADR-021-assets-metrics.md](ADR-021-assets-metrics.md) | read-only asset registry/provenance warnings and state-derived metrics |
 | [ADR-022-provenance.md](ADR-022-provenance.md) | local HMAC artifact provenance and deterministic SBOM; not PKI |
+| [ADR-023-asset-graph.md](ADR-023-asset-graph.md) | explicit asset dependency graph, cycle/layer validation and byte budgets |
 | [ADR-017-hero-character-pipeline.md](ADR-017-hero-character-pipeline.md) | first hero character: art direction, Blender generator, 20-joint rig, idle/run/reach, atlas, GLB/FBX, Godot integration and validation |
 | [ART-DIRECTION.md](ART-DIRECTION.md) | Wayfarer art direction, palette, silhouette, rig/animation set and validation contract |
 | [ADR-015-actionforge-toolkit.md](ADR-015-actionforge-toolkit.md) | reusable toolkit/plugin registry, ActionForge CC0 rig/animation fetch, licence/provenance, network and path safety, what stays manual |

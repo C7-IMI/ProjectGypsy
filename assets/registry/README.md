@@ -81,17 +81,51 @@ Rules:
   [ADR-002](../../docs/ADR-002-art-pipeline.md) D5 is the provenance contract, and AI-generated
   content still follows [ADR-004](../../docs/ADR-004-generative-media.md).
 
-## State
+## Dependency graph and budgets (optional sidecar)
 
+[workstream/asset_graph.py](../../workstream/asset_graph.py) builds a deterministic dependency graph over
+this registry's assets and validates per-media-kind byte budgets. It never infers an edge: only
+[assets/registry/dependencies.json](dependencies.json) (schema `gypsy.asset-dependencies/v1`) declares them.
+
+```text
+python workstream/asset_graph.py
+python workstream/asset_graph.py --json
+python workstream/asset_graph.py --validate
+python workstream/asset_graph.py --budget model=8388608 --validate
+python workstream/asset_graph.py --dependencies PATH --save-state
+```
+
+Edge direction is fixed: `from -> to` means `to` is produced from / depends on `from`. Declared nodes carry
+an optional `role` and `basis`; every edge requires a non-empty `basis` explaining how the derivation is
+known. Roots have no declared dependency, leaves have no declared dependent, isolated assets are both;
+layers are dependency depths. Unknown declared nodes, missing edge endpoints, self-edges and cycles are
+errors; duplicate declarations and edges are warnings; skipped edges are listed with their reason.
+
+The committed sidecar declares only the Wayfarer LOD1/LOD2/FBX derivations from the base
+`assets/hero/wayfarer.glb`, because those are the derivations recorded in
+[assets/hero/wayfarer_lods.json](../hero/wayfarer_lods.json) and [ADR-017](../../docs/ADR-017-hero-character-pipeline.md).
+Godot import copies under `game/assets/` are **not** declared: no copy/import edge is recorded for them, and
+identical bytes (see the registry duplicate groups) are not a dependency claim. The dependency sidecar is
+itself a tracked JSON file under `assets/registry/`, so the registry scan counts it as a text asset; the graph
+reads it separately.
+
+Budgets are optional. The sidecar may set `"budgets": {"model": 8388608}`, and a `--budget` flag overrides
+it. With no budget configured the graph reports `not-configured` plus a warning and does **not** fail; a
+configured and exceeded budget is a finding and fails `--validate`. The committed sidecar configures no
+budgets because no per-media byte limits are agreed yet (ADR-002 O5 leaves LOD/poly budgets open).
+
+## State
 `--save-state` writes the validated payload to `workstream/state/assets.json` atomically
 (gitignored). It is a comparison cache, not a source of truth: always rescan, and a stale state file
-must not be shown as current asset health.
+must not be shown as current asset health. The dependency graph has its own state file at
+`workstream/state/assets/graph.json`, written the same way by `asset_graph.py --save-state` or the
+`gypsy asset-graph --write` command.
 
 ## Limits
 
-- Read-only: no import, conversion, dependency graph, importer settings or engine outputs. The
-  asset-dependency work in [docs/IMPROVEMENT-ROADMAP.md](../../docs/IMPROVEMENT-ROADMAP.md) is
-  separate and is not claimed here.
+- Read-only: no import, conversion or engine outputs. The dependency graph is only the explicitly
+  declared sidecar ([workstream/asset_graph.py](../../workstream/asset_graph.py)); importer-derived
+  dependencies, per-file budgets and engine outputs are not inferred or claimed.
 - Hashes are SHA-256 of file bytes; `modified` is the filesystem mtime, not a content-freshness
   proof.
 - Duplicate content is reported, not resolved. This repository keeps both `assets/hero/` sources and

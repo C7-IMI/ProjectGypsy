@@ -57,7 +57,7 @@ untested), the Gypsy Studio operations console with **Insights**, **Projects**, 
 Unity 6 second-engine slice, the first hero art/character pipeline (Wayfarer with runtime LOD, driven Smile and spring
 cape), a **content-addressed action cache**, opt-in parallel slices/actions, **visual/performance quality gates**, a
 **project catalog with Unity/Godot golden-path templates**, an authenticated loopback **remote action cache**, an
-**asset registry** with provenance warnings, **state-derived metrics**, local HMAC **provenance/SBOM**, Unity hero FBX import proof and safe
+**asset registry** with provenance warnings, **state-derived metrics**, local HMAC **provenance/SBOM**, an explicit **asset dependency/budget graph**, Unity hero FBX import proof and safe
 self-extension. UE5 is
 hardware-blocked. See `docs/PHASE-5-EVIDENCE.md`, `docs/ADR-017-hero-character-pipeline.md`,
 `docs/ADR-019-cache-quality.md`, `docs/DEVICE-LAUNCH.md`, `docs/PHASE-6-GATE.md` and `DEFERRED.md`.

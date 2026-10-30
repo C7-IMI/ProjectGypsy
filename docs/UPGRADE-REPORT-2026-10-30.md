@@ -83,6 +83,13 @@ emulator scope.
 - **Honesty**: local symmetric integrity, not PKI; no certificates, external identity, timestamp authority or legal
   clearance. Full suite **529 tests**.
 
+## P1 increment: asset dependency graph
+
+- **31 nodes, 3 declared edges, 28 roots, 30 leaves, 2 layers, 0 cycles.**
+- Explicit hero edges: base GLB → LOD1/LOD2/FBX, each with a basis from the generator/ADR-017; no inferred edges.
+- Budgets: image 2.81 MB / 10 MB; model 6.38 MB / 10 MB; text 70.6 KB / 1 MB; all OK.
+- CLI `asset-graph`, API `/api/asset-graph`, Insights Asset graph card; 25 graph tests; full suite **554 tests**.
+
 ## Remaining external gates (not software-buildable here)
 
 The following remain **blocked by hardware, accounts/spend, or a missing upstream capability**. They are not silently

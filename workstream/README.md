@@ -46,6 +46,7 @@ python workstream/gypsy.py metrics [--write] [--json]
 python workstream/gypsy.py provenance sign ARTIFACT... [--write FILE] [--state-dir DIR]
 python workstream/gypsy.py provenance verify FILE [--state-dir DIR]
 python workstream/gypsy.py provenance sbom [--write FILE]
+python workstream/gypsy.py asset-graph [--dependencies FILE] [--write] [--json]
 python workstream/gypsy.py cache serve [--host 127.0.0.1] [--port 8767] [--root DIR]
 python workstream/gypsy.py cache remote [--url URL] [--json]
 python workstream/gypsy.py catalog [--root DIR] [--json] [--save-state]
@@ -126,6 +127,8 @@ python -m unittest discover -s workstream/tests -v
   `/api/metrics`), surfaced as Insights cards; not live OpenTelemetry.
 - Provenance: HMAC-SHA256 signed artifact manifests and a deterministic SBOM (`workstream/provenance.py`,
   `gypsy provenance sign|verify|sbom`); local integrity, not PKI/code signing.
+- Asset graph: explicit asset dependencies, cycle/layer validation and per-media byte budgets
+  (`workstream/asset_graph.py`, `gypsy asset-graph`, `/api/asset-graph`); no inferred importer graph.
 
 ## What is not built yet
 

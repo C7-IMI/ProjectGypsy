@@ -327,6 +327,16 @@
     var cells = stat('Signed', p.signedArtifacts || 0) + stat('Signature', p.signatureValid ? 'PASS' : 'FAIL') + stat('SBOM', p.sbomComponents || 0) + stat('Relations', p.sbomRelationships || 0);
     return '<div class="stats4">' + cells + '</div><p class="lead">HMAC integrity for declared artifacts plus a deterministic SBOM. This is local integrity, not PKI.</p><div class="src">signer: ' + esc(p.keyFingerprint || '—') + '</div>';
   }
+    function assetGraphCard() {
+    var g = (state && state.assetGraph) || {};
+    if (g.error) return emptyState('Asset graph unavailable', g.error, '');
+    if (g.available === false) return emptyState('No asset graph yet', 'Run python workstream/gypsy.py asset-graph --write to record it.', '');
+    var c = g.counts || {};
+    var budget = g.budgetStatus === 'ok' ? 'PASS' : (g.budgetStatus === 'not-configured' ? '—' : 'FAIL');
+    var cells = stat('Nodes', c.nodes || 0) + stat('Edges', c.edges || 0) + stat('Cycles', c.cycles || 0) + stat('Budgets', budget);
+    var findings = (g.budgetFindings || []).length;
+    return '<div class="stats4">' + cells + '</div><p class="lead">Explicit asset dependencies only; budget checks are byte totals per media kind.</p><div class="src">' + esc(findings + ' budget finding(s), ' + (g.warnings || []).length + ' warning(s)') + '</div>';
+  }
     function renderInsights() {
     shell.className = 'body';
     var ins = insight();
@@ -344,6 +354,7 @@
       insightCard('Run metrics', 'STATE-DERIVED', observabilityCard()) +
       insightCard('Asset registry', 'READ-ONLY', assetsCard()) +
       insightCard('Provenance + SBOM', 'SIGNED / LOCAL', provenanceCard()) +
+      insightCard('Asset graph', 'DECLARED EDGES', assetGraphCard()) +
       insightCard('Next actions', 'ACTIONABLE', actions || emptyState('No actions', 'Nothing needs attention in the recorded state.', '') , true) +
       '</div></main>' +
       '<aside class="right"><div class="rpanel"><div class="rpanel-h"><b>Gates</b><span class="right">HONEST STATE</span></div><div class="rpad">' + gatesMarkup() + '</div></div><div class="rpanel"><div class="rpanel-h"><b>How this stays honest</b><span>READ ONLY</span></div><div class="rpad note">Every value comes from task/slice/toolpack state, project manifests, engine probe state and live artifact files. Cache and scheduler cards stay empty until opt-in runs record stats; they never invent hits or workers.</div></div></aside>';

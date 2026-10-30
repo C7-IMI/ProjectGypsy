@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.30.010
+Current version: 2026.10.30.011
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,18 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.30.011
+
+**P1 increment: explicit asset dependency graph, cycle/layer validation and byte budgets.**
+
+- Date: 2026-10-30
+- Commit: this change.
+- Change: assets/registry/dependencies.json explicit hero derivation edges with basis; workstream/asset_graph.py graph
+  builder, unknown/self/cycle checks, roots/leaves/layers and per-media budgets; gypsy asset-graph; /api/asset-graph;
+  Insights Asset graph card; ADR-023.
+- Verification: 31 nodes, 3 edges, 28 roots, 30 leaves, 2 layers, 0 cycles; budgets image 2,810,207/10,485,760,
+  model 6,379,508/10,485,760, text 70,643/1,048,576; 25 graph tests; full suite 554 tests; check_all 6/6.
 
 ## 2026.10.30.010
 
