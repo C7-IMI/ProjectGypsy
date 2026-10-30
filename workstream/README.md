@@ -47,6 +47,8 @@ python workstream/gypsy.py provenance sign ARTIFACT... [--write FILE] [--state-d
 python workstream/gypsy.py provenance verify FILE [--state-dir DIR]
 python workstream/gypsy.py provenance sbom [--write FILE]
 python workstream/gypsy.py asset-graph [--dependencies FILE] [--write] [--json]
+python workstream/gypsy.py traces [--otel] [--write] [--json]
+python workstream/remote_worker.py --cert CERT --key KEY --port 8768
 python workstream/gypsy.py cache serve [--host 127.0.0.1] [--port 8767] [--root DIR]
 python workstream/gypsy.py cache remote [--url URL] [--json]
 python workstream/gypsy.py catalog [--root DIR] [--json] [--save-state]
@@ -129,6 +131,9 @@ python -m unittest discover -s workstream/tests -v
   `gypsy provenance sign|verify|sbom`); local integrity, not PKI/code signing.
 - Asset graph: explicit asset dependencies, cycle/layer validation and per-media byte budgets
   (`workstream/asset_graph.py`, `gypsy asset-graph`, `/api/asset-graph`); no inferred importer graph.
+- Remote worker: TLS-only coordinator + worker for allowlisted read-only jobs (`hero.wayfarer.validate` and engine
+  probes) in isolated git worktrees; no arbitrary remote command execution. `remote_worker.py` and `/api/traces` are
+  separate from the local traces card.
 
 ## What is not built yet
 

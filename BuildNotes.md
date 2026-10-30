@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.30.011
+Current version: 2026.10.30.012
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,19 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.30.012
+
+**P1 increment: TLS remote worker with isolated jobs and local hierarchical traces.**
+
+- Date: 2026-10-30
+- Commit: this change.
+- Change: workstream/remote_worker.py TLS-only coordinator/client/worker with required bearer token, explicit
+  read-only allowlist (hero.wayfarer.validate + engine probes), isolated git worktree per job, queue lifecycle and
+  bounded payloads; workstream/traces.py state-derived run/slice/toolpack traces with local OTEL shape; gypsy traces;
+  /api/traces; Insights Run traces card; ADR-024/ADR-025.
+- Verification: worker 26 tests + real TLS loopback job 0.88s passed, wrong token 401, wrong CA/plaintext refused;
+  traces 61 traces/191 spans (53 ok, 8 error, 0 problems); full suite **601 tests OK (3 skipped)**; check_all 6/6.
 
 ## 2026.10.30.011
 

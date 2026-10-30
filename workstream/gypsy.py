@@ -859,6 +859,11 @@ def main(argv=None) -> int:
             toolpack_cmd.add_argument("--parallel", type=int, default=1, help="opt-in parallel workers for independent actions (1-8)")
             toolpack_cmd.add_argument("--no-cache", action="store_true", help="disable the action cache for this run")
 
+    traces_parser = sub.add_parser("traces", help="hierarchical run traces")
+    traces_parser.add_argument("--otel", action="store_true", help="emit the local OTEL-compatible shape")
+    traces_parser.add_argument("--write", action="store_true", help="write workstream/state/traces.json")
+    traces_parser.add_argument("--json", action="store_true")
+
     asset_graph_parser = sub.add_parser("asset-graph", help="asset dependency graph and byte budgets")
     asset_graph_parser.add_argument("--dependencies", default=None, help="dependency sidecar path")
     asset_graph_parser.add_argument("--write", action="store_true", help="write workstream/state/assets/graph.json")
@@ -1240,6 +1245,23 @@ def main(argv=None) -> int:
                 if data.get("dryRun"):
                     return 0 if data.get("ok") else 1
                 return 0 if data.get("passed") else 1
+
+        if args.command == "traces":
+            import traces as trace_spec
+
+            data = trace_spec.collect()
+            if args.otel:
+                data = trace_spec.to_otel(data)
+            if args.write:
+                path = STATE_DIR / "traces.json"
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+                data["statePath"] = str(path)
+            if args.json:
+                print(json.dumps(data, indent=2))
+            else:
+                print(trace_spec.render_summary(data))
+            return 0
 
         if args.command == "asset-graph":
             import asset_graph as graph_spec

@@ -1047,6 +1047,26 @@ def _run_detail(run_id, state_root=None):
     }
 
 
+def _traces_summary():
+    try:
+        import traces as trace_spec
+        payload = trace_spec.collect()
+    except Exception as exc:
+        return {"available": False, "error": type(exc).__name__ + ": " + str(exc)}
+    counts = payload.get("counts") or {}
+    return {
+        "available": True,
+        "traces": len(payload.get("traces", [])),
+        "spans": counts.get("spans", 0),
+        "status": {
+            "ok": counts.get("okTraces", 0),
+            "error": counts.get("errorTraces", 0),
+            "unset": counts.get("unsetTraces", 0),
+        },
+        "problems": payload.get("errors") or [],
+    }
+
+
 def _asset_graph_summary():
     try:
         import asset_graph as graph_spec
@@ -1184,6 +1204,7 @@ def collect_state():
         "assetRegistry": asset_registry,
         "provenance": _provenance_summary(),
         "assetGraph": _asset_graph_summary(),
+        "traces": _traces_summary(),
         "cache": insights["cache"],
         "scheduler": insights["scheduler"],
         "commands": [{"id": key, **value} for key, value in COMMANDS.items()],
@@ -1468,6 +1489,13 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.path == "/api/state":
             try:
                 self._json(HTTPStatus.OK, collect_state())
+            except Exception as exc:
+                self._json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": type(exc).__name__ + ": " + str(exc)})
+            return
+        if parsed.path == "/api/traces":
+            try:
+                import traces as trace_spec
+                self._json(HTTPStatus.OK, trace_spec.collect())
             except Exception as exc:
                 self._json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": type(exc).__name__ + ": " + str(exc)})
             return

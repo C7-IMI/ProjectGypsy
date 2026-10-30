@@ -337,6 +337,14 @@
     var findings = (g.budgetFindings || []).length;
     return '<div class="stats4">' + cells + '</div><p class="lead">Explicit asset dependencies only; budget checks are byte totals per media kind.</p><div class="src">' + esc(findings + ' budget finding(s), ' + (g.warnings || []).length + ' warning(s)') + '</div>';
   }
+    function tracesCard() {
+    var t = (state && state.traces) || {};
+    if (t.error) return emptyState('Traces unavailable', t.error, '');
+    if (t.available === false) return emptyState('No traces yet', 'Run python workstream/gypsy.py traces --write to record them.', '');
+    var s = t.status || {};
+    var cells = stat('Traces', t.traces || 0) + stat('Spans', t.spans || 0) + stat('OK', s.ok || 0) + stat('Errors', s.error || 0);
+    return '<div class="stats4">' + cells + '</div><p class="lead">Local hierarchical traces derived from state. Not live instrumentation.</p><div class="src">' + esc((t.problems || []).length + ' problem trace(s)') + '</div>';
+  }
     function renderInsights() {
     shell.className = 'body';
     var ins = insight();
@@ -355,6 +363,7 @@
       insightCard('Asset registry', 'READ-ONLY', assetsCard()) +
       insightCard('Provenance + SBOM', 'SIGNED / LOCAL', provenanceCard()) +
       insightCard('Asset graph', 'DECLARED EDGES', assetGraphCard()) +
+      insightCard('Run traces', 'LOCAL / STATE-DERIVED', tracesCard()) +
       insightCard('Next actions', 'ACTIONABLE', actions || emptyState('No actions', 'Nothing needs attention in the recorded state.', '') , true) +
       '</div></main>' +
       '<aside class="right"><div class="rpanel"><div class="rpanel-h"><b>Gates</b><span class="right">HONEST STATE</span></div><div class="rpad">' + gatesMarkup() + '</div></div><div class="rpanel"><div class="rpanel-h"><b>How this stays honest</b><span>READ ONLY</span></div><div class="rpad note">Every value comes from task/slice/toolpack state, project manifests, engine probe state and live artifact files. Cache and scheduler cards stay empty until opt-in runs record stats; they never invent hits or workers.</div></div></aside>';

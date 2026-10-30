@@ -111,8 +111,9 @@ reads it separately.
 
 Budgets are optional. The sidecar may set `"budgets": {"model": 8388608}`, and a `--budget` flag overrides
 it. With no budget configured the graph reports `not-configured` plus a warning and does **not** fail; a
-configured and exceeded budget is a finding and fails `--validate`. The committed sidecar configures no
-budgets because no per-media byte limits are agreed yet (ADR-002 O5 leaves LOD/poly budgets open).
+configured and exceeded budget is a finding and fails `--validate`. The committed sidecar configures prototype byte
+ceilings (image/model/audio/binary 10 MiB, text 1 MiB) as validation defaults, not final art budgets; ADR-002 O5
+still leaves LOD/poly budgets open.
 
 ## State
 `--save-state` writes the validated payload to `workstream/state/assets.json` atomically

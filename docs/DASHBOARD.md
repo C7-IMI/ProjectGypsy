@@ -12,7 +12,7 @@ the port. Stop with Ctrl+C. The server binds 127.0.0.1 only.
 | View | What it is for |
 | --- | --- |
 | **Overview** (default) | Next best action, pipeline, recent runs, artifacts, readiness checklist, grouped gates |
-| **Insights** | Plain-language engine/default, last-run health, quality/gates, cache, scheduler, run metrics, asset registry, provenance/SBOM, asset graph and next actions |
+| **Insights** | Plain-language engine/default, last-run health, quality/gates, cache, scheduler, run metrics, asset registry, provenance/SBOM, asset graph, traces and next actions |
 | **Projects** | Read-only project catalog: engine/version, targets, manifest health, paths; no filesystem browsing |
 | **Run detail** | Step timeline, log, validator evidence, artifacts, retry/re-run controls |
 | **Slices** | Slice table, step progress, duration, artifacts; run/open actions |
@@ -85,6 +85,7 @@ never sends argv.
 - `GET /api/assets` — read-only asset registry (`gypsy.asset-registry/v1`) with hashes, duplicates and provenance warnings.
 - `GET /api/provenance` — latest signed artifact summary/SBOM counts, without exposing the signing key.
 - `GET /api/asset-graph` — explicit asset dependency graph summary, cycle counts and budget status.
+- `GET /api/traces` — local hierarchical traces (`gypsy.trace/v1`), not live OTel instrumentation.
 - `GET /api/runs` — newest-first run summaries from task and toolpack state.
 - `GET /api/run?id=...` — one run's steps, artifacts and validators; the id is a state path under workstream/state.
 - `GET /api/job` — current job output; `POST /api/run` starts a whitelisted action.

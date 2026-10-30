@@ -90,6 +90,15 @@ emulator scope.
 - Budgets: image 2.81 MB / 10 MB; model 6.38 MB / 10 MB; text 70.6 KB / 1 MB; all OK.
 - CLI `asset-graph`, API `/api/asset-graph`, Insights Asset graph card; 25 graph tests; full suite **554 tests**.
 
+## P1 increment: remote worker and traces
+
+- **TLS remote worker**: TLS 1.2+ only, bearer token on every endpoint, allowlist-only jobs (hero validate/engine probes),
+  isolated git worktree per job, queue lifecycle/idempotency. Real loopback TLS job completed in 0.88 s; wrong token 401;
+  wrong CA and plaintext refused; main checkout untouched.
+- **Traces**: 61 traces / 191 spans, 53 ok / 8 error, 0 problems; local state-derived, not live OTel.
+- **Surfaces**: gypsy traces, /api/traces, Insights Run traces card; ADR-024/025.
+- Full suite **601 tests**.
+
 ## Remaining external gates (not software-buildable here)
 
 The following remain **blocked by hardware, accounts/spend, or a missing upstream capability**. They are not silently
