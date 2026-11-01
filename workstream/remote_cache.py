@@ -376,6 +376,26 @@ def _handler_for(store: RemoteCacheStore, token: str, verbose: bool):
                 return None
             return data
 
+        def _drain_request_body(self):
+            """Drain a small request body before a pre-read validation error.
+
+            Closing while the client is still writing makes some clients report a reset
+            instead of the HTTP status. This is only used on error paths that have not
+            consumed Content-Length yet.
+            """
+            raw = self.headers.get("Content-Length")
+            if raw is None:
+                return
+            try:
+                remaining = min(int(raw), 64 * 1024 * 1024)
+            except (TypeError, ValueError):
+                return
+            while remaining > 0:
+                chunk = self.rfile.read(min(65536, remaining))
+                if not chunk:
+                    break
+                remaining -= len(chunk)
+
         def _path(self) -> str:
             return urlsplit(self.path).path
 
@@ -447,6 +467,7 @@ def _handler_for(store: RemoteCacheStore, token: str, verbose: bool):
                 try:
                     key = validate_key(parts[3], label="entry key")
                 except RemoteCacheError as exc:
+                    self._drain_request_body()
                     self._error(400, str(exc))
                     return
                 body = self._read_body(store.max_entry_bytes)
@@ -468,6 +489,7 @@ def _handler_for(store: RemoteCacheStore, token: str, verbose: bool):
                 try:
                     digest = validate_digest(parts[3], label="blob sha256")
                 except RemoteCacheError as exc:
+                    self._drain_request_body()
                     self._error(400, str(exc))
                     return
                 body = self._read_body(store.max_blob_bytes)

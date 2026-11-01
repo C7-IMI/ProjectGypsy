@@ -35,7 +35,8 @@ to generate (PG-D7 does not apply); the game export and captures are generated a
   MOCAPANYTHING guide and docs.
 - Verification: test suite 618 OK; 52 capabilities; 9 Mocap toolkit tests; real probe repo/Python/torch/CPU/checkpoint/
   data present; real inference attempt failed because the repo's preprocessing calls CUDA while torch is CPU-only
-  (all frames failed; no artifact), so inferenceVerified=false; pre-existing expected artifacts are rejected as outputs. No model pass claimed.
+  (all frames failed; no artifact), so inferenceVerified=false; pre-existing expected artifacts are rejected as outputs. Also fixed
+the remote-cache invalid-id PUT connection-reset flake by draining the rejected body before 400. No model pass claimed.
 
 ## 2026.10.31.013
 
