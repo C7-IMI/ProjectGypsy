@@ -89,6 +89,14 @@ def probe():
     checkpoint = home / "checkpoints" / "video2pos2rot_epoch60.pt"
     data = home / "demo" / "data"
     configs = home / "demo" / "configs"
+    evidence = None
+    try:
+        evidence_path = Path(__file__).resolve().parents[2] / "docs" / "evidence" / "mocapanything-trial.json"
+        candidate = json.loads(evidence_path.read_text(encoding="utf-8"))
+        if isinstance(candidate, dict) and candidate.get("schema") == "gypsy.mocapanything-evidence/v1":
+            evidence = candidate
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        evidence = None
     return {
         "toolkit": TOOLKIT_ID,
         "repo": str(home),
@@ -104,7 +112,8 @@ def probe():
         "configs": str(configs),
         "configsExist": configs.is_dir(),
         "ready": bool(home.is_dir() and python_info.get("ok") and checkpoint.is_file()),
-        "inferenceVerified": False,
+        "inferenceVerified": bool(evidence and evidence.get("result") == "pass"),
+        "evidence": evidence,
         "checkedAt": toolkit_core.utc_now_iso(),
         "notes": [
             "ready means the repo, Python/torch and checkpoint are present; it does not mean inference was run.",
@@ -156,6 +165,8 @@ def infer(config, expect=None, timeout=DEFAULT_TIMEOUT):
     argv = [*_python_command(), "inference/video2pose2rot.py", "--config", config_rel]
     env = os.environ.copy()
     env["PYTHONPATH"] = str(home) + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
+    env["PYTHONIOENCODING"] = "utf-8"
+    env["PYTHONUTF8"] = "1"
     completed = _run(argv, home, timeout, env)
     if completed is None:
         raise MocapAnythingError("inference did not start or timed out")

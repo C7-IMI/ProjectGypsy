@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.11.01.014
+Current version: 2026.11.01.015
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,20 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.11.01.015
+
+**MocapAnything real inference verified: CUDA first, CPU fallback.**
+
+- Date: 2026-11-01
+- Commit: this change.
+- Change: torch 2.9.0+cu126 installed in the external venv; CUDA/CPU short-clip inference; UTF-8 process env and mobile
+  CLI integration already present; docs/evidence and ADR-027 updated. External repo patches: image_process device
+  inference, common DINO device/dtype, video2pose2rot float32 DINO on CPU.
+- Verification: 34-frame Jaguar clip; CUDA 26 s (35 s trial), 3,851/4,096 MiB VRAM, no OOM, success 1/0; CPU 98 s
+  (106 s), success 1/0. BVH 46,286 B, CUDA sha 8526f277..., CPU sha 8b37e909...; validate passed 34 frames/38
+  joints/39 channels; GT 46,256 B. 618 tests, 6/6 check_all.
+- Limits: one short zoo clip with GT; no retarget/custom rig/Blender render; upstream MPJPE logs only.
 
 ## 2026.11.01.014
 

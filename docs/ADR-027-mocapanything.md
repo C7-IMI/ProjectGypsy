@@ -25,18 +25,25 @@ code and V2 weights; RMBG-1.4 and Truebones data have separate terms.
    hero/export/import pipeline.
 6. Do not bundle weights, the repo or third-party data; keep the external environment separate.
 
-## Evidence (at implementation time)
+## Evidence (verified 2026-11-01)
 
-- Repo cloned at C:\GameTools\MocapAnything; Python 3.10.11 venv; torch 2.9.0+cpu.
-- Checkpoint present: video2pos2rot_epoch60.pt, 463,907,650 bytes.
-- Demo data download completed (5,293 files / 1.70 GB); GPU CUDA/PyTorch was not installed.
-- Toolkit status: ready=true, inferenceVerified=false. A real inference attempt failed at CUDA preprocessing (CPU-only torch), so no inference pass is claimed.
-- 7 toolkit tests (fake environment; real probe skips appropriately).
+- Repo at C:\GameTools\MocapAnything; Python 3.10.11 venv; **torch 2.9.0+cu126**; CUDA true; device NVIDIA T600 Laptop GPU.
+- Checkpoint: video2pos2rot_epoch60.pt, 463,907,650 bytes; demo data 5,293 files / 1.70 GB.
+- **CUDA short clip:** Jaguar#Jaguar-Run_y60, 34 frames, 720x720@30; inference 26 s, total 35 s, upstream success
+  1 / fail 0; nvidia-smi 3,851/4,096 MiB, 100% GPU, no OOM.
+- **CPU fallback:** same clip, inference 98 s, total 106 s, success 1 / fail 0, GPU idle.
+- **BVH:** 46,286 B; CUDA SHA-256 8526f277...367628; CPU 8b37e909...39a900; Gypsy validate passed=true,
+  34 frames, 38 joints, 39 channels, frameTime 0.033333. GT 46,256 B / 5791a87c...fc44c77.
+- Upstream log MPJPE: CUDA 0.034979/0.055443; CPU 0.034973/0.055443 (not independently benchmarked).
+- A first attempt failed on cp1252 printing an arrow; UTF-8 rerun passed. `torch.utils.serialization` did not reproduce
+  in fresh processes; it was a process imported while uv replaced torch files.
+- 9 toolkit tests (fake environment; live probe only when installed).
 
 ## Limits
 
-- 4 GB VRAM is not validated for the model; the installed torch build is CPU-only.
-- CPU inference may be slow; no performance claim.
+- One short zoo clip with a GT reference; no retarget/custom-rig/Blender render.
+- CUDA vs CPU BVH bytes differ due floating point; counts/validation match.
+- No performance claim beyond the observed 26 s CUDA / 98 s CPU clip; no full-demo benchmark.
 - Custom-rig pipeline is validated upstream only on a Truebones Zoo rig; the Wayfarer rig is untested.
 - No automatic video-to-engine retargeting; Blender is required.
 - Third-party licences/data remain the operator's responsibility.

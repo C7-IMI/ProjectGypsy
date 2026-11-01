@@ -113,8 +113,9 @@ emulator scope.
 - External clone: C:\GameTools\MocapAnything; Python 3.10.11 venv; torch 2.9.0+cpu; checkpoint 463,907,650 B;
   demo data 1.63 GB.
 - Gypsy toolkit: status/infer/validate, capability and ADR-027.
-- Real probe: repo/Python/torch/checkpoint/data present. **Inference not verified:** a real attempt failed because
-  preprocessing calls CUDA while torch is CPU-only; all frames failed, no artifact. inferenceVerified=false.
+- Real inference **verified** on a 34-frame Jaguar clip: CUDA 26 s (3,851/4,096 MiB, no OOM) and CPU 98 s, both
+  success 1/0; BVH 46,286 B validated at 34 frames/38 joints/39 channels; GT 46,256 B.
+- Limits: one short zoo clip with GT; no retarget/custom rig/Blender render; upstream MPJPE logs only.
 - 7 Mocap tests; full suite **616 tests**; 52 capabilities.
 
 ## Remaining external gates (not software-buildable here)

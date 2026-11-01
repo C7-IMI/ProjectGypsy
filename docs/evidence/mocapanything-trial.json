@@ -1,0 +1,41 @@
+{
+  "schema": "gypsy.mocapanything-evidence/v1",
+  "date": "2026-11-01",
+  "result": "pass",
+  "clip": "Jaguar#Jaguar-Run_y60",
+  "frames": 34,
+  "resolution": "720x720@30",
+  "cuda": {
+    "torch": "2.9.0+cu126",
+    "device": "NVIDIA T600 Laptop GPU",
+    "inferenceSeconds": 26,
+    "trialSeconds": 35,
+    "vramUsedMiB": 3851,
+    "vramTotalMiB": 4096,
+    "oom": false,
+    "success": "1/0"
+  },
+  "cpu": {
+    "inferenceSeconds": 98,
+    "trialSeconds": 106,
+    "success": "1/0"
+  },
+  "bvh": {
+    "bytes": 46286,
+    "frames": 34,
+    "joints": 38,
+    "channels": 39,
+    "frameTime": 0.033333,
+    "cudaSha256": "8526f277eaf5da7159579eec5bf83dca40353ea557143562a680d3e7bb367628",
+    "cpuSha256": "8b37e909"
+  },
+  "gt": {
+    "bytes": 46256,
+    "sha256": "5791a87c"
+  },
+  "limits": [
+    "one short zoo clip with GT reference",
+    "no retarget/custom rig/Blender render",
+    "upstream MPJPE logs only"
+  ]
+}

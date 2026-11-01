@@ -491,5 +491,14 @@ Each entry has:
 
 ---
 
-Next prompt number: 49. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 49 - 2026-11-01
+
+- Request: Try CUDA first; if that fails, patch/adapt the CPU MocapAnything path.
+- Status: Both verified on one short clip; real BVH produced and validated.
+- Version: 2026.11.01.015
+- Evidence: CUDA 26 s / 3,851 MiB / no OOM; CPU 98 s; BVH 46,286 B; 34 frames/38 joints; 618 tests.
+
+---
+
+Next prompt number: 50. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

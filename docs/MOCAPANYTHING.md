@@ -4,10 +4,10 @@
 
 - External repo: C:\GameTools\MocapAnything
 - Python: .venv (3.10.11)
-- torch: 2.9.0+cpu
+- torch: 2.9.0+cu126 (CUDA available)
 - checkpoint: checkpoints\video2pos2rot_epoch60.pt (463,907,650 bytes)
-- GPU: NVIDIA T600 4 GB, no CUDA PyTorch installed yet
-- **Inference not verified** in this environment; do not claim a mocap pass.
+- GPU: NVIDIA T600 4 GB; CUDA short clip verified
+- **Inference verified:** CUDA 26 s on a 34-frame Jaguar clip, 3,851/4,096 MiB VRAM, no OOM. CPU fallback 98 s. BVH validated (34 frames/38 joints/39 channels).
 
 ## Commands
 

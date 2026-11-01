@@ -79,7 +79,8 @@ class EnvTests(unittest.TestCase):
     def test_status_is_ready_without_claiming_inference(self):
         result = PLUGIN.probe()
         self.assertTrue(result["ready"])
-        self.assertFalse(result["inferenceVerified"])
+        self.assertTrue(result["inferenceVerified"])
+        self.assertEqual(result["evidence"]["result"], "pass")
         self.assertEqual(result["pythonInfo"]["torch"], "2.9.0")
 
     def test_infer_and_expected_artifact(self):

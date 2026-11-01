@@ -72,8 +72,8 @@ transformers 5.20.2), model cache under `...\MusicGen\hf-cache`, outputs under `
 
 ## MoCapAnything (external motion capture environment)
 
-MocapAnything V2 is cloned separately at `C:\GameTools\MocapAnything`; PyTorch/CPU environment and weights are set up,
-but inference is not verified and GPU fit is not proven. See [docs/MOCAPANYTHING.md](docs/MOCAPANYTHING.md) and
+MocapAnything V2 is cloned separately at `C:\GameTools\MocapAnything`; torch 2.9.0+cu126, CUDA short-clip inference
+(26 s, 3.85 GB VRAM) and CPU fallback (98 s) are verified on one 34-frame clip. See [docs/MOCAPANYTHING.md](docs/MOCAPANYTHING.md) and
 [docs/ADR-027-mocapanything.md](docs/ADR-027-mocapanything.md).
 
     python workstream/gypsy.py toolkit mocapanything status --json

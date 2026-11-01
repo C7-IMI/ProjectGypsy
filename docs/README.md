@@ -45,6 +45,7 @@
 | [UPGRADE-REPORT-2026-10-30.md](UPGRADE-REPORT-2026-10-30.md) | implementation report: cache, parallel, quality gates, catalog, UI, device/Unity evidence and limits |
 | [SCULPTFORGE.md](SCULPTFORGE.md) | design workflow for SculptForge + Blender bridge and headless commands |
 | [MOCAPANYTHING.md](MOCAPANYTHING.md) | external MoCapAnything environment, commands and retarget workflow |
+| [evidence/mocapanything-trial.json](evidence/mocapanything-trial.json) | CUDA 26 s / CPU 98 s short-clip BVH evidence |
 | [DASHBOARD.md](DASHBOARD.md) | launch/use guide for the operations console, Insights and classic views |
 | [DEVICE-LAUNCH.md](DEVICE-LAUNCH.md) | emulator launch PASS (physical device untested), evidence and limits |
 | [DEVICE-EVIDENCE.json](DEVICE-EVIDENCE.json) | machine-readable emulator evidence and screenshot hash |

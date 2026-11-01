@@ -49,7 +49,7 @@ Python libraries installed into `C:\Python\python.exe`: `scipy`, `trimesh`, `pyg
 | Tool | Version | Role |
 | --- | --- | --- |
 | Blender | 5.2.3 LTS (Python 3.13.13) | 3D assets, sculpt, rig, animation, texture bake, glTF/FBX/USD export (headless verified) |
-| MoCapAnything V2 | external clone at C:\GameTools\MocapAnything | video-to-BVH motion capture for arbitrary skeletons; Python 3.10/CPU torch installed; checkpoint 463,907,650 bytes (442.4 MiB); GPU/inference unverified; MIT code/weights (third-party data separate) |
+| MoCapAnything V2 | external clone at C:\GameTools\MocapAnything | video-to-BVH motion capture for arbitrary skeletons; Python 3.10/torch 2.9.0+cu126; checkpoint 463,907,650 bytes (442.4 MiB); CUDA 26 s and CPU 98 s on a 34-frame clip; BVH validated; MIT code/weights (third-party data separate) |
 | SculptForge | 0.9.6 | headless sculpt CLI: open, LODs, GLB/FBX/USD export, Blender bridge send/receive; GPL-3.0-or-later; Blender bridge extension 0.9.6; no GUI automation |
 | Wayfarer hero pipeline | in-repo | Blender 5.2.3 generator + 23-joint rig/cape + idle/run/reach + 512² base/normal/roughmetal maps + LOD1/LOD2 + GLB/FBX + non-Blender validator; Godot integration under Player |
 | Krita | 5.3.4.1 | painting, concept art, texture layers (limited headless scripting) |
