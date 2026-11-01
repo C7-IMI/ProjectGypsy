@@ -99,6 +99,15 @@ emulator scope.
 - **Surfaces**: gypsy traces, /api/traces, Insights Run traces card; ADR-024/025.
 - Full suite **601 tests**.
 
+## SculptForge integration (2026-10-31)
+
+- Toolkit plugin: status, lods, convert, bridge-send, bridge-receive; project-confined paths; fixed CLI templates.
+- Real SculptForge 0.9.6 status: CLI installed, Blender bridge add-on found, exchange exists, no heartbeat at probe.
+- Real headless LODs: LOD0 46,208 B, LOD1 26,340 B, LOD2 15,748 B, LOD3 10,360 B with SHA-256.
+- Real bridge-send: to_blender/manifest.json + r1_000.GoZ created through the configured exchange.
+- 8 toolkit tests; full suite **609 tests**; 51 capabilities.
+- Limit: bridge receive needs Blender to send an inbound mesh; live GUI automation is not claimed.
+
 ## Remaining external gates (not software-buildable here)
 
 The following remain **blocked by hardware, accounts/spend, or a missing upstream capability**. They are not silently

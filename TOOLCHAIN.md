@@ -48,6 +48,7 @@ python workstream/gypsy.py engines probe
 | --- | --- | --- | --- |
 | Godot | 4.7.2 | `%LOCALAPPDATA%\Microsoft\WinGet\Links\godot.exe` | reference adapter; headless smoke, export, exported-binary demo and windowed capture all pass |
 | Unity | 6000.6.7f1 | `C:\Program Files\Unity 6000.6.7f1\Editor\Unity.exe` | installed; licence + LeftBehind Windows build/demo/capture pass; **new-project default (ADR-018)**; Android Build Support not installed; asset import not run |
+| SculptForge | 0.9.6 | `C:\Program Files\SculptForge\bin\sculptforge-cli.exe` | installed; headless LOD/convert real; Blender bridge extension 0.9.6 installed; exchange folder configured; live GUI/heartbeat not running at probe |
 | Unreal Engine 5 | 5.8.4 | `D:\UnrealEngine\UE_5.8\Engine\Binaries\Win64\UnrealEditor-Cmd.exe` | detected; hardware gate fails (4 GB VRAM, 51.5 GB free on D) |
 | Flax | 1.13 | `C:\Program Files (x86)\Flax\Flax_1.13\Binaries\Editor\Win64\Release\FlaxEditor.exe` | experimental; no headless path demonstrated |
 
@@ -68,6 +69,14 @@ transformers 5.20.2), model cache under `...\MusicGen\hf-cache`, outputs under `
 - **Licence: model weights CC-BY-NC 4.0 — non-commercial. Prototype only; not for shipping audio.** See
   [docs/ADR-004-generative-media.md](docs/ADR-004-generative-media.md).
 - YuE2 is **not** installed: it requires Linux + Python 3.12 + a 24 GB BF16 GPU (PG-D10).
+
+## SculptForge (installed sculpting application)
+
+SculptForge 0.9.6 is installed with the CLI, the Blender bridge extension and the exchange folder. See
+[docs/SCULPTFORGE.md](docs/SCULPTFORGE.md) and [docs/ADR-026-sculptforge.md](docs/ADR-026-sculptforge.md).
+
+    python workstream/gypsy.py toolkit sculptforge status --json
+    python workstream/gypsy.py toolkit sculptforge lods --project . --input assets/hero/wayfarer.glb --output artifacts/sculptforge/wayfarer.glb --levels 3 --ratio 0.5 --force
 
 ## ActionForge (hosted CC0 animation library)
 

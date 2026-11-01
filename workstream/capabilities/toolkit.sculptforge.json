@@ -1,0 +1,78 @@
+{
+  "schema": "gypsy.capability/v1",
+  "file": "toolkit.sculptforge.json",
+  "id": "toolkit.sculptforge",
+  "layer": "art",
+  "tool": "sculptforge",
+  "kind": "sculpting",
+  "maturity": "partial",
+  "description": "Headless SculptForge LOD/convert commands and the SculptForge Blender bridge handoff, with project-confined paths and artifact hashes; live GUI automation and arbitrary remote execution are not claimed.",
+  "requires": [
+    "SculptForge 0.9.6 CLI",
+    "SculptForge Blender bridge add-on for bridge commands",
+    "Windows"
+  ],
+  "inputs": [
+    {
+      "name": "project",
+      "type": "path"
+    },
+    {
+      "name": "input",
+      "type": "path"
+    },
+    {
+      "name": "output",
+      "type": "path"
+    },
+    {
+      "name": "levels",
+      "type": "integer"
+    },
+    {
+      "name": "ratio",
+      "type": "number"
+    },
+    {
+      "name": "format",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "lods",
+      "type": "glb[]"
+    },
+    {
+      "name": "converted",
+      "type": "file"
+    },
+    {
+      "name": "bridge-manifest",
+      "type": "json"
+    },
+    {
+      "name": "provenance",
+      "type": "json"
+    }
+  ],
+  "checks": [
+    "SculptForge CLI is located and --help succeeds for status",
+    "Blender bridge extension and exchange folder are inspected honestly",
+    "input/output paths resolve inside the project and reject script metacharacters",
+    "LOD output files exist for every requested level",
+    "convert output exists and is hashed",
+    "bridge send reports whether the exchange manifest changed",
+    "bridge receive fails honestly when no returned mesh exists",
+    "SculptForge is not redistributed by Gypsy"
+  ],
+  "provenance": {
+    "record": [
+      "action",
+      "input",
+      "output",
+      "artifacts",
+      "checkedAt"
+    ]
+  }
+}

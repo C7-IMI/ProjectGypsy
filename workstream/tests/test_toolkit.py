@@ -176,9 +176,10 @@ class RegistryTests(unittest.TestCase):
     def test_registry_and_capability_link_validate(self):
         self.assertEqual(toolkit.registry_errors(), [])
         rows = toolkit.capability_rows()
-        self.assertEqual(len(rows), 1)
-        row = rows[0]
-        self.assertEqual(row["toolkit"], "actionforge")
+        by_toolkit = {row["toolkit"]: row for row in rows}
+        self.assertIn("actionforge", by_toolkit)
+        self.assertIn("sculptforge", by_toolkit)
+        row = by_toolkit["actionforge"]
         self.assertEqual(row["capability"], "toolkit.actionforge")
         self.assertTrue(row["exists"])
         self.assertEqual(row["schema"], "gypsy.capability/v1")
@@ -556,10 +557,11 @@ class CliTests(TemporaryProject):
         code, out, err = run_cli(["toolkit", "list", "--json"])
         self.assertEqual(code, 0, err)
         rows = json.loads(out)
-        self.assertEqual(len(rows), 1)
-        self.assertEqual(rows[0]["id"], "actionforge")
-        self.assertEqual(rows[0]["status"], "partial")
-        self.assertIn("CC0", rows[0]["license"])
+        by_id = {row["id"]: row for row in rows}
+        self.assertIn("actionforge", by_id)
+        self.assertIn("sculptforge", by_id)
+        self.assertEqual(by_id["actionforge"]["status"], "partial")
+        self.assertIn("CC0", by_id["actionforge"]["license"])
         code, out, err = run_cli(["toolkit", "show", "actionforge", "--json"])
         self.assertEqual(code, 0, err)
         data = json.loads(out)

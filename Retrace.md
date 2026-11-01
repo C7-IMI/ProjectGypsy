@@ -473,5 +473,14 @@ Each entry has:
 
 ---
 
-Next prompt number: 47. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 47 - 2026-10-31
+
+- Request: Extend Gypsy with SculptForge from the installed CLI and configured Blender bridge.
+- Status: SculptForge toolkit implemented, real CLI LOD/bridge evidence, docs and tests added.
+- Version: 2026.10.31.013
+- Evidence: status 0.9.6, bridge add-on found, real LOD0-3, bridge-send manifest; 8 tests; 609 total; 51 capabilities.
+
+---
+
+Next prompt number: 48. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

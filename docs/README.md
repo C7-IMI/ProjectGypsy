@@ -25,6 +25,7 @@
 | [ADR-023-asset-graph.md](ADR-023-asset-graph.md) | explicit asset dependency graph, cycle/layer validation and byte budgets |
 | [ADR-024-remote-worker.md](ADR-024-remote-worker.md) | TLS-only coordinator/worker, allowlisted jobs, isolated git worktree |
 | [ADR-025-traces.md](ADR-025-traces.md) | local hierarchical state-derived traces; not live OTel |
+| [ADR-026-sculptforge.md](ADR-026-sculptforge.md) | SculptForge CLI/LOD/convert and Blender bridge toolkit integration |
 | [ADR-017-hero-character-pipeline.md](ADR-017-hero-character-pipeline.md) | first hero character: art direction, Blender generator, 20-joint rig, idle/run/reach, atlas, GLB/FBX, Godot integration and validation |
 | [ART-DIRECTION.md](ART-DIRECTION.md) | Wayfarer art direction, palette, silhouette, rig/animation set and validation contract |
 | [ADR-015-actionforge-toolkit.md](ADR-015-actionforge-toolkit.md) | reusable toolkit/plugin registry, ActionForge CC0 rig/animation fetch, licence/provenance, network and path safety, what stays manual |
@@ -41,6 +42,7 @@
 | [UNITY-PORT-INSTRUCTIONS.md](UNITY-PORT-INSTRUCTIONS.md) | Stage B Unity migration/port instructions for UltraBlade 2 |
 | [IMPROVEMENT-ROADMAP.md](IMPROVEMENT-ROADMAP.md) | research-backed roadmap: cache/scheduler, QA, asset graph, DX, observability, agent safety |
 | [UPGRADE-REPORT-2026-10-30.md](UPGRADE-REPORT-2026-10-30.md) | implementation report: cache, parallel, quality gates, catalog, UI, device/Unity evidence and limits |
+| [SCULPTFORGE.md](SCULPTFORGE.md) | design workflow for SculptForge + Blender bridge and headless commands |
 | [DASHBOARD.md](DASHBOARD.md) | launch/use guide for the operations console, Insights and classic views |
 | [DEVICE-LAUNCH.md](DEVICE-LAUNCH.md) | emulator launch PASS (physical device untested), evidence and limits |
 | [DEVICE-EVIDENCE.json](DEVICE-EVIDENCE.json) | machine-readable emulator evidence and screenshot hash |

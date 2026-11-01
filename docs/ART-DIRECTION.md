@@ -29,6 +29,8 @@ weathered, not military or glossy.
 
 1. **Brief and palette** — this document plus assets/hero/ART-BRIEF.md.
 2. **Blockout** — primitive-based body and cloak at correct scale, origin at feet, forward −Y in Blender (Godot −Z).
+2b. **Sculpt pass (optional)** — send the blockout through the SculptForge Blender bridge, sculpt detail, return in
+    place, then continue. See [SCULPTFORGE.md](SCULPTFORGE.md); this is authoring, not a quality pass by itself.
 3. **Rig and skin** — armature with explicit bone names; automatic weights followed by cleanup; test poses.
 4. **Animation** — three actions on the same armature: idle, run, reach. Loop idle/run; reach is one-shot.
 5. **Texture/material** — hand-authored palette texture or procedural cloth/leather detail; PBR values; emissive map for

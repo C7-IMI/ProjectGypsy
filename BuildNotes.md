@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.30.012
+Current version: 2026.10.31.013
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,19 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.10.31.013
+
+**SculptForge design/toolkit integration.**
+
+- Date: 2026-10-31
+- Commit: this change.
+- Change: SculptForge 0.9.6 toolkit plugin (status, LODs, convert, bridge-send, bridge-receive), capability
+  toolkit.sculptforge, Blender bridge detection/heartbeat, project-confined paths, fixed CLI templates, artifact hashes;
+  ADR-026, SCULPTFORGE workflow guide, TOOLCHAIN/TOOL-INVENTORY/README updates.
+- Verification: real status installed 0.9.6, bridge add-on found, exchange exists, no heartbeat at probe; real headless
+  LODs LOD0-3 (46,208/26,340/15,748/10,360 B); real bridge-send created to_blender manifest/r1_000.GoZ; 8 toolkit
+  tests; full suite **609 tests OK (3 skipped)**; check_all 6/6; 51 capabilities.
 
 ## 2026.10.30.012
 

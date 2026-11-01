@@ -31,6 +31,11 @@ python workstream/gypsy.py capabilities list|check [--json]
 python workstream/gypsy.py toolkit list|show|probe|capabilities [--json]
 python workstream/gypsy.py toolkit actionforge catalog [--json]
 python workstream/gypsy.py toolkit actionforge fetch --project <dir> --clips idle_loop,walk_loop --rig
+python workstream/gypsy.py toolkit sculptforge status [--json]
+python workstream/gypsy.py toolkit sculptforge lods --project . --input assets/hero/wayfarer.glb --output artifacts/sculptforge/wayfarer.glb --levels 3 --ratio 0.5 --force
+python workstream/gypsy.py toolkit sculptforge convert --project . --input assets/hero/wayfarer.glb --output artifacts/sculptforge/wayfarer.fbx --format fbx --force
+python workstream/gypsy.py toolkit sculptforge bridge-send --project . --input assets/hero/wayfarer.glb
+python workstream/gypsy.py toolkit sculptforge bridge-receive --project . --output artifacts/sculptforge/received.glb --force
 python workstream/gypsy.py project init --path <dir>              # default: Unity 6000.6.7f1 / PC
 python workstream/gypsy.py project init --path game --engine godot --version 4.7.2 --targets pc  # legacy Godot
 python workstream/gypsy.py project show [--path game]
@@ -123,6 +128,8 @@ python -m unittest discover -s workstream/tests -v
   fallback, cache/scheduler cards with honest empty states, and actionable failures.
 - Project catalog: read-only discovery of `project.gypsy.json` manifests with health, duplicate detection and an optional
   state file; golden-path Unity/Godot templates under `templates/`.
+- SculptForge toolkit: installed CLI status, headless LOD/convert, and file-exchange Blender bridge send/receive;
+  project-confined paths and artifact hashes, no GUI automation or arbitrary command execution. See `docs/SCULPTFORGE.md`.
 - Asset registry: read-only hashed inventory under `assets/`, `game/assets/` and `unity/LeftBehind/Assets`, with
   duplicate-content groups and provenance warnings (`workstream/assets.py`, `gypsy assets`).
 - Metrics: state-derived task/slice/toolpack/cache/quality aggregates (`workstream/metrics.py`, `gypsy metrics`,
