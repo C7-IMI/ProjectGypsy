@@ -70,6 +70,14 @@ transformers 5.20.2), model cache under `...\MusicGen\hf-cache`, outputs under `
   [docs/ADR-004-generative-media.md](docs/ADR-004-generative-media.md).
 - YuE2 is **not** installed: it requires Linux + Python 3.12 + a 24 GB BF16 GPU (PG-D10).
 
+## MoCapAnything (external motion capture environment)
+
+MocapAnything V2 is cloned separately at `C:\GameTools\MocapAnything`; PyTorch/CPU environment and weights are set up,
+but inference is not verified and GPU fit is not proven. See [docs/MOCAPANYTHING.md](docs/MOCAPANYTHING.md) and
+[docs/ADR-027-mocapanything.md](docs/ADR-027-mocapanything.md).
+
+    python workstream/gypsy.py toolkit mocapanything status --json
+
 ## SculptForge (installed sculpting application)
 
 SculptForge 0.9.6 is installed with the CLI, the Blender bridge extension and the exchange folder. See

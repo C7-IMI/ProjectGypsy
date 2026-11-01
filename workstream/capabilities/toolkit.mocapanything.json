@@ -1,0 +1,52 @@
+{
+  "schema": "gypsy.capability/v1",
+  "file": "toolkit.mocapanything.json",
+  "id": "toolkit.mocapanything",
+  "layer": "art",
+  "tool": "mocapanything",
+  "kind": "animation",
+  "maturity": "experimental",
+  "description": "Inspect and run an external MoCapAnything V2 environment for video-to-BVH motion capture; requires separate torch/model weights, and inference passes only on a zero exit plus expected artifact.",
+  "requires": [
+    "MoCapAnything repository",
+    "Python 3.10 environment with PyTorch",
+    "model checkpoint",
+    "demo data for bundled configs",
+    "optional CUDA GPU"
+  ],
+  "inputs": [
+    {
+      "name": "config",
+      "type": "path"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "bvh",
+      "type": "file"
+    },
+    {
+      "name": "pose",
+      "type": "file"
+    },
+    {
+      "name": "media",
+      "type": "file"
+    }
+  ],
+  "checks": [
+    "repository, Python, torch and checkpoint presence are probed honestly",
+    "config must be a repository-local YAML file",
+    "inference passes only when the command exits 0 and an expected artifact exists if requested",
+    "BVH validation checks HIERARCHY/MOTION, joints, frame count and SHA-256",
+    "no automatic retarget into Gypsy/Godot/Unity is claimed"
+  ],
+  "provenance": {
+    "record": [
+      "config",
+      "returncode",
+      "artifacts",
+      "checkedAt"
+    ]
+  }
+}

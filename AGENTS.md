@@ -92,6 +92,7 @@ In this order:
    [`docs/ADR-024-remote-worker.md`](./docs/ADR-024-remote-worker.md),
    [`docs/ADR-025-traces.md`](./docs/ADR-025-traces.md),
    [`docs/ADR-026-sculptforge.md`](./docs/ADR-026-sculptforge.md),
+   [`docs/ADR-027-mocapanything.md`](./docs/ADR-027-mocapanything.md),
    [`docs/UNITY-SLICE.md`](./docs/UNITY-SLICE.md),
    [`docs/ENGINE-SMOKE.md`](./docs/ENGINE-SMOKE.md), [`docs/IMPORT-MATRIX.md`](./docs/IMPORT-MATRIX.md),
    the PHASE-1..5 evidence files and [`docs/PHASE-6-GATE.md`](./docs/PHASE-6-GATE.md).
@@ -106,6 +107,9 @@ In this order:
 
 ## The rules that bind every turn
 
+- **Always use Gypsy slices and subagents for every task, without exception.** Route verification through a slice and
+delegate a bounded, non-overlapping task to a subagent/teammate; the Lead integrates and records the result. Do not
+silently skip this because a task looks small.
 - **Never claim a check you did not run.** Report exactly what was verified, by what command, and what was not
   (§1.10, P1, Part 11.2).
 - **This is a game, not a web app.** No design-language, mockup-first, visual-bar, viewport, token-lint,
@@ -150,7 +154,7 @@ validators/provenance, a read-only terminal console, a live watcher, a performan
 APK, the Gypsy Studio operations console and classic four-view dashboard; **LeftBehind** proves the same slice on Unity 6
 (build, demo and capture); an action-level content cache, opt-in parallel execution, visual/performance quality gates, a
 project catalog with golden-path templates, the Projects/Insights/live-log dashboard and an authenticated loopback
-remote action cache, asset registry/provenance warnings, state-derived metrics and local HMAC provenance/SBOM, an explicit asset dependency/budget graph, TLS remote worker (allowlisted read-only jobs), local traces, and a SculptForge design/toolkit bridge; records and the one pack check list; the
+remote action cache, asset registry/provenance warnings, state-derived metrics and local HMAC provenance/SBOM, an explicit asset dependency/budget graph, TLS remote worker (allowlisted read-only jobs), local traces, a SculptForge design/toolkit bridge and an external MoCapAnything toolkit; records and the one pack check list; the
 ADRs; a golden Blender import matrix; MCP/ComfyUI/Poly Haven tooling, the safe self-extension pipeline and the first hero
 art/character pipeline (runtime LOD, driven Smile, spring cape). The Android **emulator launch passes** (boot, install,
 launch, render, screenshot, logcat); a physical device, touch/audio/rotation/performance and release signing remain

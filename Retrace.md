@@ -482,5 +482,14 @@ Each entry has:
 
 ---
 
-Next prompt number: 48. The version list is [BuildNotes.md](BuildNotes.md); the checks are
+## 48 - 2026-11-01
+
+- Request: Extend Gypsy with MocapAnything and actually set it up.
+- Status: External environment and Gypsy toolkit added; inference not verified (CPU torch vs CUDA preprocessing).
+- Version: 2026.11.01.014
+- Evidence: 616 tests, 52 capabilities, 7 Mocap tests; repo/Python/checkpoint/data present; failed inference recorded.
+
+---
+
+Next prompt number: 49. The version list is [BuildNotes.md](BuildNotes.md); the checks are
 [scripts/check_all.py](scripts/check_all.py).

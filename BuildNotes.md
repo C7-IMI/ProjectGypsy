@@ -1,6 +1,6 @@
 # BuildNotes - the changelog
 
-Current version: 2026.10.31.013
+Current version: 2026.11.01.014
 
 BuildNotes is ProjectGypsy's dated, versioned changelog (`<CHANGELOG>` in the pack). Newest entry first; versions
 are `YYYY.M.D.NNN` with a zero-padded sequence, and the next one is computed by
@@ -23,6 +23,19 @@ This changelog has **no generated documentation copies yet**. There is no contra
 to generate (PG-D7 does not apply); the game export and captures are generated artefacts under gitignored `build/` and
 `artifacts/`. [scripts/records_check.py](scripts/records_check.py) checks the source, its `Current version:` header and
 [Retrace.md](Retrace.md); it will compare generated copies when they exist.
+
+## 2026.11.01.014
+
+**MoCapAnything external environment/toolkit integration.**
+
+- Date: 2026-11-01
+- Commit: this change.
+- Change: cloned C7-IMI/MocapAnything to C:\GameTools\MocapAnything; Python 3.10 venv with torch 2.9.0 CPU;
+  checkpoint 463,907,650 B; demo data 1.63 GB; added toolkit plugin status/infer/validate, capability, ADR-027,
+  MOCAPANYTHING guide and docs.
+- Verification: test suite 618 OK; 52 capabilities; 9 Mocap toolkit tests; real probe repo/Python/torch/CPU/checkpoint/
+  data present; real inference attempt failed because the repo's preprocessing calls CUDA while torch is CPU-only
+  (all frames failed; no artifact), so inferenceVerified=false; pre-existing expected artifacts are rejected as outputs. No model pass claimed.
 
 ## 2026.10.31.013
 

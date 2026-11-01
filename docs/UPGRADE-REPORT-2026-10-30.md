@@ -108,6 +108,15 @@ emulator scope.
 - 8 toolkit tests; full suite **609 tests**; 51 capabilities.
 - Limit: bridge receive needs Blender to send an inbound mesh; live GUI automation is not claimed.
 
+## MoCapAnything integration (2026-11-01)
+
+- External clone: C:\GameTools\MocapAnything; Python 3.10.11 venv; torch 2.9.0+cpu; checkpoint 463,907,650 B;
+  demo data 1.63 GB.
+- Gypsy toolkit: status/infer/validate, capability and ADR-027.
+- Real probe: repo/Python/torch/checkpoint/data present. **Inference not verified:** a real attempt failed because
+  preprocessing calls CUDA while torch is CPU-only; all frames failed, no artifact. inferenceVerified=false.
+- 7 Mocap tests; full suite **616 tests**; 52 capabilities.
+
 ## Remaining external gates (not software-buildable here)
 
 The following remain **blocked by hardware, accounts/spend, or a missing upstream capability**. They are not silently
